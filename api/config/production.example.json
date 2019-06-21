@@ -1,0 +1,12 @@
+{
+    "serverPort": 8000,
+    "binance": {
+        "cli": "./cli/prod/0.5.8.1/mac/tbnbcli",
+        "api": "https://testnet-dex.binance.org/",
+        "network": "mainnet"
+    },
+    "database": {
+        "user": "",
+        "password": ""
+    }
+}

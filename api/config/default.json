@@ -1,0 +1,16 @@
+{
+    "serverPort": 8000,
+    "binance": {
+        "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
+        "api": "https://testnet-dex.binance.org/",
+        "network": "testnet"
+    },
+    "database": {
+        "host": "localhost",
+        "port": 5432,
+        "database": "lokibridge",
+        "user": "",
+        "password": ""
+    },
+    "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT IS USED TO ENCRYPT GENERATED ACCOUNTS"
+}
