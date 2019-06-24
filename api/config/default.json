@@ -1,5 +1,6 @@
 {
     "serverPort": 8000,
+    "useEncryption": false,
     "binance": {
         "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
         "api": "https://testnet-dex.binance.org/",
@@ -9,8 +10,21 @@
         "host": "localhost",
         "port": 5432,
         "database": "lokibridge",
-        "user": "",
+        "user": "postgres",
         "password": ""
+    },
+    "loki": {
+      "walletRPC": {
+        "host": "localhost",
+        "port": 18082,
+        "username": "",
+        "password": ""
+      },
+      "wallet": {
+        "filename": "My Wallet",
+        "password": "",
+        "accountIndex": 0
+      }
     },
     "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT IS USED TO ENCRYPT GENERATED ACCOUNTS"
 }

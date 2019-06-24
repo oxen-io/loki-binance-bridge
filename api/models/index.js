@@ -1,9 +1,9 @@
 /* eslint-disable no-extend-native */
 import sha256 from 'sha256';
 import crypto from 'crypto';
-import bip39 from 'bip39';
+import * as bip39 from 'bip39';
 import config from 'config';
-import { bnb, db } from '../helpers';
+import { bnb, db, loki } from '../helpers';
 import * as validator from './validators';
 import { SWAP_TYPE, TYPE } from './constants';
 
@@ -16,9 +16,9 @@ import { SWAP_TYPE, TYPE } from './constants';
  *  - address: An address. The type of address is determined from the `type` passed.
  *  E.g If `type = LOKI_TO_BNB` then the `address` is expected to be a loki address.
  */
-export function swapToken(res, req, next) {
+export function swapToken(req, res, next) {
   decryptPayload(req, res, next, async data => {
-    const result = validator.validateSwap(data);
+    const result = await validator.validateSwap(data);
     if (result != null) {
       res.status(400);
       res.body = { status: 400, success: false, result };
@@ -27,8 +27,11 @@ export function swapToken(res, req, next) {
 
     const { type, address } = data;
 
-    // We assume the address type is that of the currency we are swapping from.
-    const addressType = type === SWAP_TYPE.LOKI_TO_BNB ? TYPE.LOKI : TYPE.BNB;
+    // We assume the address type is that of the currency we are swapping to.
+    // So if the swap is LOKI_TO_BNB then we want the user to give the BNB address
+    // We then generate a LOKI address that they will deposit to.
+    // After the deposit we pay them out to the BNB address they passed.
+    const addressType = type === SWAP_TYPE.LOKI_TO_BNB ? TYPE.BNB : TYPE.LOKI;
 
     try {
       const account = await getClientAccount(address, addressType);
@@ -43,8 +46,7 @@ export function swapToken(res, req, next) {
         // Create a BNB account
         newAccount = bnb.createAccountWithMnemonic();
       } else if (addressType === TYPE.BNB) {
-        // TODO: Do loki account stuff
-        const lokiAccount = null;
+        newAccount = await loki.createAccount();
       }
 
       if (!newAccount) {
@@ -73,12 +75,62 @@ export function swapToken(res, req, next) {
  * Request Data:
  *  - uuid: The uuid that was returned in `swapToken` (client account uuid)
  */
-export function finalizeSwap(res, req, next) {
+export function finalizeSwap(req, res, next) {
+  decryptPayload(req, res, next, async data => {
+    const result = validator.validateFinalizeSwap(data);
+    if (result != null) {
+      res.status(400);
+      res.body = { status: 400, success: false, result };
+      return next(null, req, res, next);
+    }
 
+    const { uuid } = data;
+    try {
+      const clientAccount = await getClientAccountForUuid(uuid);
+      if (!clientAccount) {
+        res.status(400);
+        res.body = { status: 400, success: false, result: 'Unable to find swap details' };
+        return next(null, req, res, next);
+      }
+
+      const { accountAddress, accountType } = clientAccount;
+
+      const [transactions, swaps] = Promise.all([
+        getIncomingTransactions(accountAddress, accountType),
+        getSwaps(uuid),
+      ]);
+
+      if (!transactions || transactions.length === 0) {
+        res.status(400);
+        res.body = { status: 400, success: false, result: 'Unable to find a deposit' };
+        return next(null, req, res, next);
+      }
+
+      // Filter out any transactions we haven't added to our swaps db
+      const newTransactions = transactions.filter(tx => !swaps.find(s => s.deposit_transaction_hash === tx.hash));
+      if (newTransactions.length === 0) {
+        res.status(400);
+        res.body = { status: 400, success: false, result: 'Unable to find any new deposits' };
+        return next(null, req, res, next);
+      }
+
+      // Give back the new swaps to the user
+      const newSwaps = insertSwaps(newTransactions, clientAccount);
+      res.status(205);
+      res.body = { status: 200, success: true, result: newSwaps };
+    } catch (error) {
+      console.log(error);
+      res.status(500);
+      res.body = { status: 500, success: false, result: error };
+    }
+
+    return next(null, req, res, next);
+  });
 }
 
 /**
- * Create a BNB wallet
+ * Create a BNB wallet.
+ * This method is for creating a wallet from the frontend.
  */
 export function createBNBAccount(req, res, next) {
   const account = bnb.createAccountWithMnemonic();
@@ -139,6 +191,12 @@ function decrypt(text, seed) {
 
 /* Decrypt a request payload */
 function decryptPayload(req, res, next, callback) {
+  // Only decrypt if we use encryption
+  if (!config.get('useEncryption')) {
+    callback(req.body);
+    return null;
+  }
+
   const { m, e, t, s, u, p } = req.body;
 
   if (!m || !e || !t || !s || !u || !p) {
@@ -176,6 +234,38 @@ function decryptPayload(req, res, next, callback) {
 }
 
 /**
+ * Get the client account with the given uuid.
+ * The return of this functions SHOULD NOT be sent to the client.
+ *
+ * @param {*} uuid The unique identifier of the client account
+ */
+async function getClientAccountForUuid(uuid) {
+  const query = 'select * from client_accounts where uuid = $1;';
+  const clientAccount = await db.oneOrNone(query, [uuid]);
+  if (!clientAccount) return null;
+
+  const {
+    address_type: addressType,
+    address,
+    account_type: accountType,
+    account_uuid: accountUuid,
+  } = clientAccount;
+  const accountTable = addressType === TYPE.LOKI ? 'accounts_loki' : 'accounts_bnb';
+  const accountQuery = `select address from ${accountTable} where uuid = $1;`;
+  const account = await db.oneOrNone(accountQuery, [accountUuid]);
+  if (!account) return null;
+
+  const { address: accountAddress } = account;
+  return {
+    uuid,
+    address,
+    addressType,
+    accountAddress,
+    accountType,
+  };
+}
+
+/**
  * Get the client account associated with the given address.
  * @param {string} address An address.
  * @param {'loki'|'bnb'} addressType Which platform the address belongs to.
@@ -191,21 +281,23 @@ async function getClientAccount(address, addressType) {
   const accountTable = accountType === TYPE.LOKI ? 'accounts_loki' : 'accounts_bnb';
 
   const leftJoin = `${accountTable} a on a.uuid = ca.account_uuid`;
-  const query = `select ca.uuid, ca.address, a.address as account_address from client_accounts ca left join ${leftJoin} where ca.address = $1 and address_type = $2`;
 
-  return db.oneOrNone(query, [address, addressType]).then(data => {
-    if (!data) return null;
-    // eslint-disable-next-line no-shadow
-    const { uuid, address, account_address: accountAddress } = data;
-    const lokiAddress = addressType === TYPE.LOKI ? address : accountAddress;
-    const bnbAddress = addressType === TYPE.BNB ? address : accountAddress;
-    return {
-      uuid,
-      userAddressType: addressType,
-      lokiAddress,
-      bnbAddress,
-    };
-  });
+  // eslint-disable-next-line max-len
+  const query = `select ca.uuid, a.address as account_address from client_accounts ca left join ${leftJoin} where ca.address = $1 and ca.address_type = $2;`;
+
+  const data = await db.oneOrNone(query, [address, addressType]);
+  if (!data) return null;
+
+  // eslint-disable-next-line no-shadow
+  const { uuid, account_address: accountAddress } = data;
+  const lokiAddress = addressType === TYPE.LOKI ? address : accountAddress;
+  const bnbAddress = addressType === TYPE.BNB ? address : accountAddress;
+  return {
+    uuid,
+    userAddressType: addressType,
+    lokiAddress,
+    bnbAddress,
+  };
 }
 
 /**
@@ -220,41 +312,113 @@ async function insertClientAccount(address, addressType, account) {
 
   let dbAccount = null;
   if (accountType === TYPE.LOKI) {
-    dbAccount = insertLokiAccount(account);
+    dbAccount = await insertLokiAccount(account);
   } else if (accountType === TYPE.BNB) {
     dbAccount = await insertBNBAccount(account);
   }
 
-  const query = 'insert into client_accounts(uuid, address, address_type, account_uuid, account_type, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now())';
-  return db.oneOrNone(query, [address, addressType, dbAccount.uuid, accountType]).then(data => {
-    if (!data) return null;
+  // eslint-disable-next-line max-len
+  const query = 'insert into client_accounts(uuid, address, address_type, account_uuid, account_type, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now()) returning uuid;';
+  const data = await db.oneOrNone(query, [address, addressType, dbAccount.uuid, accountType]);
+  if (!data) return null;
 
-    const { uuid } = data;
-    const lokiAddress = addressType === TYPE.LOKI ? address : dbAccount.address;
-    const bnbAddress = addressType === TYPE.BNB ? address : dbAccount.address;
-    return {
-      uuid,
-      userAddressType: addressType,
-      lokiAddress,
-      bnbAddress,
-    };
-  });
-}
-
-function insertLokiAccount(account) {
+  const { uuid } = data;
+  const lokiAddress = addressType === TYPE.LOKI ? address : dbAccount.address;
+  const bnbAddress = addressType === TYPE.BNB ? address : dbAccount.address;
   return {
-    uuid: 0,
-    address: 1,
+    uuid,
+    userAddressType: addressType,
+    lokiAddress,
+    bnbAddress,
   };
 }
 
-function insertBNBAccount(account) {
+function insertLokiAccount(account) {
+  // eslint-disable-next-line max-len
+  const query = 'insert into accounts_loki(uuid, address, address_index) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2) returning *;';
+  return db.one(query, [account.address, account.addressIndex]);
+}
+
+async function insertBNBAccount(account) {
   const key = config.get('encryptionKey');
   const salt = bip39.generateMnemonic();
   const encryptedPrivateKey = hexEncrypt(account.privateKey, key + salt);
 
-  const query = 'insert into accounts_bnb(uuid, address, encrypted_private_key, salt, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now())';
-  return db.oneOrNone(query, [account.address, encryptedPrivateKey, salt]);
+  // eslint-disable-next-line max-len
+  const query = 'insert into accounts_bnb(uuid, address, encrypted_private_key, salt, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid, address;';
+  return db.one(query, [account.address, encryptedPrivateKey, salt]);
+}
+
+async function getLokiAccount(address) {
+  const query = 'select * from accounts_loki where address = $1;';
+  return db.oneOrNone(query, [address]);
+}
+
+/**
+ * Get incoming transactions to the given address.
+ * @param {string} accountAddress The account address.
+ * @param {'loki'|'bnb'} accountType The account type
+ */
+async function getIncomingTransactions(accountAddress, accountType) {
+  switch (accountType) {
+    case TYPE.BNB: {
+      const transactions = await bnb.getIncomingTransactions(accountAddress);
+      return transactions.map(tx => ({
+        hash: tx.txHash,
+        amount: tx.value,
+      }));
+    }
+    case TYPE.LOKI: {
+      const lokiAccount = await getLokiAccount(accountAddress);
+      if (!lokiAccount) return [];
+
+      const transactions = await loki.getIncomingTransactions(lokiAccount.address_index);
+
+      // We only want transactions with a certain number of confirmations
+      return transactions.filter(tx => tx.confirmations >= 6).map(tx => ({
+        hash: tx.txid,
+        amount: tx.amount,
+      }));
+    }
+    default:
+      return [];
+  }
+}
+
+async function getSwaps(clientAccountUuid) {
+  const query = 'select * from swaps where client_account_uuid = $1;';
+  return db.manyOrNone(query, [clientAccountUuid]);
+}
+
+async function insertSwaps(transactions, clientAccount) {
+  const { addressType, address, accountAddress } = clientAccount;
+  const lokiAddress = addressType === TYPE.LOKI ? address : accountAddress;
+  const bnbAddress = addressType === TYPE.BNB ? address : accountAddress;
+
+  const swaps = await db.tx(t => t.batch(transactions.map(tx => insertSwap(tx, clientAccount))));
+  if (!swaps) return null;
+
+  // Filter out any null swaps and map it to sanitized values
+  return swaps.filter(s => !!s).map(swap => ({
+    uuid: swap.uuid,
+    type: swap.type,
+    lokiAddress,
+    bnbAddress,
+    amount: swap.amount,
+    txHash: swap.deposit_transaction_hash,
+  }));
+}
+
+async function insertSwap(transaction, clientAccount) {
+  const { uuid: clientAccountUuid, addressType } = clientAccount;
+
+  // Since we only have 2 currencies to swap between, we can simple check the address type.
+  // If you want to extend to more than 2 currencies then you need to do this differently.
+  const type = addressType === TYPE.LOKI ? SWAP_TYPE.LOKI_TO_BNB : SWAP_TYPE.BNB_TO_LOKI;
+
+  // eslint-disable-next-line max-len
+  const query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now()) returning uuid, type, amount, deposit_transaction_hash;';
+  return db.oneOrNone(query, [type, transaction.amount, clientAccountUuid, transaction.hash]);
 }
 
 String.prototype.hexEncode = () => {

@@ -4,6 +4,7 @@ module.exports = {
         "no-console": "off",
         "object-curly-newline": ["error", { "multiline": true }],
         "no-use-before-define": ["error", { "functions": false }],
-        "arrow-parens": ["error", "as-needed"]
+        "arrow-parens": ["error", "as-needed"],
+       "max-len": ["error", { "code": 150 }]
     }
 };

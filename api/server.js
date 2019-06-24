@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import https from 'https';
 import config from 'config';
 import routes from './routes';
+import { loki } from './helpers';
 
 const app = express();
 app.all('/*', (req, res, next) => {
@@ -29,85 +30,90 @@ app.use(compression());
 app.use('/', routes);
 
 // Data handler
-app.use((req, res) => {
-  let status = null;
-  let body = null;
-
-  switch (res.statusCode) {
-    case 205: // Reset Content
-      if (res.body) {
-        status = res.body.length > 0 ? 200 : 204;
-        body = res.body.length > 0 ? res.body : {
-          status,
+app.use((req, res, next) => {
+  if (res.statusCode === 205) {
+    if (res.body) {
+      if (res.body.length === 0) {
+        res.status(204);
+        res.json({
+          status: 204,
           result: 'No Content',
-        };
+        });
       } else {
-        status = 204;
-        body = {
-          status,
-          result: 'No Content',
-        };
+        res.status(200);
+        res.json(res.body);
       }
-      break;
-    case 400: // Bad Request
-      body = res.body || {
+    } else {
+      res.status(204);
+      res.json({
+        status: 204,
+        result: 'No Content',
+      });
+    }
+  } else if (res.statusCode === 400) {
+    res.status(res.statusCode);
+    if (res.body) {
+      res.json(res.body);
+    } else {
+      res.json({
         status: res.statusCode,
         success: false,
         result: 'Bad Request',
-      };
-      break;
-    case 401: // Unauthorized
-      body = res.body || {
+      });
+    }
+  } else if (res.statusCode === 401) {
+    res.status(res.statusCode);
+    if (res.body) {
+      res.json(res.body);
+    } else {
+      res.json({
         status: res.statusCode,
         success: false,
         result: 'Unauthorized',
-      };
-      break;
-    default: break;
+      });
+    }
+  } else if (res.statusCode) {
+    res.status(res.statusCode);
+    res.json(res.body);
+  } else {
+    res.status(200);
+    res.json(res.body);
   }
-
-  if (status) res.status(status);
-  if (body) res.json(body);
 });
 
-// Error handler
-app.use((err, req, res) => {
-  let status = null;
-  let body = null;
-
-  if (!err) {
-    status = 404;
-    body = {
-      status,
-      result: 'Request not found',
-    };
-  } else {
-    switch (res.statusCode) {
-      case 500:
-      case 501:
-        status = 250;
-        body = {
-          status,
-          result: err,
-        };
-        break;
-      default:
-        status = 500;
-        body = {
-          status,
-          result: err.message,
-        };
+app.use((err, req, res, next) => {
+  if (err) {
+    if (res.statusCode === 500 || req.statusCode === 501) {
+      res.status(250);
+      res.json({
+        status: 250,
+        result: err,
+      });
+    } else {
+      res.status(500);
+      res.json({
+        status: 500,
+        result: err.message,
+      });
     }
+  } else {
+    res.status(404);
+    res.json({
+      status: 404,
+      result: 'Request not found',
+    });
   }
-
-  if (status) res.status(status);
-  if (body) res.json(body);
 });
 
 https.globalAgent.maxSockets = 50;
 app.set('port', config.get('serverPort'));
 
-const server = Server(app);
-server.listen(app.get('port'), () => {
-  console.log('[Loki Bridge API] Stared server on', server.address().port);
+const walletConfig = config.get('loki.wallet');
+loki.openWallet(walletConfig.filename, walletConfig.password).then(() => {
+  const server = Server(app);
+  server.listen(app.get('port'), () => {
+    console.log('[Loki Bridge API] Stared server on', server.address().port);
+  });
+}).catch(error => {
+  console.log(`Failed to open Loki Wallet - ${error.message}`);
 });

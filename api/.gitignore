@@ -93,3 +93,6 @@ typings/
 
 cli/**/*
 !cli/*.md
+
+config/development.json
+config/production.json
