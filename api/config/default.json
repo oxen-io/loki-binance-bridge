@@ -1,6 +1,6 @@
 {
     "serverPort": 8000,
-    "useEncryption": false,
+    "useAPIEncryption": false,
     "binance": {
         "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
         "api": "https://testnet-dex.binance.org/",
@@ -21,7 +21,7 @@
         "password": ""
       },
       "wallet": {
-        "filename": "My Wallet",
+        "filename": "lokibridge",
         "password": "",
         "accountIndex": 0
       }

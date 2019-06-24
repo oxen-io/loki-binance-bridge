@@ -95,7 +95,7 @@ export function finalizeSwap(req, res, next) {
 
       const { accountAddress, accountType } = clientAccount;
 
-      const [transactions, swaps] = Promise.all([
+      const [transactions, swaps] = await Promise.all([
         getIncomingTransactions(accountAddress, accountType),
         getSwaps(uuid),
       ]);
@@ -115,7 +115,7 @@ export function finalizeSwap(req, res, next) {
       }
 
       // Give back the new swaps to the user
-      const newSwaps = insertSwaps(newTransactions, clientAccount);
+      const newSwaps = await insertSwaps(newTransactions, clientAccount);
       res.status(205);
       res.body = { status: 200, success: true, result: newSwaps };
     } catch (error) {
@@ -192,7 +192,7 @@ function decrypt(text, seed) {
 /* Decrypt a request payload */
 function decryptPayload(req, res, next, callback) {
   // Only decrypt if we use encryption
-  if (!config.get('useEncryption')) {
+  if (!config.get('useAPIEncryption')) {
     callback(req.body);
     return null;
   }
@@ -250,9 +250,9 @@ async function getClientAccountForUuid(uuid) {
     account_type: accountType,
     account_uuid: accountUuid,
   } = clientAccount;
-  const accountTable = addressType === TYPE.LOKI ? 'accounts_loki' : 'accounts_bnb';
-  const accountQuery = `select address from ${accountTable} where uuid = $1;`;
-  const account = await db.oneOrNone(accountQuery, [accountUuid]);
+  const accountTable = accountType === TYPE.LOKI ? 'accounts_loki' : 'accounts_bnb';
+  const accountQuery = 'select address from $1:name where uuid = $2;';
+  const account = await db.oneOrNone(accountQuery, [accountTable, accountUuid]);
   if (!account) return null;
 
   const { address: accountAddress } = account;

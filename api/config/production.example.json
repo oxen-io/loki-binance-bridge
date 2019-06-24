@@ -1,6 +1,6 @@
 {
     "serverPort": 8000,
-    "useEncryption": true,
+    "useAPIEncryption": true,
     "binance": {
         "cli": "./cli/prod/0.5.8.1/mac/bnbcli",
         "api": "https://dex.binance.org/",
