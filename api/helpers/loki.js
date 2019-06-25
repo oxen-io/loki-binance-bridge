@@ -3,7 +3,7 @@ import config from 'config';
 import request from 'request-promise';
 import nodeCleanup from 'node-cleanup';
 
-const walletConfig = config.get('loki.wallet');
+const accountIndex = config.get('loki.wallet.accountIndex');
 const rpcConfig = config.get('loki.walletRPC');
 let id = 0;
 
@@ -88,7 +88,7 @@ export async function openWallet(filename, password = '') {
  * @returns {Promise<{ address: string, address_index: number }>} A new loki account or `null` if we failed to make one.
  */
 export async function createAccount() {
-  const data = await rpc('create_address', { account_index: walletConfig.accountIndex });
+  const data = await rpc('create_address', { account_index: accountIndex });
   if (data.error) {
     console.log('[Loki Wallet] Failed to create account: ', data.error);
     return null;
@@ -112,7 +112,7 @@ export async function getIncomingTransactions(addressIndex) {
     pending: false,
     failed: false,
     pool: false,
-    account_index: walletConfig.accountIndex,
+    account_index: accountIndex,
     subaddr_indices: [addressIndex],
   });
 
@@ -141,4 +141,50 @@ export async function validateAddress(address) {
   }
 
   return data.result.valid;
+}
+
+/**
+ * Get balances for the given `addressIndicies`.
+ *
+ * @param {[number]} addressIndicies An array of subaddress indicies.
+ * @returns {Promise<[{ addressIndex, address, balance, unlocked }]>} An array of balances
+ */
+export async function getBalances(addressIndicies) {
+  const data = await rpc('getbalance', {
+    account_index: accountIndex,
+    address_indices: addressIndicies,
+  });
+
+  if (data.error) {
+    console.log('[Loki Wallet] Failed to get balances: ', data.error);
+    return [];
+  }
+
+  // eslint-disable-next-line camelcase
+  return data.result.per_subaddress.map(({ address_index, address, balance, unlocked_balance }) => ({
+    addressIndex: address_index,
+    address,
+    balance,
+    unlocked: unlocked_balance,
+  }));
+}
+
+/**
+ * Send multiple transactions from the current open wallet.
+ *
+ * @param {[{ address: string, amount: number }]}]} destinations The destinations.
+ * @returns {Promise<[string]>} The transaction hashes
+ */
+export async function multiSend(destinations) {
+  const data = rpc('transfer_split', {
+    destinations,
+    account_index: accountIndex,
+  });
+
+  if (data.error || !data.result) {
+    const error = data.error || 'No result found';
+    throw new Error('[Loki Wallet] Failed to send transactions: ', error);
+  }
+
+  return data.result.tx_hash_list;
 }

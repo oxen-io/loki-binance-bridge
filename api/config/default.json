@@ -4,7 +4,11 @@
     "binance": {
         "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
         "api": "https://testnet-dex.binance.org/",
-        "network": "testnet"
+        "network": "testnet",
+        "symbol": "BLOKI",
+        "wallet": {
+          "mnemonic": ""
+        }
     },
     "database": {
         "host": "localhost",

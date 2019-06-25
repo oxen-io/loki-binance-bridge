@@ -1,7 +1,7 @@
 import ApiClient from '@binance-chain/javascript-sdk';
 import config from 'config';
 
-const bnConfig = config.get('binance');
+const { api, network } = config.get('binance');
 
 /**
  * Create an account.
@@ -62,9 +62,55 @@ export async function getIncomingTransactions(address) {
   }
 }
 
+/**
+ * Get all the balances from the given `address`
+ *
+ * @param {string} address The bnb address to get balances from.
+ * @returns {Promise<[{ symbol, free, locked, frozen }]>} An array of balances.
+ */
+export async function getBalances(address) {
+  try {
+    const client = getClient();
+    const balances = await client.getBalance(address);
+    return balances || [];
+  } catch (e) {
+    console.log('[BNB] Failed to get balance: ', e);
+    return [];
+  }
+}
+
+/**
+ * Send multiple transactions.
+ *
+ * @param {string} mnemonic The mnemonic of the wallet to send from.
+ * @param {[{ to: string, coins: [{ denom: string, amount: number }]}]} outputs The outputs to send.
+ * @param {string} message The message to attach to the transaction.
+ * @returns {Promise<[string]>} The transaction hashes
+ */
+export async function multiSend(mnemonic, outputs, message) {
+  const cleanedMnemonic = mnemonic.replace(/(\r\n|\n|\r)/gm, '');
+  const privateKey = ApiClient.crypto.getPrivateKeyFromMnemonic(cleanedMnemonic);
+
+  const client = getClient();
+  await client.setPrivateKey(privateKey);
+  await client.initChain();
+
+  const address = client.getClientKeyAddress();
+  // eslint-disable-next-line no-underscore-dangle
+  const res = await client._httpClient.request('get', `/api/v1/account/${address}/sequence`);
+  const sequence = (res && res.data && res.data.sequence) || 0;
+
+  const sendResult = client.multiSend(address, outputs, message, sequence);
+
+  if (!sendResult || !sendResult.result || sendResult.result.length === 0) {
+    throw new Error(`[BNB] Failed to send transactions: ${String(sendResult)}`);
+  }
+
+  return sendResult.result.map(r => r.hash);
+}
+
 function getClient() {
-  const client = new ApiClient(bnConfig.api);
-  client.chooseNetwork(bnConfig.network);
-  client.initChain();
+  const client = new ApiClient(api);
+  client.chooseNetwork(network);
   return client;
 }

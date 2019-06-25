@@ -96,7 +96,7 @@ export function finalizeSwap(req, res, next) {
 
       const [transactions, swaps] = await Promise.all([
         getIncomingTransactions(accountAddress, accountType),
-        db.getSwaps(uuid),
+        db.getSwapsForClientAccount(uuid),
       ]);
 
       if (!transactions || transactions.length === 0) {
