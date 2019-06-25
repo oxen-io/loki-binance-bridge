@@ -1,4 +1,4 @@
-import bnb from './bnb';
-import loki from './loki';
+import * as bnb from './bnb';
+import * as loki from './loki';
 
 export { bnb, loki };

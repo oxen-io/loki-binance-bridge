@@ -6,7 +6,8 @@ import config from 'config';
 /**
  * Encrypt the given text using `aes-256-ctr` and get the hex output.
  * @param {string} text The text to encrypt
- * @param {string} password The encryption password
+ * @param {string} password The encryption password.
+ * @returns The encrypted string as hex.
  */
 export function hexEncrypt(text, password) {
   const cipher = crypto.createCipher('aes-256-ctr', password);
@@ -18,7 +19,8 @@ export function hexEncrypt(text, password) {
 /**
  * Decrypty the given hex string using `aes-256-ctr` and get the original string output.
  * @param {string} encryptedText The encrypted hex string.
- * @param {string} password The decryption password
+ * @param {string} password The decryption password.
+ * @returns The decrypted string.
  */
 export function hexDecrypt(encryptedText, password) {
   const decipher = crypto.createDecipher('aes-256-ctr', password);
@@ -37,7 +39,7 @@ function decrypt(encryptedText, seed) {
 
 /**
  * Decrypt the API payload.
- * @param {*} callback The callback which returns the decrypted payload
+ * @param {function} callback The callback which returns the decrypted payload
  */
 export function decryptAPIPayload(req, res, next, callback) {
   // Only decrypt if we use encryption

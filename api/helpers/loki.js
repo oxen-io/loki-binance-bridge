@@ -14,6 +14,7 @@ nodeCleanup(() => {
   agent.destroy();
 });
 
+// Do the rpc!
 async function rpc(method, params = {}) {
   id += 1;
   const options = {
@@ -62,7 +63,15 @@ async function rpc(method, params = {}) {
   }
 }
 
-async function openWallet(filename, password = '') {
+/**
+ * Open a wallet.
+ * This will close any opened wallets.
+ *
+ * @param {string} filename The wallet filename.
+ * @param {string} password The wallet password if it is set.
+ * @throws Will throw an error if opening a wallet failed.
+ */
+export async function openWallet(filename, password = '') {
   // close any open wallet
   await rpc('close_wallet');
 
@@ -74,20 +83,29 @@ async function openWallet(filename, password = '') {
 }
 
 /**
- * Create a sub-address.
+ * Create a new sub-address from the current open wallet.
+ *
+ * @returns {Promise<{ address: string, address_index: number }>} A new loki account or `null` if we failed to make one.
  */
-async function createAccount() {
+export async function createAccount() {
   const data = await rpc('create_address', { account_index: walletConfig.accountIndex });
   if (data.error) {
     console.log('[Loki Wallet] Failed to create account: ', data.error);
     return null;
   }
 
-  const { address, address_index: addressIndex } = data.result;
-  return { address, addressIndex };
+  // eslint-disable-next-line camelcase
+  const { address, address_index } = data.result;
+  return { address, address_index };
 }
 
-async function getIncomingTransactions(addressIndex) {
+/**
+ * Get all incoming transactions sent to the given `addressIndex`.
+ *
+ * @param {number} addressIndex The index of the sub-address.
+ * @returns {Promise<[object]>} An array of LOKI transactions.
+ */
+export async function getIncomingTransactions(addressIndex) {
   const data = await rpc('get_transfers', {
     in: true,
     out: false,
@@ -106,7 +124,12 @@ async function getIncomingTransactions(addressIndex) {
   return data.result.in || [];
 }
 
-async function validateAddress(address) {
+/**
+ * Validate an address.
+ * @param {string} address The LOKI address to validate.
+ * @returns {Promise<boolean>} Wether the given `address` is valid or not.
+ */
+export async function validateAddress(address) {
   const data = await rpc('validate_address', {
     address,
     any_net_type: false,
@@ -119,10 +142,3 @@ async function validateAddress(address) {
 
   return data.result.valid;
 }
-
-export default {
-  openWallet,
-  createAccount,
-  getIncomingTransactions,
-  validateAddress,
-};

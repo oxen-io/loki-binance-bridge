@@ -10,9 +10,11 @@ const db = pgp({ host, port, database, user, password });
 
 /**
  * Get the client account with the given uuid.
+ * This function is different from `getClientAccount` in that it will return non sanitized values.
  * The return of this functions SHOULD NOT be sent to the client.
  *
- * @param {*} uuid The unique identifier of the client account
+ * @param {string} uuid The unique identifier of the client account
+ * @returns The client account or `null` if something went wrong.
  */
 export async function getClientAccountForUuid(uuid) {
   const query = 'select * from client_accounts where uuid = $1;';
@@ -41,9 +43,11 @@ export async function getClientAccountForUuid(uuid) {
 }
 
 /**
- * Get the client account associated with the given address.
+ * Get the client account associated with the given `address`.
+ *
  * @param {string} address An address.
  * @param {'loki'|'bnb'} addressType Which platform the address belongs to.
+ * @return The client account or `null` if we failed to get the client account.
  */
 export async function getClientAccount(address, addressType) {
   /*
@@ -77,9 +81,11 @@ export async function getClientAccount(address, addressType) {
 
 /**
  * Insert a client account with the given address and account.
+ *
  * @param {string} address The address.
  * @param {'loki'|'bnb'} addressType Which platform the address belongs to.
- * @param {*} account The generated account.
+ * @param {*} account The account to insert.
+ * @returns The inserted client account or `null` if we failed.
  */
 export async function insertClientAccount(address, addressType, account) {
   // We assume that if addressType is loki then accountType is bnb and viceversa
@@ -108,12 +114,24 @@ export async function insertClientAccount(address, addressType, account) {
   };
 }
 
-export function insertLokiAccount(account) {
+/**
+ * Insert a loki account.
+ *
+ * @param {{ address: string, address_index: int }} account A loki account.
+ * @returns {Promise<{ uuid, address, address_index }>} The inserted loki account or `null` if we failed.
+ */
+export async function insertLokiAccount(account) {
   // eslint-disable-next-line max-len
   const query = 'insert into accounts_loki(uuid, address, address_index) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2) returning *;';
-  return db.one(query, [account.address, account.addressIndex]);
+  return db.oneOrNone(query, [account.address, account.address_index]);
 }
 
+/**
+ * Insert a bnb account.
+ *
+ * @param {{ address: string, privateKey: string }} account A bnb account.
+ * @returns {Promise<{ uuid, address }>} The inserted bnb account or `null` if we failed.
+ */
 export async function insertBNBAccount(account) {
   const key = config.get('encryptionKey');
   const salt = bip39.generateMnemonic();
@@ -121,19 +139,39 @@ export async function insertBNBAccount(account) {
 
   // eslint-disable-next-line max-len
   const query = 'insert into accounts_bnb(uuid, address, encrypted_private_key, salt, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid, address;';
-  return db.one(query, [account.address, encryptedPrivateKey, salt]);
+  return db.oneOrNone(query, [account.address, encryptedPrivateKey, salt]);
 }
 
+/**
+ * Get the loki account associated with the given loki `address`
+ *
+ * @param {string} address The loki address.
+ * @returns {Promise<{ uuid, address, address_index }>} The loki account or `null` if there wasn't one.
+ */
 export async function getLokiAccount(address) {
   const query = 'select * from accounts_loki where address = $1;';
   return db.oneOrNone(query, [address]);
 }
 
+/**
+ * Get all `swaps` for the given `clientAccount`.
+ *
+ * @param {string} clientAccountUuid The uuid of the client account.
+ * @returns {Promise<[object]>} An array of swaps or `null` if something went wrong.
+ */
 export async function getSwaps(clientAccountUuid) {
   const query = 'select * from swaps where client_account_uuid = $1;';
   return db.manyOrNone(query, [clientAccountUuid]);
 }
 
+/**
+ * Insert swaps with the given `transactions`.
+ *
+ * @export
+ * @param {[{ hash: string, amount: number }]} transactions An array of transactions.
+ * @param {*} clientAccount The client account to associate with the swap.
+ * @returns {Promise<[{ uuid, type, lokiAddress, bnbAddress, amount, txHash }]>} An array of inserted swaps.
+ */
 export async function insertSwaps(transactions, clientAccount) {
   const { addressType, address, accountAddress } = clientAccount;
   const lokiAddress = addressType === TYPE.LOKI ? address : accountAddress;
@@ -153,6 +191,13 @@ export async function insertSwaps(transactions, clientAccount) {
   }));
 }
 
+/**
+ * Insert a swap from the given `transaction`.
+ *
+ * @param {{ hash: string, amount: number }} transaction The transaction.
+ * @param {*} clientAccount The client account to associate with the swap
+ * @returns {Promise<{ uuid, type, amount, deposit_transaction_hash }>} The inserted swap or `null` if we failed.
+ */
 export async function insertSwap(transaction, clientAccount) {
   const { uuid: clientAccountUuid, addressType } = clientAccount;
 
