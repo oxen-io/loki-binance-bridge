@@ -1,0 +1,7 @@
+{
+    "useAPIEncryption": false,
+    "database": {
+        "database": "lokibridge-test"
+    },
+    "encryptionKey": "Test encryption key"
+}

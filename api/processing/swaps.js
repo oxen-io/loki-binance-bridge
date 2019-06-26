@@ -1,7 +1,6 @@
 /* eslint-disable no-else-return */
 import config from 'config';
-import { SWAP_TYPE } from '../utils/constants';
-import * as db from '../utils/db';
+import { db, SWAP_TYPE } from '../utils';
 import { bnb, loki } from '../helpers';
 
 /**

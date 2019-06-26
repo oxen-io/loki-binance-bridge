@@ -1,10 +1,6 @@
 /* eslint-disable no-extend-native */
 import { bnb, loki } from '../helpers';
-import { validateSwap, validateFinalizeSwap } from '../utils/validation';
-import { SWAP_TYPE, TYPE } from '../utils/constants';
-import { decryptAPIPayload } from '../utils/crypto';
-import { getIncomingTransactions } from '../utils/transaction';
-import * as db from '../utils/db';
+import { db, crypto, transaction, validation, SWAP_TYPE, TYPE } from '../utils';
 
 // - Public
 
@@ -16,8 +12,8 @@ import * as db from '../utils/db';
  *  E.g If `type = LOKI_TO_BNB` then the `address` is expected to be a loki address.
  */
 export function swapToken(req, res, next) {
-  decryptAPIPayload(req, res, next, async data => {
-    const result = await validateSwap(data);
+  crypto.decryptAPIPayload(req, res, next, async data => {
+    const result = await validation.validateSwap(data);
     if (result != null) {
       res.status(400);
       res.body = { status: 400, success: false, result };
@@ -75,8 +71,8 @@ export function swapToken(req, res, next) {
  *  - uuid: The uuid that was returned in `swapToken` (client account uuid)
  */
 export function finalizeSwap(req, res, next) {
-  decryptAPIPayload(req, res, next, async data => {
-    const result = validateFinalizeSwap(data);
+  crypto.decryptAPIPayload(req, res, next, async data => {
+    const result = validation.validateFinalizeSwap(data);
     if (result != null) {
       res.status(400);
       res.body = { status: 400, success: false, result };
@@ -95,7 +91,7 @@ export function finalizeSwap(req, res, next) {
       const { accountAddress, accountType } = clientAccount;
 
       const [transactions, swaps] = await Promise.all([
-        getIncomingTransactions(accountAddress, accountType),
+        transaction.getIncomingTransactions(accountAddress, accountType),
         db.getSwapsForClientAccount(uuid),
       ]);
 

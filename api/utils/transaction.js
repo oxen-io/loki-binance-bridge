@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { bnb, loki } from '../helpers';
 import { TYPE } from './constants';
-import * as db from './db';
+import db from './db';
 
 /**
  * Get incoming transactions to the given address.

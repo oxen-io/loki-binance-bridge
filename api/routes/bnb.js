@@ -1,7 +1,6 @@
 /* eslint-disable no-extend-native */
 import { bnb } from '../helpers';
-import { validateBNBDownloadKeyStore } from '../utils/validation';
-import { decryptAPIPayload } from '../utils/crypto';
+import { crypto, validation } from '../utils';
 
 /**
  * Create a BNB wallet.
@@ -22,8 +21,8 @@ export function createBNBAccount(req, res, next) {
  *  - privateKey: The BNB account private key
  */
 export function downloadBNBKeystore(req, res, next) {
-  decryptAPIPayload(req, res, next, data => {
-    const result = validateBNBDownloadKeyStore(data);
+  crypto.decryptAPIPayload(req, res, next, data => {
+    const result = validation.validateBNBDownloadKeyStore(data);
     if (result != null) {
       res.status(400);
       res.body = { status: 400, success: false, result };

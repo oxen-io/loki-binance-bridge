@@ -6,5 +6,9 @@ module.exports = {
         "no-use-before-define": ["error", { "functions": false }],
         "arrow-parens": ["error", "as-needed"],
        "max-len": ["error", { "code": 150 }]
+    },
+    env: {
+      mocha: true,
+      node: true
     }
 };
