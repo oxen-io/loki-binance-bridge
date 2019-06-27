@@ -43,21 +43,21 @@ Once it has started, make sure you have created a wallet and after you have done
 
 For development, you can use `lokitestnet.com:38157` as the `daemon-address`
 
-### Development
-
-If you want to run in development mode then you need to run:
-```
-npm install
-npm run dev
-```
-
-You can add development config in `config/development.json`
-
 ## Configuration
 
 Any properties found in `config/default.json` can be modified to your needs.
-If you need different values for either `development` or `production` then add those values to the corresponsing config files.
+If you need different values for either `test`, `development` or `production` then add those values to the corresponsing config files.
 
-`config/development.json` for `development` or `config/production.json` for `production`.
+`config/test.json` for `testing`
+`config/development.json` for `development`
+`config/production.json` for `production`.
 
 Any values that you don't set in those files will be fetched from `config/default.json`.
+
+## Commands
+
+| Command | Description |
+| --- | --- |
+| npm run start | Run the API server in **Production** mode |
+| npm run dev | Run the API server in **Development** mode |
+| npm run test | Run the test suite |

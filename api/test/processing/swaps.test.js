@@ -88,15 +88,12 @@ describe('Processing Swaps', () => {
   });
 
   describe('#processSwaps', () => {
-    let bnbStub;
-    let lokiStub;
-
     beforeEach(async () => {
       // Clear out any data in the db
       await postgres.none('TRUNCATE client_accounts, accounts_loki, accounts_bnb, swaps CASCADE;');
 
-      bnbStub = sandbox.stub(bnb, 'multiSend').returns(['bnbTxHash1', 'bnbTxHash2']);
-      lokiStub = sandbox.stub(loki, 'multiSend').returns(['lokiTxHash1', 'lokiTxHash2']);
+      sandbox.stub(bnb, 'multiSend').returns(['bnbTxHash1', 'bnbTxHash2']);
+      sandbox.stub(loki, 'multiSend').returns(['lokiTxHash1', 'lokiTxHash2']);
     });
 
     const processSwap = async swapType => {
