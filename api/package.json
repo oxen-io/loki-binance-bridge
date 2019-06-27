@@ -1,8 +1,9 @@
 {
   "name": "loki-network-bridge-api",
   "version": "1.0.0",
-  "description": "Bridge API for converting Loki to BLoki",
+  "description": "Bridge API for converting Loki to B-Loki",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "NODE_ENV=production node -r esm server.js",
     "dev": "NODE_ENV=development node -r esm server.js",
