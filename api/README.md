@@ -20,6 +20,9 @@ npm install --production
 ```
 
 If you haven't setup a postgres database then do so and edit `config/production.json` with the database info.
+
+If it doesn't exist then you can copy and rename `config/production.example.json`
+
 You will also need to run the sql script found in `sql/setup.sql` on this database.
 
 The easiest method would be to run:
@@ -32,14 +35,18 @@ After everything is setup, all you have to do is run:
 npm run start
 ```
 
-### Loki Wallet RPC
+## Loki Wallet RPC
 
-Make sure a loki wallet RPC is running. You can do this simply by running the following:
+To ensure the server starts, you need to make sure a loki wallet RPC instance is running.
+
+You can do this simply by running the following:
 ```
 loki-wallet-rpc --rpc-login <username>:<password> --rpc-bind-port <port> --daemon-address <address> --wallet-dir <dir> [--testnet]
 ```
 
-Once it has started, make sure you have created a wallet and after you have done that go into `config/production.json` and edit the values under `loki`.
+You will also need to ensure that you have a wallet created to be used with the bridge. Any deposits and swaps will be made using this wallet.
+
+Go into `config/production.json` and edit the values under `loki`.
 
 For development, you can use `lokitestnet.com:38157` as the `daemon-address`
 
