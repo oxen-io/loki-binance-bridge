@@ -3,5 +3,8 @@
     "database": {
         "database": "lokibridge-test"
     },
+    "binance": {
+      "symbol": "TEST"
+    },
     "encryptionKey": "Test encryption key"
 }

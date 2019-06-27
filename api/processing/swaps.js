@@ -24,7 +24,7 @@ export async function processSwaps(swapType) {
 /**
  * Take an array of `swaps` and combine the ones going to the same `address`.
  *
- * @param {[{ amount, address }]} swaps An array of swaps.
+ * @param {[{ amount, address: string }]} swaps An array of swaps.
  * @returns Simplified transactions from the swaps.
  */
 export function getTransactions(swaps) {
@@ -33,9 +33,9 @@ export function getTransactions(swaps) {
   // eslint-disable-next-line no-restricted-syntax
   for (const swap of swaps) {
     if (swap.address in amounts) {
-      amounts[swap.address] += swap.amount;
+      amounts[swap.address] += parseFloat(swap.amount) || 0;
     } else {
-      amounts[swap.address] = swap.amount;
+      amounts[swap.address] = parseFloat(swap.amount) || 0;
     }
   }
 
@@ -46,7 +46,7 @@ export function getTransactions(swaps) {
  * Send the given `swaps`.
  *
  * @param {string} swapType The type of swap.
- * @param {[{ address, amount }]} transactions An array of transactions.
+ * @param {[{ address: string, amount: number }]} transactions An array of transactions.
  * @returns An array of transaction hashes
  */
 export async function send(swapType, transactions) {
