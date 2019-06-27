@@ -21,7 +21,7 @@ describe('Transaction', () => {
           value,
         }];
 
-        const stub = sandbox.stub(bnb, 'getIncomingTransactions').returns(Promise.resolve(mockAPIResult));
+        const stub = sandbox.stub(bnb, 'getIncomingTransactions').returns(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions('123', TYPE.BNB);
         assert(stub.calledOnce, 'bnb.getIncomingTransactions was not called');
@@ -34,7 +34,7 @@ describe('Transaction', () => {
 
     context('Loki', () => {
       it('should return empty transactions if we failed to find a loki account in the database', async () => {
-        const stub = sandbox.stub(db, 'getLokiAccount').returns(Promise.resolve(null));
+        const stub = sandbox.stub(db, 'getLokiAccount').returns(null);
         const transactions = await transaction.getIncomingTransactions('123', TYPE.LOKI);
         assert(stub.calledOnce, 'db.getLokiAccount was not called');
         assert.isEmpty(transactions);
@@ -50,8 +50,8 @@ describe('Transaction', () => {
           confirmations: 6,
         }];
 
-        sandbox.stub(db, 'getLokiAccount').returns(Promise.resolve({ address_index: 0 }));
-        const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(Promise.resolve(mockAPIResult));
+        sandbox.stub(db, 'getLokiAccount').returns({ address_index: 0 });
+        const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions('123', TYPE.LOKI);
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');
@@ -68,8 +68,8 @@ describe('Transaction', () => {
           confirmations,
         }));
 
-        sandbox.stub(db, 'getLokiAccount').returns(Promise.resolve({ address_index: 0 }));
-        const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(Promise.resolve(mockAPIResult));
+        sandbox.stub(db, 'getLokiAccount').returns({ address_index: 0 });
+        const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions('123', TYPE.LOKI);
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');

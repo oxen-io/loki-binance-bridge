@@ -2,7 +2,7 @@ import config from 'config';
 import * as bip39 from 'bip39';
 import { TYPE, SWAP_TYPE } from './constants';
 import { hexEncrypt, hexDecrypt } from './crypto';
-import postgres from '../helpers/postgres';
+import { postgres } from '../helpers';
 
 // We have all db functions in a const so that when testing we can stub out certain functions.
 const db = {
@@ -280,7 +280,11 @@ const db = {
 
     // Since we only have 2 currencies to swap between, we can simple check the address type.
     // If you want to extend to more than 2 currencies then you need to do this differently.
-    const type = addressType === TYPE.LOKI ? SWAP_TYPE.LOKI_TO_BNB : SWAP_TYPE.BNB_TO_LOKI;
+
+    // eslint-disable-next-line max-len
+    // If the client address is LOKI then it must mean that we generated a BNB address for them to deposit into and thus they want to swap BNB for LOKI.
+    // Same logic applies the other way
+    const type = addressType === TYPE.LOKI ? SWAP_TYPE.BNB_TO_LOKI : SWAP_TYPE.LOKI_TO_BNB;
 
     // eslint-disable-next-line max-len
     const query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now()) returning uuid, type, amount, deposit_transaction_hash;';

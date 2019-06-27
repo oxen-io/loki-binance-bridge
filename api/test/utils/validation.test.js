@@ -13,7 +13,7 @@ describe('Validation', () => {
 
   describe('#validateSwap', async () => {
     const stubValidateAddressReturn = value => {
-      sandbox.stub(loki, 'validateAddress').returns(Promise.resolve(value));
+      sandbox.stub(loki, 'validateAddress').returns(value);
       sandbox.stub(bnb, 'validateAddress').returns(value);
     };
 

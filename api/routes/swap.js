@@ -54,8 +54,9 @@ export function swapToken(req, res, next) {
       res.body = { status: 200, success: true, result: clientAccount };
     } catch (error) {
       console.log(error);
+      const message = (error && error.message);
       res.status(500);
-      res.body = { status: 500, success: false, result: error };
+      res.body = { status: 500, success: false, result: message || error };
     }
 
     return next(null, req, res, next);
@@ -115,8 +116,9 @@ export function finalizeSwap(req, res, next) {
       res.body = { status: 200, success: true, result: newSwaps };
     } catch (error) {
       console.log(error);
+      const message = (error && error.message);
       res.status(500);
-      res.body = { status: 500, success: false, result: error };
+      res.body = { status: 500, success: false, result: message || error };
     }
 
     return next(null, req, res, next);

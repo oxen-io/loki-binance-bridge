@@ -30,8 +30,8 @@ export async function processSwaps(swapType) {
 export function getTransactions(swaps) {
   const amounts = {};
 
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
-  for (const swap in swaps) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const swap of swaps) {
     if (swap.address in amounts) {
       amounts[swap.address] += swap.amount;
     } else {
