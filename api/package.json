@@ -5,9 +5,9 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "NODE_ENV=production node -r esm server.js",
-    "dev": "NODE_ENV=development node -r esm server.js",
-    "test": "NODE_ENV=test mocha -r esm --recursive"
+    "start": "cross-env NODE_ENV=production node -r esm server.js",
+    "dev": "cross-env NODE_ENV=development node -r esm server.js",
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive"
   },
   "author": "Loki Network",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "config": "^3.1.0",
+    "cross-env": "^5.2.0",
     "crypto": "^1.0.1",
     "esm": "^3.2.25",
     "express": "^4.16.4",
