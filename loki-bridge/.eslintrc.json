@@ -1,3 +1,8 @@
 {
-  "extends": "react-app"
+  "extends": "react-app",
+  "rules": {
+    "semi": [2, "always"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "indent": ["error", 2, { "SwitchCase": 1 }]
+  }
 }

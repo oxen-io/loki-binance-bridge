@@ -1,25 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { Container } from '@material-ui/core';
+import { Route, Switch } from 'react-router-dom';
+import Controller from './components/controller';
+
+// TODO: Move this out
+const theme = {};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // <MuiThemeProvider theme={ createMuiTheme(theme) }>
+    <React.Fragment>
+      <CssBaseline />
+      <Container>
+        <Controller />
+      </Container>
+    </React.Fragment>
   );
 }
 
