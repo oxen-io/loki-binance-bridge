@@ -1,14 +1,14 @@
-module.exports = {
-    extends: "airbnb-base",
-    rules: {
+{
+    "extends": "airbnb-base",
+    "rules": {
         "no-console": "off",
         "object-curly-newline": ["error", { "multiline": true }],
         "no-use-before-define": ["error", { "functions": false }],
         "arrow-parens": ["error", "as-needed"],
        "max-len": ["error", { "code": 150 }]
     },
-    env: {
-      mocha: true,
-      node: true
+    "env": {
+      "mocha": true,
+      "node": true
     }
-};
+}
