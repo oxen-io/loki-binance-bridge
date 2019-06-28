@@ -14,6 +14,7 @@ export default function ErrorSnackbar(props) {
       }}
       open={ open }
       autoHideDuration={6000}
+      disableWindowBlurListener
       onClose={ onClose }
       ContentProps={{
         'aria-describedby': 'message-id',

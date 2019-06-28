@@ -10,7 +10,7 @@ export function createBNBAccount(req, res, next) {
   const account = bnb.createAccountWithMnemonic();
 
   res.status(205);
-  res.body = { status: 205, success: true, result: account };
+  res.body = { status: 200, success: true, result: account };
   return next(null, req, res, next);
 }
 

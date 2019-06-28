@@ -48,6 +48,8 @@ class CreateAccount extends Component {
       account,
       mnemonicWords: account.mnemonic.split(' ').sort(() => Math.random() - 0.5),
     });
+
+    this.downloadBNBKeystore(account.privateKey);
   }
 
   onBNBKeystoreDownloaded = () => {
@@ -58,7 +60,7 @@ class CreateAccount extends Component {
     const { accept, password, confirmPassword } = this.state;
 
     const isEmpty = string => !string || string.length === 0;
-    const passwordsSet = isEmpty(password) && isEmpty(confirmPassword);
+    const passwordsSet = !isEmpty(password) && !isEmpty(confirmPassword);
     const passwordsMatch = password.trim() === confirmPassword.trim();
     this.setState({
       passwordError: !passwordsSet || !passwordsMatch,
@@ -78,7 +80,7 @@ class CreateAccount extends Component {
       type: Actions.DOWNLOAD_BNB_KEYSTORE,
       content: {
         password,
-        private_key: privateKey
+        privateKey
       }
     });
     this.setState({ loading: true });
@@ -183,7 +185,7 @@ class CreateAccount extends Component {
 
     return (
       <Grid container>
-        { true && <PageLoader /> }
+        { loading && <PageLoader /> }
         <Grid item xs={12}>
           <Typography>Create New Binance Chain Wallet</Typography>
         </Grid>

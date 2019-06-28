@@ -9,8 +9,8 @@ import theme from './theme';
 
 export default class App extends PureComponent {
   state = {
-    error: 'omg',
-    errorOpen: true
+    error: null,
+    errorOpen: false
   }
 
   showError = (error) => {

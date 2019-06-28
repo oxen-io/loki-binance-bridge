@@ -74,32 +74,16 @@ class Store extends EventEmitter {
 
   async downloadBNBKeystore(payload) {
     try {
-      const blob = await this.fetch(endpoints.downloadBNBKeystore, 'POST', payload.content, 'blob');
-
-      // Save the blob to file
-      const keystore = await new Promise((resolve, reject) => {
-        const fr = new FileReader();
-        fr.onerror = function () {
-          fr.abort();
-          reject(new Error('Failed to read keystore data from server'));
-        };
-
-        fr.onload = function () {
-          const response = JSON.parse(this.result);
-          FileSaver.saveAs(blob, `${response.id}_keystore.json`);
-          resolve(response);
-        };
-
-        fr.readAsText(blob);
-      });
-
-      this.emit(Events.BNB_KEYSTORE_DOWNLOADED, keystore);
+      const data = await this.fetch(endpoints.downloadBNBKeystore, 'POST', payload.content);
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json;charset=utf-8' });
+      FileSaver.saveAs(blob, `${data.id}_keystore.json`);
+      this.emit(Events.BNB_KEYSTORE_DOWNLOADED, data);
     } catch (e) {
       this.emit(Events.ERROR, e);
     }
   }
 
-  async fetch(url, method, params = null, responseType = 'json') {
+  async fetch(url, method, params = null) {
     // Encrypt the params if necessary
     let encrypted = params;
     if (useAPIEncryption && method.toLowerCase() === 'post') {
@@ -110,8 +94,7 @@ class Store extends EventEmitter {
       const { data } = await httpClient({
         method,
         url,
-        data: encrypted,
-        responseType
+        data: encrypted
       });
       return data;
     } catch (e) {
