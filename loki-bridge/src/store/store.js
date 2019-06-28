@@ -2,10 +2,14 @@ import config from 'config';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import { EventEmitter } from 'events';
+import { encrypt } from '../utils/crypto';
 import * as Actions from './actions';
+import * as Events from './events';
 import dispatcher from './dispatcher';
 
 const apiUrl = config.get('apiUrl');
+const useAPIEncryption = config.get('useAPIEncryption');
+
 const httpClient = axios.create({ baseURL: apiUrl });
 const endpoints = {
   swap: '/api/v1/swap',
@@ -45,27 +49,27 @@ class Store extends EventEmitter {
   async swapToken(payload) {
     try {
       const data = await this.fetch(endpoints.swap, 'POST', payload.content);
-      this.emit(Actions.TOKEN_SWAPPED, data.result);
+      this.emit(Events.TOKEN_SWAPPED, data.result);
     } catch (e) {
-      this.emit(Actions.ERROR, e);
+      this.emit(Events.ERROR, e);
     }
   }
 
   async finalizeSwap(payload) {
     try {
       const data = await this.fetch(endpoints.finalizeSwap, 'POST', payload.content);
-      this.emit(Actions.TOKEN_SWAP_FINALIZED, data.result);
+      this.emit(Events.TOKEN_SWAP_FINALIZED, data.result);
     } catch (e) {
-      this.emit(Actions.ERROR, e);
+      this.emit(Events.ERROR, e);
     }
   }
 
   async createBNBAccount(payload) {
     try {
       const data = await this.fetch(endpoints.createBNBAccount, 'POST', payload.content);
-      this.emit(Actions.BNB_ACCOUNT_CREATED, data.result);
+      this.emit(Events.BNB_ACCOUNT_CREATED, data.result);
     } catch (e) {
-      this.emit(Actions.ERROR, e);
+      this.emit(Events.ERROR, e);
     }
   }
 
@@ -90,19 +94,24 @@ class Store extends EventEmitter {
         fr.readAsText(blob);
       });
 
-      this.emit(Actions.BNB_KEYSTORE_DOWNLOADED, keystore);
+      this.emit(Events.BNB_KEYSTORE_DOWNLOADED, keystore);
     } catch (e) {
-      this.emit(Actions.ERROR, e);
+      this.emit(Events.ERROR, e);
     }
   }
 
   async fetch(url, method, params = null, responseType = 'json') {
-    // TODO: Encrypt params on POST
+    // Encrypt the params if necessary
+    let encrypted = params;
+    if (useAPIEncryption && method.toLowerCase() === 'post') {
+      encrypted = encrypt(params, url);
+    }
+
     try {
       const { data } = await httpClient({
         method,
         url,
-        data: params,
+        data: encrypted,
         responseType
       });
       return data;
