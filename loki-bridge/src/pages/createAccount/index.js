@@ -9,7 +9,7 @@ import {
   SvgIcon
 } from '@material-ui/core';
 import { store, dispatcher, Actions, Events } from '../../store';
-import PageLoader from '../../components/pageLoader';
+import { PageLoader, Checkbox, Input, Button } from '../../components';
 import styles from './styles';
 
 class CreateAccount extends Component {
@@ -21,8 +21,8 @@ class CreateAccount extends Component {
     enteredWords: [],
     wordError: false,
     validateEnabled: false,
-    password: null,
-    confirmPassword: null,
+    password: '',
+    confirmPassword: '',
     passwordError: false,
   };
 
@@ -57,7 +57,8 @@ class CreateAccount extends Component {
   validateCreateBNBAccount = () => {
     const { accept, password, confirmPassword } = this.state;
 
-    const passwordsSet = password && confirmPassword;
+    const isEmpty = string => !string || string.length === 0;
+    const passwordsSet = isEmpty(password) && isEmpty(confirmPassword);
     const passwordsMatch = password.trim() === confirmPassword.trim();
     this.setState({
       passwordError: !passwordsSet || !passwordsMatch,
@@ -98,8 +99,83 @@ class CreateAccount extends Component {
     }
   }
 
+  onChange = (event) => {
+    let val = [];
+    val[event.target.id] = event.target.value;
+    this.setState(val);
+  };
+
+  onCheckChange = (event) => {
+    let val = [];
+    val[event.target.id] = event.target.checked;
+    this.setState(val);
+  }
+
   renderInitialPage = () => {
-    return <h1>Page 0</h1>;
+    const {
+      classes
+    } = this.props;
+
+    const {
+      accept,
+      password,
+      confirmPassword,
+      passwordError,
+      loading,
+    } = this.state;
+
+    return (
+      <React.Fragment>
+        <Grid item xs={ 12 }>
+          <Typography className={ classes.step }>
+            Step 1 of 4
+          </Typography>
+        </Grid>
+        <Grid item xs={ 12 }>
+          <Input
+            id="password"
+            fullWidth={ true }
+            label="Password"
+            placeholder="Set a New Password"
+            value={ password }
+            error={ passwordError }
+            onChange={ this.onChange }
+            disabled={ loading }
+            password
+          />
+        </Grid>
+        <Grid item xs={ 12 }>
+          <Input
+            id="confirmPassword"
+            fullWidth={ true }
+            label="Re-enter Password"
+            placeholder="Re-enter Password"
+            value={ confirmPassword }
+            error={ passwordError }
+            onChange={ this.onChange }
+            disabled={ loading }
+            password
+          />
+        </Grid>
+        <Grid item xs={ 12 }>
+          <Checkbox
+            id="accept"
+            fullWidth={ true }
+            label="I understand that loki cannot recover or reset my account details. I will make a backup of the account details and complete all wallet creation steps."
+            checked={ accept }
+            onChange={ this.onCheckChange }
+          />
+        </Grid>
+        <Grid item xs={ 12 } align='right' className={ classes.button }>
+          <Button
+            fullWidth={true}
+            label={ 'Download Mnemonic' }
+            disabled={ !accept }
+            onClick={ this.onNext }
+          />
+        </Grid>
+      </React.Fragment>
+    );
   }
 
   render() {

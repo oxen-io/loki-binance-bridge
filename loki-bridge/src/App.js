@@ -1,14 +1,11 @@
 import React, { PureComponent } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { Container } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
-import Swap from './pages/swap';
-import CreateAccount from './pages/createAccount';
-import ErrorSnackbar from './components/errorSnackbar';
-
-// TODO: Move this out
-const theme = {};
+import { Swap, CreateAccount } from './pages';
+import { ErrorSnackbar } from './components';
+import theme from './theme';
 
 export default class App extends PureComponent {
   state = {
@@ -43,14 +40,20 @@ export default class App extends PureComponent {
     const { errorOpen } = this.state;
 
     return (
-      // <MuiThemeProvider theme={ createMuiTheme(theme) }>
-      <React.Fragment>
+      <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
-        <Container>
-          { this.renderRoutes() }
-          { errorOpen && this.renderError() }
-        </Container>
-      </React.Fragment>
+        <Grid
+          style={{ padding: '0 7.5em'}}
+          container
+          justify="center"
+          alignItems="center"
+        >
+          <Grid item>
+            { this.renderRoutes() }
+            { errorOpen && this.renderError() }
+          </Grid>
+        </Grid>
+      </MuiThemeProvider>
     );
   }
 }
