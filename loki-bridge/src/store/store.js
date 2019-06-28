@@ -1,14 +1,13 @@
-import config from 'config';
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import { EventEmitter } from 'events';
 import { encrypt } from '../utils/crypto';
+import config from '../config';
 import * as Actions from './actions';
 import * as Events from './events';
 import dispatcher from './dispatcher';
 
-const apiUrl = config.get('apiUrl');
-const useAPIEncryption = config.get('useAPIEncryption');
+const { apiUrl, useAPIEncryption } = config;
 
 const httpClient = axios.create({ baseURL: apiUrl });
 const endpoints = {
@@ -32,7 +31,7 @@ class Store extends EventEmitter {
           this.finalizeSwap(payload);
           break;
         case Actions.CREATE_BNB_ACCOUNT:
-          this.createBNBAccount(payload);
+          this.createBNBAccount();
           break;
         case Actions.DOWNLOAD_BNB_KEYSTORE:
           this.downloadBNBKeystore(payload);
@@ -64,9 +63,9 @@ class Store extends EventEmitter {
     }
   }
 
-  async createBNBAccount(payload) {
+  async createBNBAccount() {
     try {
-      const data = await this.fetch(endpoints.createBNBAccount, 'POST', payload.content);
+      const data = await this.fetch(endpoints.createBNBAccount, 'POST', {});
       this.emit(Events.BNB_ACCOUNT_CREATED, data.result);
     } catch (e) {
       this.emit(Events.ERROR, e);
