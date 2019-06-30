@@ -3,7 +3,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
-import { Swap, CreateAccount } from './pages';
+import { Swap, CreateAccount } from './routes';
 import { ErrorSnackbar } from './components';
 import theme from './theme';
 
