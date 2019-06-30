@@ -8,8 +8,7 @@ import {
   InputAdornment,
   IconButton
 } from '@material-ui/core';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 import StyledLabel from '../label';
 import styles from './styles';

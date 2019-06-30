@@ -8,9 +8,14 @@ const styles = theme => ({
     letterSpacing: '0.03em',
     fontSize: '0.8rem',
     '&:hover': {
-      //you want this to be the same as the backgroundColor above
       backgroundColor: theme.palette.primary.main,
       color: 'white'
+    }
+  },
+  secondary: {
+    border: `1px solid ${theme.palette.secondary.main}`,
+    '&:hover': {
+      backgroundColor: theme.palette.secondary.main,
     }
   }
 });

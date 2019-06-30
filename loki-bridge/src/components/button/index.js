@@ -12,15 +12,16 @@ function StyledButton(props) {
     label,
     fullWidth,
     onClick,
-    disabled
+    disabled,
+    secondary
   } = props;
 
   return (
     <Button
-      className={ classes.root }
+      className={[classes.root, secondary && classes.secondary].join(' ')}
       fullWidth={ fullWidth }
       variant="outlined"
-      color="primary"
+      color={ secondary ? 'secondary' : 'primary'}
       disabled={ disabled }
       onClick={ onClick }>
       {label}
@@ -33,7 +34,8 @@ StyledButton.propTypes = {
   label: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   fullWidth: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  secondary: PropTypes.bool,
 };
 
 export default withStyles(styles)(StyledButton);

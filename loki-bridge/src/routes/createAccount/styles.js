@@ -1,18 +1,16 @@
 const styles = theme => ({
   root: {
-    maxWidth: '400px'
+    maxWidth: '800px'
   },
   button: {
     marginTop: '24px'
   },
+  copyButton: {
+    marginTop: '24px',
+  },
   heading: {
     fontSize: '24px',
     marginBottom: '24px'
-  },
-  image: {
-    padding: '24px',
-    margin: '0 auto',
-    width: '280px'
   },
   instruction: {
     marginBottom: '24px'
@@ -55,7 +53,8 @@ const styles = theme => ({
     lineHeight: '30px',
     fontSize: '16px',
     fontWeight: '600',
-    textAlign: 'center'
+    display: 'flex',
+    alignItems: 'center',
   }
 });
 

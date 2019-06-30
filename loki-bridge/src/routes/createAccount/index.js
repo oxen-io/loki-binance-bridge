@@ -1,29 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Grid,
-  Typography,
-  Paper,
-  IconButton,
-  SvgIcon
-} from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import { store, dispatcher, Actions, Events } from '../../store';
-import { PageLoader, Checkbox, Input, Button } from '../../components';
+import { PageLoader } from '../../components';
+import { CreateWallet, MnemonicDisplayWarning, MnemonicDisplay, MnemonicConfirm, Completion } from './pages';
 import styles from './styles';
 
 class CreateAccount extends Component {
   state = {
     loading: false,
     page: 0,
-    accept: false,
-    account: null,
+    account: {},
     enteredWords: [],
     wordError: false,
     validateEnabled: false,
     password: '',
-    confirmPassword: '',
-    passwordError: false,
+    mnemonicWords: [],
   };
 
   componentWillMount() {
@@ -56,19 +50,6 @@ class CreateAccount extends Component {
     this.setState({ page: 1, loading: false });
   }
 
-  validateCreateBNBAccount = () => {
-    const { accept, password, confirmPassword } = this.state;
-
-    const isEmpty = string => !string || string.length === 0;
-    const passwordsSet = !isEmpty(password) && !isEmpty(confirmPassword);
-    const passwordsMatch = password.trim() === confirmPassword.trim();
-    this.setState({
-      passwordError: !passwordsSet || !passwordsMatch,
-    });
-
-    return accept && passwordsSet && passwordsMatch;
-  }
-
   createBNBAccount = () => {
     dispatcher.dispatch({ type: Actions.CREATE_BNB_ACCOUNT });
     this.setState({ loading: true });
@@ -86,11 +67,14 @@ class CreateAccount extends Component {
     this.setState({ loading: true });
   }
 
+  navigateBackToHome = () => {
+    this.props.history.push('/');
+  }
+
   onNext = () => {
     switch (this.state.page) {
       case 0: // Input password
-        if (this.validateCreateBNBAccount())
-          this.createBNBAccount();
+        this.createBNBAccount();
         break;
       case 1: // Mnemonic reveal warning
       case 2: // Mnemonic
@@ -101,95 +85,53 @@ class CreateAccount extends Component {
     }
   }
 
-  onChange = (event) => {
-    let val = [];
-    val[event.target.id] = event.target.value;
-    this.setState(val);
-  };
-
-  onCheckChange = (event) => {
-    let val = [];
-    val[event.target.id] = event.target.checked;
-    this.setState(val);
-  }
-
-  renderInitialPage = () => {
-    const {
-      classes
-    } = this.props;
-
-    const {
-      accept,
-      password,
-      confirmPassword,
-      passwordError,
-      loading,
-    } = this.state;
-
-    return (
-      <React.Fragment>
-        <Grid item xs={ 12 }>
-          <Typography className={ classes.step }>
-            Step 1 of 4
-          </Typography>
-        </Grid>
-        <Grid item xs={ 12 }>
-          <Input
-            id="password"
-            fullWidth={ true }
-            label="Password"
-            placeholder="Set a New Password"
-            value={ password }
-            error={ passwordError }
-            onChange={ this.onChange }
-            disabled={ loading }
-            password
-          />
-        </Grid>
-        <Grid item xs={ 12 }>
-          <Input
-            id="confirmPassword"
-            fullWidth={ true }
-            label="Re-enter Password"
-            placeholder="Re-enter Password"
-            value={ confirmPassword }
-            error={ passwordError }
-            onChange={ this.onChange }
-            disabled={ loading }
-            password
-          />
-        </Grid>
-        <Grid item xs={ 12 }>
-          <Checkbox
-            id="accept"
-            fullWidth={ true }
-            label="I understand that loki cannot recover or reset my account details. I will make a backup of the account details and complete all wallet creation steps."
-            checked={ accept }
-            onChange={ this.onCheckChange }
-          />
-        </Grid>
-        <Grid item xs={ 12 } align='right' className={ classes.button }>
-          <Button
-            fullWidth={true}
-            label={ 'Download Mnemonic' }
-            disabled={ !accept }
-            onClick={ this.onNext }
-          />
-        </Grid>
-      </React.Fragment>
-    );
-  }
-
   render() {
-    const { page, loading } = this.state;
+    const { classes } = this.props;
+    const { page, loading, account, mnemonicWords } = this.state;
 
     return (
-      <Grid container>
+      <Grid container spacing={1} className={ classes.root }>
         { loading && <PageLoader /> }
         <Grid item xs={12}>
-          <Typography>Create New Binance Chain Wallet</Typography>
+          <Typography className={ classes.heading }>
+            Create New Binance Chain Wallet
+          </Typography>
         </Grid>
-        { page === 0 && this.renderInitialPage() }
+        <React.Fragment>
+          <Grid item xs={ 12 }>
+            <Typography className={ classes.step }>
+              { page < 3 ? `Step ${page + 1} of 4` : 'Completed' }
+            </Typography>
+          </Grid>
+        </React.Fragment>
+        { page === 0 && (
+          <CreateWallet
+            loading={loading}
+            onNext={(password) => {
+              this.setState({ password });
+              this.onNext();
+            }}
+            onCancel={this.navigateBackToHome}
+          />
+        )}
+        { page === 1 && <MnemonicDisplayWarning onNext={this.onNext} />}
+        { page === 2 && (
+          <MnemonicDisplay
+            loading={loading}
+            mnemonic={account.mnemonic}
+            onNext={this.onNext}
+          />
+        )}
+        { page === 3 && (
+          <MnemonicConfirm
+            loading={loading}
+            mnemonic={account.mnemonic}
+            mnemonicWords={mnemonicWords}
+            onNext={this.onNext}
+            onBack={() => this.setState({ page: page - 1 })}
+          />
+        )}
+        { page === 4 && <Completion onNext={this.navigateBackToHome} address={account.address} />}
       </Grid>
     );
   }
@@ -197,7 +139,8 @@ class CreateAccount extends Component {
 
 CreateAccount.propTypes = {
   showError: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(CreateAccount);
+export default withRouter(withStyles(styles)(CreateAccount));

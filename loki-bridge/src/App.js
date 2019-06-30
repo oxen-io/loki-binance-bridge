@@ -9,8 +9,24 @@ import theme from './theme';
 
 export default class App extends PureComponent {
   state = {
+    padding: 0,
     error: null,
     errorOpen: false
+  }
+
+  componentDidMount() {
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  onResize = () => {
+    const width = window.innerWidth;
+    const padding = (width <= 479) ? '0 8px' : '0 7.5em';
+    this.setState({ padding });
   }
 
   showError = (error) => {
@@ -37,13 +53,13 @@ export default class App extends PureComponent {
   }
 
   render() {
-    const { errorOpen } = this.state;
+    const { errorOpen, padding } = this.state;
 
     return (
       <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
         <Grid
-          style={{ padding: '0 7.5em'}}
+          style={{ padding }}
           container
           justify="center"
           alignItems="center"
