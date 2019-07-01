@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Typography, IconButton } from '@material-ui/core';
+import { Grid, Typography, IconButton, Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button } from '../../../components';
 import { SWAP_TYPE, TYPE } from '../../../utils/constants';
+import SwapList from '../components/swapList';
 import styles from '../styles';
 
 class SwapInfo extends Component {
@@ -29,8 +30,8 @@ class SwapInfo extends Component {
     }
   };
 
-  render() {
-    const { swapType, classes, swapInfo, loading, onNext } = this.props;
+  renderInstructions = () => {
+    const { swapType, classes, swapInfo } = this.props;
 
     const { userAddressType, lokiAddress, bnbAddress } = swapInfo;
 
@@ -40,7 +41,7 @@ class SwapInfo extends Component {
     return (
       <React.Fragment>
         <Grid item xs={ 12 } className={ classes.frame }>
-          <Typography className={ classes.instructionUnderlined }>
+          <Typography className={ classes.instructions }>
             Here's what you need to do next:
           </Typography>
           <Typography className={ classes.instructionBold }>
@@ -61,18 +62,35 @@ class SwapInfo extends Component {
               <CopyIcon/>
             </IconButton>
           </Typography>
-          <Typography className={ classes.instructionUnderlined }>
-            After you've completed the transfer, click the "NEXT" button so we can verify your transaction.
+          <Typography className={ classes.instructions }>
+            After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through. <br/>
+            <b>Note:</b> You will have to wait for there to be atleast 12 confirmations before your request is logged.
+          </Typography>
+
+          <Typography className={ classes.instructions }>
+            You can leave this page and come back later to refresh your swap requests. <br/>
+            If you run into any trouble, or your swap request has not gone through after 12 confirmations, please contact us.
           </Typography>
         </Grid>
+      </React.Fragment>
+    );
+  }
+
+  render() {
+    const { classes, loading, onRefresh, swapInfo } = this.props;
+
+    return (
+      <React.Fragment>
+        {this.renderInstructions()}
         <Grid item xs={ 12 } align='right' className={ classes.button }>
           <Button
             fullWidth
-            label="Next"
+            label="Refresh"
             disabled={loading}
-            onClick={onNext}
+            onClick={onRefresh}
           />
         </Grid>
+        <SwapList swaps={swapInfo.swaps} />
       </React.Fragment>
     );
   }
@@ -82,7 +100,7 @@ SwapInfo.propTypes = {
   classes: PropTypes.object.isRequired,
   swapType: PropTypes.string.isRequired,
   swapInfo: PropTypes.object.isRequired,
-  onNext: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func.isRequired,
   loading: PropTypes.bool,
 };
 

@@ -9,13 +9,45 @@ import { PageLoader } from '../../components';
 import { Selection, SwapInfo, Transactions } from './pages';
 import styles from './styles';
 
+/*
+uuid: swap.uuid,
+        type: swap.type,
+        lokiAddress,
+        bnbAddress,
+        amount: swap.amount,
+        txHash: swap.deposit_transaction_hash,
+        transferTxHashes: transactionHashArray,
+        created: swap.created,
+        */
+
 class Swap extends Component {
   state = {
     loading: false,
-    page: 0,
+    page: 1,
     swapType: SWAP_TYPE.LOKI_TO_BLOKI,
     address: '',
-    swapInfo: {},
+    swapInfo: {
+      bnbAddress: 'tbnb19rem68yzsjgdcmrjk4lv9jv9gd37d9gtmwfcul',
+      lokiAddress: 'TRrPPz1eru2WpJa1KiAb2ZhDfnJYzuFVDLJKUrJGdy1HEfFrxfdGgfRYbbdvkQHDQMM2a3BYo3tFsU5omwtDqxuW1ggv7hWDX',
+      userAddressType: 'bnb',
+      uuid: '5c6ca27e-b347-7c31-614f-fb06db725302',
+      swaps: [{
+        uuid: '5c6ca27e-b347-7c31-614f-fb06db725302',
+        amount: 10000000,
+        txHash: 'test',
+        transferTxHashes: [],
+        created: Date.now(),
+        type: SWAP_TYPE.LOKI_TO_BLOKI,
+      },
+      {
+        uuid: '5c6ca27e-b347-7c31-614f-fb06db725303',
+        amount: 2000000000000,
+        txHash: 'test',
+        transferTxHashes: ['hash1'],
+        created: Date.now(),
+        type: SWAP_TYPE.LOKI_TO_BLOKI,
+      }]
+    },
     transactions: [],
   };
 
@@ -56,7 +88,7 @@ class Swap extends Component {
   }
 
   onTokenSwapFinalized = (transactions) => {
-    this.setState({ transactions, loading: false, page: 2 });
+    this.setState({ transactions, loading: false });
     this.getSwaps();
   }
 
@@ -151,16 +183,7 @@ class Swap extends Component {
           <SwapInfo
             swapType={swapType}
             swapInfo={swapInfo}
-            onNext={this.onNext}
-            loading={loading}
-          />
-        )}
-        { page === 2 && (
-          <Transactions
-            swapType={swapType}
-            swapInfo={swapInfo}
-            transactions={transactions}
-            onDone={this.onNext}
+            onRefresh={this.finalizeSwap}
             loading={loading}
           />
         )}

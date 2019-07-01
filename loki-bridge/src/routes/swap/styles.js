@@ -16,21 +16,16 @@ const styles = theme => ({
     padding: '1rem'
   },
   instructions: {
-    fontSize: '0.8rem',
-    textAlign: 'center',
-    marginBottom: '16px'
-  },
-  instructionUnderlined: {
-    fontSize: '0.8rem',
-    textDecoration: 'underline',
+    fontSize: '0.9rem',
     textAlign: 'center',
     marginBottom: '16px'
   },
   instructionBold: {
-    fontSize: '0.8rem',
+    fontSize: '0.9rem',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: '16px'
+    marginBottom: '16px',
+    overflowWrap: 'break-word',
   },
   hash: {
     fontSize: '0.8rem',
@@ -73,6 +68,12 @@ const styles = theme => ({
   transactionItemValue: {
     marginBottom: theme.spacing(1),
     overflowWrap: 'break-word',
+  },
+  swapList: {
+    marginTop: theme.spacing(1)
+  },
+  swapInfo: {
+    padding: theme.spacing(2)
   }
 });
 
