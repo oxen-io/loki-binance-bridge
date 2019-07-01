@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import { SWAP_TYPE } from '../../../../utils/constants';
+import { SWAP_TYPE } from '@constants';
 import styles from './styles';
 
 class SwapList extends Component {

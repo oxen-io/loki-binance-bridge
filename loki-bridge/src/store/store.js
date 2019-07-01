@@ -1,8 +1,8 @@
 import axios from 'axios';
 import FileSaver from 'file-saver';
 import { EventEmitter } from 'events';
-import { encrypt } from '../utils/crypto';
-import config from '../config';
+import { encrypt } from '@utils/crypto';
+import config from '@config';
 import * as Actions from './actions';
 import * as Events from './events';
 import dispatcher from './dispatcher';

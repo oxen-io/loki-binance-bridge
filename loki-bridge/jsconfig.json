@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@components/*": ["./components/*", "./components"],
+      "@config/*": ["./config/*", "./config"],
+      "@routes/*": ["./routes/*", "./routes"],
+      "@store/*": ["./store/*", "./store"],
+      "@theme/*": ["./theme/*", "./theme"],
+      "@utils/*": ["./utils/*", "./utils"],
+      "@constants": ["./utils/constants.js"]
+    }
+  }
+}

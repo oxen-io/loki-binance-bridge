@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import { Button } from '../../../components';
-import { SWAP_TYPE, TYPE } from '../../../utils/constants';
+import { Button } from '@components';
+import { SWAP_TYPE, TYPE } from '@constants';
 import styles from '../styles';
 
 class Transactions extends Component {

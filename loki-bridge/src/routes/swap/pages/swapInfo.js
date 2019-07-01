@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Grid, Typography, IconButton, Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
-import { Button } from '../../../components';
-import { SWAP_TYPE, TYPE } from '../../../utils/constants';
+import { Button } from '@components';
+import { SWAP_TYPE, TYPE } from '@constants';
 import SwapList from '../components/swapList';
 import styles from '../styles';
 

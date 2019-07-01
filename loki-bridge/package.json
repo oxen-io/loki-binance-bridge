@@ -18,12 +18,13 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "request-promise": "^4.2.4",
-    "sha256": "^0.2.0"
+    "sha256": "^0.2.0",
+    "cra-alias": "^4.13.13"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test"
+    "start": "cra-alias start",
+    "build": "cra-alias build",
+    "test": "cra-alias test"
   },
   "eslintConfig": {
     "extends": "react-app"

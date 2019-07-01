@@ -15,7 +15,7 @@ nvm use
 
 Install all the dependencies:
 ```
-npm install --production
+npm install
 ```
 
 TODO: Edit config instructions

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
-import { Checkbox, Input, Button } from '../../../components';
+import { Checkbox, Input, Button } from '@components';
 import styles from '../styles';
 
 class CreateWallet extends Component {

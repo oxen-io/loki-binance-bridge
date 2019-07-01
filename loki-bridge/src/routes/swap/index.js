@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
-import { store, dispatcher, Actions, Events } from '../../store';
-import { SWAP_TYPE } from '../../utils/constants';
-import { PageLoader } from '../../components';
-import { Selection, SwapInfo, Transactions } from './pages';
+import { store, dispatcher, Actions, Events } from '@store';
+import { SWAP_TYPE } from '@constants';
+import { PageLoader } from '@components';
+import { Selection, SwapInfo } from './pages';
 import styles from './styles';
 
 /*

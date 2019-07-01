@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography, IconButton } from '@material-ui/core';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
-import { Button } from '../../../components';
+import { Button } from '@components';
 import styles from '../styles';
 
 class Completion extends Component {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
-import { Button } from '../../../components';
+import { Button } from '@components';
 import styles from '../styles';
 
 class MnemonicDisplayWarning extends Component {

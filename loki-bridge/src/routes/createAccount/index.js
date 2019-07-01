@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
-import { store, dispatcher, Actions, Events } from '../../store';
-import { PageLoader } from '../../components';
+import { store, dispatcher, Actions, Events } from '@store';
+import { PageLoader } from '@components';
 import { CreateWallet, MnemonicDisplayWarning, MnemonicDisplay, MnemonicConfirm, Completion } from './pages';
 import styles from './styles';
 
