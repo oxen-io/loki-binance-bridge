@@ -18,7 +18,8 @@ function StyledSelect(props) {
     handleChange,
     fullWidth,
     options,
-    disabled
+    disabled,
+    allowNull
   } = props;
 
   return (
@@ -38,7 +39,7 @@ function StyledSelect(props) {
           />
         }
       >
-        <option value={null}>select</option>
+        { allowNull && <option value={null}>select</option> }
         {
           options ? options.map((option) => {
             return <option key={option.value} value={option.value}>{option.description}</option>;
@@ -56,7 +57,8 @@ StyledSelect.propTypes = {
   value: PropTypes.string,
   handleChange: PropTypes.func,
   fullWidth: PropTypes.bool,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  allowNull: PropTypes.bool,
 };
 
 export default withStyles(styles)(StyledSelect);

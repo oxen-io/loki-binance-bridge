@@ -6,16 +6,14 @@ import { Button } from '../../../components';
 import styles from '../styles';
 
 class MnemonicConfirm extends Component {
-
-  state = {
-    mnemonicWords: [],
-    validateEnabled: false,
-    enteredWords: [],
-    wordError: false,
-  }
-
-  componentWillMount() {
-    this.setState({ mnemonicWords: this.props.mnemonicWords });
+  constructor(props) {
+    super(props);
+    this.state = {
+      mnemonicWords: props.mnemonicWords || [],
+      validateEnabled: false,
+      enteredWords: [],
+      wordError: false,
+    };
   }
 
   addWord = (word) => {

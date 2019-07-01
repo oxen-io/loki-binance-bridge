@@ -45,7 +45,7 @@ create table if not exists accounts_bnb (
 create table if not exists swaps (
   uuid char(36) primary key,
 
-  /* The type of swap: loki_to_bnb or bnb_to_loki */
+  /* The type of swap: loki_to_bloki or bloki_to_loki */
   type text,
 
   amount text,

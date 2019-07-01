@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import config from 'config';
 import { bnb, loki } from '../helpers';
 import { TYPE } from './constants';
 import db from './db';
@@ -24,9 +25,10 @@ export async function getIncomingTransactions(accountAddress, accountType) {
       if (!lokiAccount) return [];
 
       const transactions = await loki.getIncomingTransactions(lokiAccount.address_index);
+      const minConfirmations = config.get('loki.minConfirmations');
 
       // We only want transactions with a certain number of confirmations
-      return transactions.filter(tx => tx.confirmations >= 6).map(tx => ({
+      return transactions.filter(tx => tx.confirmations >= minConfirmations).map(tx => ({
         hash: tx.txid,
         amount: tx.amount,
       }));

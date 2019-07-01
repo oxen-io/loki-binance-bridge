@@ -28,7 +28,8 @@
         "filename": "lokibridge",
         "password": "",
         "accountIndex": 0
-      }
+      },
+      "minConfirmations": 12
     },
     "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT IS USED TO ENCRYPT GENERATED ACCOUNTS"
 }
