@@ -11,6 +11,7 @@ const { apiUrl, useAPIEncryption } = config;
 
 const httpClient = axios.create({ baseURL: apiUrl });
 const endpoints = {
+  getSwaps: '/api/v1/getSwaps',
   swap: '/api/v1/swap',
   finalizeSwap: '/api/v1/finalizeSwap',
   createBNBAccount: '/api/v1/createBNBAccount',
@@ -24,6 +25,9 @@ class Store extends EventEmitter {
 
     dispatcher.register(async payload => {
       switch(payload.type) {
+        case Actions.GET_SWAPS:
+          this.getSwaps(payload);
+          break;
         case Actions.SWAP_TOKEN:
           this.swapToken(payload);
           break;
@@ -44,6 +48,15 @@ class Store extends EventEmitter {
   getStore(key) {
     return this.store[key];
   };
+
+  async getSwaps(payload) {
+    try {
+      const data = await this.fetch(endpoints.getSwaps, 'GET', payload.content);
+      this.emit(Events.FETCHED_SWAPS, data.result);
+    } catch (e) {
+      this.emit(Events.ERROR, e);
+    }
+  }
 
   async swapToken(payload) {
     try {
@@ -90,11 +103,12 @@ class Store extends EventEmitter {
       encrypted = encrypt(params, url);
     }
 
+    const field = method.toLowerCase() === 'post' ? 'data' : 'params';
     try {
       const { data } = await httpClient({
         method,
         url,
-        data: encrypted
+        [field]: encrypted
       });
       return data;
     } catch (e) {

@@ -12,7 +12,7 @@ const wrapRouterFunction = (routerFunc, params) => new Promise(resolve => {
     resolve(res.body);
   };
 
-  routerFunc({ body: params }, response, next);
+  routerFunc({ body: params, query: params }, response, next);
 });
 
 export { dbHelper, wrapRouterFunction };

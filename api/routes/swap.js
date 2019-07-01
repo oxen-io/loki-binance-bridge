@@ -127,7 +127,7 @@ export function finalizeSwap(req, res, next) {
 }
 
 export async function getSwaps(req, res, next) {
-  const data = req.body;
+  const data = req.query;
 
   const result = validation.validateUuidPresent(data);
   if (result != null) {
@@ -148,7 +148,7 @@ export async function getSwaps(req, res, next) {
 
     const { address, addressType, accountAddress } = clientAccount;
 
-    const swaps = db.getSwapsForClientAccount(uuid);
+    const swaps = await db.getSwapsForClientAccount(uuid);
     if (!swaps) {
       res.status(400);
       res.body = { status: 400, success: false, result: 'Failed to fetch swaps' };

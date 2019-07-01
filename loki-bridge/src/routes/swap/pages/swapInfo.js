@@ -7,7 +7,7 @@ import { Button } from '../../../components';
 import { SWAP_TYPE, TYPE } from '../../../utils/constants';
 import styles from '../styles';
 
-class DepositInfo extends Component {
+class SwapInfo extends Component {
   onCopy = () => {
     var elm = document.getElementById('depositAddress');
     let range;
@@ -78,7 +78,7 @@ class DepositInfo extends Component {
   }
 }
 
-DepositInfo.propTypes = {
+SwapInfo.propTypes = {
   classes: PropTypes.object.isRequired,
   swapType: PropTypes.string.isRequired,
   swapInfo: PropTypes.object.isRequired,
@@ -86,4 +86,4 @@ DepositInfo.propTypes = {
   loading: PropTypes.bool,
 };
 
-export default withStyles(styles)(DepositInfo);
+export default withStyles(styles)(SwapInfo);

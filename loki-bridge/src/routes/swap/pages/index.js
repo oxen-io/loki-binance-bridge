@@ -1,5 +1,5 @@
 import Selection from './selection';
-import DepositInfo from './depositInfo';
+import SwapInfo from './swapInfo';
 import Transactions from './transactions';
 
-export { Selection, DepositInfo, Transactions };
+export { Selection, SwapInfo, Transactions };

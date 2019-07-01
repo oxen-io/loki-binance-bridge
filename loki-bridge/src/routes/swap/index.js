@@ -6,7 +6,7 @@ import { Grid, Typography } from '@material-ui/core';
 import { store, dispatcher, Actions, Events } from '../../store';
 import { SWAP_TYPE } from '../../utils/constants';
 import { PageLoader } from '../../components';
-import { Selection, DepositInfo, Transactions } from './pages';
+import { Selection, SwapInfo, Transactions } from './pages';
 import styles from './styles';
 
 class Swap extends Component {
@@ -25,12 +25,14 @@ class Swap extends Component {
 
   componentWillMount() {
     store.on(Events.ERROR, this.onError);
+    store.on(Events.FETCHED_SWAPS, this.onSwapsFetched);
     store.on(Events.TOKEN_SWAPPED, this.onTokenSwapped);
     store.on(Events.TOKEN_SWAP_FINALIZED, this.onTokenSwapFinalized);
   }
 
   componentWillUnmount() {
     store.removeListener(Events.ERROR, this.onError);
+    store.removeListener(Events.FETCHED_SWAPS, this.onSwapsFetched);
     store.removeListener(Events.TOKEN_SWAPPED, this.onTokenSwapped);
     store.removeListener(Events.TOKEN_SWAP_FINALIZED, this.onTokenSwapFinalized);
   }
@@ -40,12 +42,22 @@ class Swap extends Component {
     this.setState({ loading: false });
   }
 
+  onSwapsFetched = (swaps) => {
+    const swapInfo = {
+      ...this.state.swapInfo,
+      swaps,
+    };
+    this.setState({ swapInfo, loading: false });
+  }
+
   onTokenSwapped = (swapInfo) => {
-    this.setState({ swapInfo, loading: false, page: 1 });
+    this.setState({ swapInfo, page: 1 });
+    setImmediate(() => this.getSwaps());
   }
 
   onTokenSwapFinalized = (transactions) => {
     this.setState({ transactions, loading: false, page: 2 });
+    this.getSwaps();
   }
 
   resetState = () => {
@@ -73,6 +85,17 @@ class Swap extends Component {
       default:
 
     }
+  }
+
+  getSwaps = () => {
+    const { swapInfo } = this.state;
+    dispatcher.dispatch({
+      type: Actions.GET_SWAPS,
+      content: {
+        uuid: swapInfo.uuid
+      }
+    });
+    this.setState({ loading: true });
   }
 
   swapToken = () => {
@@ -125,7 +148,7 @@ class Swap extends Component {
           />
         )}
         { page === 1 && (
-          <DepositInfo
+          <SwapInfo
             swapType={swapType}
             swapInfo={swapInfo}
             onNext={this.onNext}
