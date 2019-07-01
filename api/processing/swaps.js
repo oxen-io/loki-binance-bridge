@@ -51,7 +51,7 @@ export function getTransactions(swaps) {
  */
 export async function send(swapType, transactions) {
   // Multi-send always returns an array of hashes
-  if (swapType === SWAP_TYPE.LOKI_TO_BNB) {
+  if (swapType === SWAP_TYPE.LOKI_TO_BLOKI) {
     const symbol = config.get('binance.symbol');
     const outputs = transactions.map(({ address, amount }) => ({
       to: address,
@@ -63,7 +63,7 @@ export async function send(swapType, transactions) {
 
     // Send BNB to the users
     return bnb.multiSend(config.get('binance.wallet.mnemonic'), outputs, 'Loki Bridge');
-  } else if (swapType === SWAP_TYPE.BNB_TO_LOKI) {
+  } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
     // Send Loki to the users
     return loki.multiSend(transactions);
   }

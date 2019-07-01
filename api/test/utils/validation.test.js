@@ -23,7 +23,7 @@ describe('Validation', () => {
     });
 
     it('should return an error if address is not present', async () => {
-      const error = await validation.validateSwap({ type: SWAP_TYPE.LOKI_TO_BNB });
+      const error = await validation.validateSwap({ type: SWAP_TYPE.LOKI_TO_BLOKI });
       assert.strictEqual(error, 'address is required');
     });
 
@@ -35,25 +35,25 @@ describe('Validation', () => {
     it('should return an error if the loki address was invalid', async () => {
       stubValidateAddressReturn(false);
 
-      const error = await validation.validateSwap({ address: 'an address', type: SWAP_TYPE.BNB_TO_LOKI });
+      const error = await validation.validateSwap({ address: 'an address', type: SWAP_TYPE.BLOKI_TO_LOKI });
       assert(loki.validateAddress.calledOnce, 'Loki validate was not called');
       assert.strictEqual(error, 'address must be a LOKI address');
     });
 
     it('should return an error if the bnb address was invalid', async () => {
       stubValidateAddressReturn(false);
-      const error = await validation.validateSwap({ address: 'an address', type: SWAP_TYPE.LOKI_TO_BNB });
+      const error = await validation.validateSwap({ address: 'an address', type: SWAP_TYPE.LOKI_TO_BLOKI });
       assert(bnb.validateAddress.calledOnce, 'BNB validate was not called');
       assert.strictEqual(error, 'address must be a BNB address');
     });
 
     it('should return null if no errors occurred', async () => {
       stubValidateAddressReturn(true);
-      const lokiError = await validation.validateSwap({ address: '1', type: SWAP_TYPE.BNB_TO_LOKI });
+      const lokiError = await validation.validateSwap({ address: '1', type: SWAP_TYPE.BLOKI_TO_LOKI });
       assert.isNull(lokiError);
       assert(loki.validateAddress.calledOnce, 'Loki validate was not called');
 
-      const bnbError = await validation.validateSwap({ address: '1', type: SWAP_TYPE.LOKI_TO_BNB });
+      const bnbError = await validation.validateSwap({ address: '1', type: SWAP_TYPE.LOKI_TO_BLOKI });
       assert.isNull(bnbError);
       assert(bnb.validateAddress.calledOnce, 'BNB validate was not called');
     });

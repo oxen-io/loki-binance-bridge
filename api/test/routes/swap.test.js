@@ -35,13 +35,13 @@ describe('Swap API', () => {
 
         const failingData = [
           null,
-          { type: SWAP_TYPE.LOKI_TO_BNB },
+          { type: SWAP_TYPE.LOKI_TO_BLOKI },
           { address: '123', type: 'invalid type' },
 
           // validateAddress for both loki and bnb have been stubbed to return false
           // Which should cause these to fail
-          { address: '123', type: SWAP_TYPE.LOKI_TO_BNB },
-          { address: '123', type: SWAP_TYPE.BNB_TO_LOKI },
+          { address: '123', type: SWAP_TYPE.LOKI_TO_BLOKI },
+          { address: '123', type: SWAP_TYPE.BLOKI_TO_LOKI },
         ];
 
         const results = await Promise.all(failingData.map(swapToken));
@@ -90,8 +90,8 @@ describe('Swap API', () => {
           dbHelper.insertClientAccount(bnbClientAccount, bnbAddress, TYPE.BNB, lokiAccountUuid, TYPE.LOKI),
         ]));
 
-        // LOKI_TO_BNB means we give the api our BNB address
-        const lokiToBnb = await swapToken({ type: SWAP_TYPE.LOKI_TO_BNB, address: bnbAddress });
+        // LOKI_TO_BLOKI means we give the api our BNB address
+        const lokiToBnb = await swapToken({ type: SWAP_TYPE.LOKI_TO_BLOKI, address: bnbAddress });
         assert.equal(lokiToBnb.status, 200);
         assert.isTrue(lokiToBnb.success);
         assert.deepEqual(lokiToBnb.result, {
@@ -101,8 +101,8 @@ describe('Swap API', () => {
           bnbAddress,
         });
 
-        // BNB_TO_LOKI means we give the api our LOKI address
-        const bnbToLoki = await swapToken({ type: SWAP_TYPE.BNB_TO_LOKI, address: lokiAddress });
+        // BLOKI_TO_LOKI means we give the api our LOKI address
+        const bnbToLoki = await swapToken({ type: SWAP_TYPE.BLOKI_TO_LOKI, address: lokiAddress });
         assert.equal(bnbToLoki.status, 200);
         assert.isTrue(bnbToLoki.success);
         assert.deepEqual(bnbToLoki.result, {
@@ -129,7 +129,7 @@ describe('Swap API', () => {
         };
         sandbox.stub(loki, 'createAccount').returns(generateLokiAccount);
 
-        const lokiToBnb = await swapToken({ type: SWAP_TYPE.LOKI_TO_BNB, address: bnbAddress });
+        const lokiToBnb = await swapToken({ type: SWAP_TYPE.LOKI_TO_BLOKI, address: bnbAddress });
         assert.equal(lokiToBnb.status, 200);
         assert.isTrue(lokiToBnb.success);
 
@@ -138,7 +138,7 @@ describe('Swap API', () => {
         assert.strictEqual(lokiClientAccount.lokiAddress, 'generatedLoki');
         assert.strictEqual(lokiClientAccount.bnbAddress, bnbAddress);
 
-        const bnbToLoki = await swapToken({ type: SWAP_TYPE.BNB_TO_LOKI, address: lokiAddress });
+        const bnbToLoki = await swapToken({ type: SWAP_TYPE.BLOKI_TO_LOKI, address: lokiAddress });
         assert.equal(bnbToLoki.status, 200);
         assert.isTrue(bnbToLoki.success);
 
@@ -254,7 +254,7 @@ describe('Swap API', () => {
         assert.lengthOf(result, 1);
 
         const swap = result[0];
-        assert.strictEqual(swap.type, SWAP_TYPE.BNB_TO_LOKI);
+        assert.strictEqual(swap.type, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.strictEqual(swap.lokiAddress, clientAccount.address);
         assert.strictEqual(swap.bnbAddress, clientAccount.accountAddress);
         assert.equal(swap.amount, 100);

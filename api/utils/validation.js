@@ -8,11 +8,11 @@ export async function validateSwap(body) {
   if (!address) return 'address is required';
   if (!Object.values(SWAP_TYPE).includes(type)) return 'type is invalid';
 
-  if (type === SWAP_TYPE.BNB_TO_LOKI) {
+  if (type === SWAP_TYPE.BLOKI_TO_LOKI) {
     // User should pass a LOKI address
     const valid = await loki.validateAddress(address);
     if (!valid) return 'address must be a LOKI address';
-  } else if (type === SWAP_TYPE.LOKI_TO_BNB) {
+  } else if (type === SWAP_TYPE.LOKI_TO_BLOKI) {
     // User should pass a BNB address
     if (!bnb.validateAddress(address)) return 'address must be a BNB address';
   }

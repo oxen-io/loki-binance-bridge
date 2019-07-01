@@ -9,7 +9,7 @@ import { db, crypto, transaction, validation, SWAP_TYPE, TYPE } from '../utils';
  * Request Data:
  *  - type: The type of swap (SWAP_TYPE).
  *  - address: An address. The type of address is determined from the `type` passed.
- *  E.g If `type = LOKI_TO_BNB` then the `address` is expected to be a loki address.
+ *  E.g If `type = LOKI_TO_BLOKI` then the `address` is expected to be a loki address.
  */
 export function swapToken(req, res, next) {
   crypto.decryptAPIPayload(req, res, next, async data => {
@@ -23,10 +23,10 @@ export function swapToken(req, res, next) {
     const { type, address } = data;
 
     // We assume the address type is that of the currency we are swapping to.
-    // So if the swap is LOKI_TO_BNB then we want the user to give the BNB address
+    // So if the swap is LOKI_TO_BLOKI then we want the user to give the BNB address
     // We then generate a LOKI address that they will deposit to.
     // After the deposit we pay them out to the BNB address they passed.
-    const addressType = type === SWAP_TYPE.LOKI_TO_BNB ? TYPE.BNB : TYPE.LOKI;
+    const addressType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
 
     try {
       const account = await db.getClientAccount(address, addressType);

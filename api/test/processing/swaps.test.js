@@ -50,13 +50,13 @@ describe('Processing Swaps', () => {
       lokiStub = sandbox.stub(loki, 'multiSend');
     });
 
-    it('should send to BNB if swap type is LOKI_TO_BNB', async () => {
-      await functions.send(SWAP_TYPE.LOKI_TO_BNB, transactions);
+    it('should send to BNB if swap type is LOKI_TO_BLOKI', async () => {
+      await functions.send(SWAP_TYPE.LOKI_TO_BLOKI, transactions);
       assert(bnbStub.called, 'bnb.multiSend was not called');
     });
 
-    it('should send to LOKI if swap type is BNB_TO_LOKI', async () => {
-      await functions.send(SWAP_TYPE.BNB_TO_LOKI, transactions);
+    it('should send to LOKI if swap type is BLOKI_TO_LOKI', async () => {
+      await functions.send(SWAP_TYPE.BLOKI_TO_LOKI, transactions);
       assert(lokiStub.called, 'loki.multiSend was not called');
     });
 
@@ -70,7 +70,7 @@ describe('Processing Swaps', () => {
     });
 
     it('should convert the transactions to correct outputs for BNB', async () => {
-      await functions.send(SWAP_TYPE.LOKI_TO_BNB, transactions);
+      await functions.send(SWAP_TYPE.LOKI_TO_BLOKI, transactions);
 
       const { args } = bnbStub.getCalls()[0];
       assert.lengthOf(args, 3);
@@ -97,7 +97,7 @@ describe('Processing Swaps', () => {
     });
 
     const processSwap = async swapType => {
-      const addressType = swapType === SWAP_TYPE.LOKI_TO_BNB ? TYPE.BNB : TYPE.LOKI;
+      const addressType = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
       const accountType = addressType === TYPE.BNB ? TYPE.LOKI : TYPE.BNB;
       const clientAccountUuid = 'cbfa4d0f-cecb-4c46-88b8-719bbca6395a';
       const swapUuid = 'a2a67748-ae5d-415c-81d6-803d28dc29fb';
@@ -112,17 +112,17 @@ describe('Processing Swaps', () => {
       return postgres.oneOrNone('select transfer_transaction_hash from swaps where uuid = $1', [swapUuid]);
     };
 
-    context('LOKI_TO_BNB', () => {
+    context('LOKI_TO_BLOKI', () => {
       it('should update the transfer transactions hash on success', async () => {
-        const swap = await processSwap(SWAP_TYPE.LOKI_TO_BNB);
+        const swap = await processSwap(SWAP_TYPE.LOKI_TO_BLOKI);
         assert.isNotNull(swap);
         assert.strictEqual(swap.transfer_transaction_hash, 'bnbTxHash1,bnbTxHash2');
       });
     });
 
-    context('BNB_TO_LOKI', () => {
+    context('BLOKI_TO_LOKI', () => {
       it('should update the transfer transactions hash on success', async () => {
-        const swap = await processSwap(SWAP_TYPE.BNB_TO_LOKI);
+        const swap = await processSwap(SWAP_TYPE.BLOKI_TO_LOKI);
         assert.isNotNull(swap);
         assert.strictEqual(swap.transfer_transaction_hash, 'lokiTxHash1,lokiTxHash2');
       });

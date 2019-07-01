@@ -284,7 +284,7 @@ const db = {
     // eslint-disable-next-line max-len
     // If the client address is LOKI then it must mean that we generated a BNB address for them to deposit into and thus they want to swap BNB for LOKI.
     // Same logic applies the other way
-    const type = addressType === TYPE.LOKI ? SWAP_TYPE.BNB_TO_LOKI : SWAP_TYPE.LOKI_TO_BNB;
+    const type = addressType === TYPE.LOKI ? SWAP_TYPE.BLOKI_TO_LOKI : SWAP_TYPE.LOKI_TO_BLOKI;
 
     // eslint-disable-next-line max-len
     const query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now()) returning uuid, type, amount, deposit_transaction_hash;';

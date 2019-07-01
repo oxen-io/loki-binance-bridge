@@ -295,9 +295,9 @@ describe('Database', () => {
       it('should return all the swaps for the given client account', async () => {
         const clientUuid = 'clientUuid';
         await postgres.tx(t => t.batch([
-          dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BNB, 1, clientUuid),
-          dbHelper.insertSwap('2', SWAP_TYPE.BNB_TO_LOKI, 2, clientUuid),
-          dbHelper.insertSwap('3', SWAP_TYPE.LOKI_TO_BNB, 4, 'another uuid'),
+          dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BLOKI, 1, clientUuid),
+          dbHelper.insertSwap('2', SWAP_TYPE.BLOKI_TO_LOKI, 2, clientUuid),
+          dbHelper.insertSwap('3', SWAP_TYPE.LOKI_TO_BLOKI, 4, 'another uuid'),
         ]));
 
         const swaps = await db.getSwapsForClientAccount(clientUuid);
@@ -310,19 +310,19 @@ describe('Database', () => {
         const { count } = await postgres.one('select count(*) from swaps');
         assert.equal(count, 0);
 
-        const swaps = await db.getPendingSwaps(SWAP_TYPE.LOKI_TO_BNB);
+        const swaps = await db.getPendingSwaps(SWAP_TYPE.LOKI_TO_BLOKI);
         assert.isEmpty(swaps);
       });
 
       it('should return all the swaps that are pending', async () => {
         const clientUuid = '17b42f9e-97b1-11e9-bc42-526af7764f64';
         await postgres.tx(t => t.batch([
-          dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BNB, 1, clientUuid, 'pending swap'),
-          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BNB, 1, clientUuid, 'completed swap', 'transaction', true),
-          dbHelper.insertSwap('3', SWAP_TYPE.BNB_TO_LOKI, 1, clientUuid, 'pending swap'),
+          dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BLOKI, 1, clientUuid, 'pending swap'),
+          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BLOKI, 1, clientUuid, 'completed swap', 'transaction', true),
+          dbHelper.insertSwap('3', SWAP_TYPE.BLOKI_TO_LOKI, 1, clientUuid, 'pending swap'),
         ]));
 
-        const swaps = await db.getPendingSwaps(SWAP_TYPE.LOKI_TO_BNB);
+        const swaps = await db.getPendingSwaps(SWAP_TYPE.LOKI_TO_BLOKI);
         assert.lengthOf(swaps, 1);
       });
 
@@ -334,16 +334,16 @@ describe('Database', () => {
 
         await postgres.tx(t => t.batch([
           dbHelper.insertClientAccount(clientUuid, address, TYPE.LOKI, accountUuid, TYPE.BNB),
-          dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BNB, 2, clientUuid, 'pending swap'),
-          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BNB, 9, clientUuid, 'completed swap', 'transaction', true),
-          dbHelper.insertSwap('3', SWAP_TYPE.BNB_TO_LOKI, 10, clientUuid, depositHash),
+          dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BLOKI, 2, clientUuid, 'pending swap'),
+          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BLOKI, 9, clientUuid, 'completed swap', 'transaction', true),
+          dbHelper.insertSwap('3', SWAP_TYPE.BLOKI_TO_LOKI, 10, clientUuid, depositHash),
         ]));
 
-        const swaps = await db.getPendingSwaps(SWAP_TYPE.BNB_TO_LOKI);
+        const swaps = await db.getPendingSwaps(SWAP_TYPE.BLOKI_TO_LOKI);
         assert.lengthOf(swaps, 1);
 
         const swap = swaps[0];
-        assert.strictEqual(swap.type, SWAP_TYPE.BNB_TO_LOKI);
+        assert.strictEqual(swap.type, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.equal(swap.amount, 10);
         assert.strictEqual(swap.deposit_transaction_hash, depositHash);
         assert.strictEqual(swap.address_type, TYPE.LOKI);
@@ -373,7 +373,7 @@ describe('Database', () => {
         assert.isNotNull(dbSwap);
 
         assert.strictEqual(dbSwap.uuid, swap.uuid);
-        assert.strictEqual(dbSwap.type, SWAP_TYPE.BNB_TO_LOKI);
+        assert.strictEqual(dbSwap.type, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.equal(dbSwap.amount, 10);
         assert.strictEqual(dbSwap.deposit_transaction_hash, '123');
         assert.strictEqual(dbSwap.client_account_uuid, clientUuid);
@@ -419,7 +419,7 @@ describe('Database', () => {
         assert.lengthOf(swaps, 1);
 
         const swap = swaps[0];
-        assert.strictEqual(swap.type, SWAP_TYPE.BNB_TO_LOKI);
+        assert.strictEqual(swap.type, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.strictEqual(swap.lokiAddress, clientAccount.address);
         assert.strictEqual(swap.bnbAddress, clientAccount.accountAddress);
         assert.equal(swap.amount, transaction.amount);
@@ -431,7 +431,7 @@ describe('Database', () => {
       it('should update transaction hash and set swap to processed', async () => {
         const uuid = '17b42f9e-97b1-11e9-bc42-526af7764f64';
         const transferTxHash = 'transfer';
-        await dbHelper.insertSwap(uuid, SWAP_TYPE.LOKI_TO_BNB, 10, 'uuid', 'deposit');
+        await dbHelper.insertSwap(uuid, SWAP_TYPE.LOKI_TO_BLOKI, 10, 'uuid', 'deposit');
 
         const { count: processedCount } = await postgres.one('select count(*) from swaps where processed = true');
         assert.equal(processedCount, 0);
