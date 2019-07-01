@@ -20,7 +20,7 @@ export async function validateSwap(body) {
   return null;
 }
 
-export function validateFinalizeSwap(body) {
+export function validateUuidPresent(body) {
   if (!body) return 'invalid params';
   const { uuid } = body;
   if (!uuid) return 'uuid is required';

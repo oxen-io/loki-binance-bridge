@@ -220,13 +220,13 @@ const db = {
    * @returns {Promise<[object]>} An array of swaps or `null` if something went wrong.
    */
   async getSwapsForClientAccount(clientAccountUuid) {
-    const query = 'select * from swaps where client_account_uuid = $1;';
+    const query = 'select * from swaps where client_account_uuid = $1 order by created asc;';
     return postgres.manyOrNone(query, [clientAccountUuid]);
   },
 
   /**
    * Get all pending `swaps` of the given `swapType`.
-   * A pending swap is when the `deposit tx hash` is set but `transfer tx hash` is not set and `processed` is not true.
+   * A pending swap is when the `deposit tx hash` is set but `transfer tx hash` is not set and `processed` is not set.
    *
    * @param {string} swapType The swap type.
    * @returns {Promise<[object]>} An array of swaps or `null` if something went wrong.
@@ -298,7 +298,7 @@ const db = {
    * @param {string} transactionHash The transaction hash to set on the swaps.
    */
   async updateSwapsTransferTransactionHash(swapUuids, transactionHash) {
-    const query = 'update swaps set transfer_transaction_hash = $1, processed = true where uuid in ($2:csv)';
+    const query = 'update swaps set transfer_transaction_hash = $1, processed = now() where uuid in ($2:csv)';
     return postgres.none(query, [transactionHash, swapUuids]);
   },
 };

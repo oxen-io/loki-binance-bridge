@@ -318,7 +318,7 @@ describe('Database', () => {
         const clientUuid = '17b42f9e-97b1-11e9-bc42-526af7764f64';
         await postgres.tx(t => t.batch([
           dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BLOKI, 1, clientUuid, 'pending swap'),
-          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BLOKI, 1, clientUuid, 'completed swap', 'transaction', true),
+          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BLOKI, 1, clientUuid, 'completed swap', 'transaction', Date.now()),
           dbHelper.insertSwap('3', SWAP_TYPE.BLOKI_TO_LOKI, 1, clientUuid, 'pending swap'),
         ]));
 
@@ -335,7 +335,7 @@ describe('Database', () => {
         await postgres.tx(t => t.batch([
           dbHelper.insertClientAccount(clientUuid, address, TYPE.LOKI, accountUuid, TYPE.BNB),
           dbHelper.insertSwap('1', SWAP_TYPE.LOKI_TO_BLOKI, 2, clientUuid, 'pending swap'),
-          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BLOKI, 9, clientUuid, 'completed swap', 'transaction', true),
+          dbHelper.insertSwap('2', SWAP_TYPE.LOKI_TO_BLOKI, 9, clientUuid, 'completed swap', 'transaction', Date.now()),
           dbHelper.insertSwap('3', SWAP_TYPE.BLOKI_TO_LOKI, 10, clientUuid, depositHash),
         ]));
 
@@ -433,11 +433,11 @@ describe('Database', () => {
         const transferTxHash = 'transfer';
         await dbHelper.insertSwap(uuid, SWAP_TYPE.LOKI_TO_BLOKI, 10, 'uuid', 'deposit');
 
-        const { count: processedCount } = await postgres.one('select count(*) from swaps where processed = true');
+        const { count: processedCount } = await postgres.one('select count(*) from swaps where processed is not null');
         assert.equal(processedCount, 0);
 
         await db.updateSwapsTransferTransactionHash([uuid], transferTxHash);
-        const { count: newProcessedCount } = await postgres.one('select count(*) from swaps where processed = true');
+        const { count: newProcessedCount } = await postgres.one('select count(*) from swaps where processed is not null');
         assert.equal(newProcessedCount, 1);
 
         // eslint-disable-next-line camelcase

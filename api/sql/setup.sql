@@ -57,6 +57,6 @@ create table if not exists swaps (
   /* The transaction hash of our transfer to the client */
   transfer_transaction_hash text,
 
-  processed boolean,
+  processed timestamp,
   created timestamp
 );

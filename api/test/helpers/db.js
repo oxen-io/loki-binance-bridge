@@ -14,5 +14,9 @@ export const insertClientAccount = async (uuid, address, addressType, accountUui
 };
 
 export const insertSwap = async (uuid, type, amount, clientAccountUuid, depositTransactionHash = null, transferTransactionHash = null, processed = null) => {
-  return postgres.none('insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, transfer_transaction_hash, processed, created) values ($1, $2, $3, $4, $5, $6, $7, now())', [uuid, type, amount, clientAccountUuid, depositTransactionHash, transferTransactionHash, processed]);
+  let query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, transfer_transaction_hash, created) values ($1, $2, $3, $4, $5, $6, now())';
+  if (processed) {
+    query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, transfer_transaction_hash, processed, created) values ($1, $2, $3, $4, $5, $6, now(), now())';
+  }
+  return postgres.none(query, [uuid, type, amount, clientAccountUuid, depositTransactionHash, transferTransactionHash]);
 };

@@ -62,6 +62,7 @@ export function swapToken(req, res, next) {
     return next(null, req, res, next);
   });
 }
+
 /**
  * Check to see if transfer was done.
  * Validate that against the swaps that have recorded previously.
@@ -73,7 +74,7 @@ export function swapToken(req, res, next) {
  */
 export function finalizeSwap(req, res, next) {
   crypto.decryptAPIPayload(req, res, next, async data => {
-    const result = validation.validateFinalizeSwap(data);
+    const result = validation.validateUuidPresent(data);
     if (result != null) {
       res.status(400);
       res.body = { status: 400, success: false, result };
@@ -123,4 +124,64 @@ export function finalizeSwap(req, res, next) {
 
     return next(null, req, res, next);
   });
+}
+
+export async function getSwaps(req, res, next) {
+  const data = req.body;
+
+  const result = validation.validateUuidPresent(data);
+  if (result != null) {
+    res.status(400);
+    res.body = { status: 400, success: false, result };
+    return next(null, req, res, next);
+  }
+
+  const { uuid } = data;
+
+  try {
+    const clientAccount = await db.getClientAccountForUuid(uuid);
+    if (!clientAccount) {
+      res.status(400);
+      res.body = { status: 400, success: false, result: 'Unable to find swap details' };
+      return next(null, req, res, next);
+    }
+
+    const { address, addressType, accountAddress } = clientAccount;
+
+    const swaps = db.getSwapsForClientAccount(uuid);
+    if (!swaps) {
+      res.status(400);
+      res.body = { status: 400, success: false, result: 'Failed to fetch swaps' };
+      return next(null, req, res, next);
+    }
+
+    const lokiAddress = addressType === TYPE.LOKI ? address : accountAddress;
+    const bnbAddress = addressType === TYPE.BNB ? address : accountAddress;
+
+    const formatted = swaps.map(swap => {
+      const transactionHashes = swap.transfer_transaction_hash;
+      const transactionHashArray = (transactionHashes && transactionHashes.split(',')) || [];
+
+      return {
+        uuid: swap.uuid,
+        type: swap.type,
+        lokiAddress,
+        bnbAddress,
+        amount: swap.amount,
+        txHash: swap.deposit_transaction_hash,
+        transferTxHashes: transactionHashArray,
+        created: swap.created,
+      };
+    });
+
+    res.status(205);
+    res.body = { status: 200, success: true, result: formatted };
+  } catch (error) {
+    console.log(error);
+    const message = (error && error.message);
+    res.status(500);
+    res.body = { status: 500, success: false, result: message || error };
+  }
+
+  return next(null, req, res, next);
 }

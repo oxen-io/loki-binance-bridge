@@ -6,5 +6,8 @@
     "binance": {
       "symbol": "TEST"
     },
+    "loki": {
+      "minConfirmations": 6
+    },
     "encryptionKey": "Test encryption key"
 }

@@ -59,19 +59,19 @@ describe('Validation', () => {
     });
   });
 
-  describe('#validateFinalizeSwap', () => {
+  describe('#validateUuidPresent', () => {
     it('should return an error if body is null', async () => {
-      const error = await validation.validateFinalizeSwap(null);
+      const error = await validation.validateUuidPresent(null);
       assert.strictEqual(error, 'invalid params');
     });
 
     it('should return an error if uuid is not present', async () => {
-      const error = await validation.validateFinalizeSwap({});
+      const error = await validation.validateUuidPresent({});
       assert.strictEqual(error, 'uuid is required');
     });
 
     it('should not return an error if correct params are present', async () => {
-      const error = await validation.validateFinalizeSwap({ uuid: '1' });
+      const error = await validation.validateUuidPresent({ uuid: '1' });
       assert.isNull(error);
     });
   });
