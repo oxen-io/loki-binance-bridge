@@ -2,12 +2,18 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "@components/*": ["./components/*", "./components"],
-      "@config/*": ["./config/*", "./config"],
-      "@routes/*": ["./routes/*", "./routes"],
-      "@store/*": ["./store/*", "./store"],
-      "@theme/*": ["./theme/*", "./theme"],
-      "@utils/*": ["./utils/*", "./utils"],
+      "@components": ["./components"],
+      "@components/*": ["./components/*"],
+      "@config": ["./config"],
+      "@config/*": ["./config/*"],
+      "@routes": ["./routes"],
+      "@routes/*": ["./routes/*"],
+      "@store": ["./store"],
+      "@store/*": ["./store/*"],
+      "@theme": ["./theme"],
+      "@theme/*": ["./theme/*"],
+      "@utils": ["./utils"],
+      "@utils/*": ["./utils/*"],
       "@constants": ["./utils/constants.js"]
     }
   }

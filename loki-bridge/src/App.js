@@ -4,14 +4,17 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
 import { Swap, CreateAccount } from '@routes';
-import { ErrorSnackbar } from '@components';
+import { Snackbar } from '@components';
 import theme from '@theme';
 
 export default class App extends PureComponent {
   state = {
     padding: 0,
-    error: null,
-    errorOpen: false
+    snackbar: {
+      message: null,
+      variant: 'success',
+      open: false,
+    }
   }
 
   componentDidMount() {
@@ -25,48 +28,57 @@ export default class App extends PureComponent {
 
   onResize = () => {
     const width = window.innerWidth;
-    const padding = (width <= 479) ? '0 8px' : '0 7.5em';
+    const padding = (width <= 600) ? '0 8px' : '0 7.5em';
     this.setState({ padding });
   }
 
-  showError = (error) => {
-    this.setState({ error, errorOpen: true });
+  showMessage = (message, variant) => {
+    const snackbar = {
+      message,
+      variant: variant || 'error',
+      open: true
+    };
+    this.setState({ snackbar });
   }
 
-  closeError = (event, reason) => {
+  closeMessage = (event, reason) => {
     if (reason === 'clickaway') return;
-    this.setState({ error: null, errorOpen: false });
+    const snackbar = {
+      ...this.state.snackbar,
+      open: false
+    };
+    this.setState({ snackbar });
   }
 
   renderRoutes = () => {
     return (
       <Switch>
-        <Route exact path='/' render={(props) => <Swap {...props} showError={this.showError} />} />
-        <Route path='/createAccount' render={(props) => <CreateAccount {...props} showError={this.showError} />} />
+        <Route exact path='/' render={(props) => <Swap {...props} showMessage={this.showMessage} />} />
+        <Route path='/createAccount' render={(props) => <CreateAccount {...props} showMessage={this.showMessage} />} />
       </Switch>
     );
   }
 
-  renderError = () => {
-    const { error, errorOpen } = this.state;
-    return <ErrorSnackbar error={error} open={errorOpen} onClose={this.closeError} />;
+  renderSnackbar = () => {
+    const { snackbar } = this.state;
+    return <Snackbar message={snackbar.message} open={snackbar.open} onClose={this.closeMessage} variant={snackbar.variant} />;
   }
 
   render() {
-    const { errorOpen, padding } = this.state;
+    const { padding } = this.state;
 
     return (
       <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
         <Grid
-          style={{ padding }}
+          style={{ padding, overflow: 'auto', minWidth: '280px' }}
           container
           justify="center"
           alignItems="center"
         >
-          <Grid item>
+          <Grid item style={{ maxWidth: '100%' }}>
             { this.renderRoutes() }
-            { errorOpen && this.renderError() }
+            { this.renderSnackbar() }
           </Grid>
         </Grid>
       </MuiThemeProvider>

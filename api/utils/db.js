@@ -220,7 +220,7 @@ const db = {
    * @returns {Promise<[object]>} An array of swaps or `null` if something went wrong.
    */
   async getSwapsForClientAccount(clientAccountUuid) {
-    const query = 'select * from swaps where client_account_uuid = $1 order by created asc;';
+    const query = 'select * from swaps where client_account_uuid = $1 order by created desc;';
     return postgres.manyOrNone(query, [clientAccountUuid]);
   },
 

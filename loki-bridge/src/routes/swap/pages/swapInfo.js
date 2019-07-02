@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Typography, IconButton, Paper } from '@material-ui/core';
+import { Grid, Typography, IconButton } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button } from '@components';
@@ -76,6 +76,22 @@ class SwapInfo extends Component {
     );
   }
 
+  renderReceivingAmount = () => {
+    const { classes, swapType, swapInfo } = this.props;
+    if (!swapInfo || !swapInfo.swaps || swapInfo.swaps.length === 0) return null;
+
+    const receivingCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'B-Loki' : 'Loki';
+    const total = swapInfo.swaps.reduce((total, swap) => total + parseFloat(swap.amount), 0);
+    const displayTotal = total / 1e9;
+
+    return (
+      <Grid item xs={ 12 } align='right' className={ classes.stats }>
+        <Typography className={classes.statTitle}>Pending Amount:</Typography>
+        <Typography className={classes.statAmount}>{displayTotal} {receivingCurrency}</Typography>
+      </Grid>
+    );
+  }
+
   render() {
     const { classes, loading, onRefresh, swapInfo } = this.props;
 
@@ -90,6 +106,7 @@ class SwapInfo extends Component {
             onClick={onRefresh}
           />
         </Grid>
+        {this.renderReceivingAmount()}
         <SwapList swaps={swapInfo.swaps} />
       </React.Fragment>
     );

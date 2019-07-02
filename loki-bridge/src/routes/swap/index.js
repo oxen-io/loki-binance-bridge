@@ -9,46 +9,13 @@ import { PageLoader } from '@components';
 import { Selection, SwapInfo } from './pages';
 import styles from './styles';
 
-/*
-uuid: swap.uuid,
-        type: swap.type,
-        lokiAddress,
-        bnbAddress,
-        amount: swap.amount,
-        txHash: swap.deposit_transaction_hash,
-        transferTxHashes: transactionHashArray,
-        created: swap.created,
-        */
-
 class Swap extends Component {
   state = {
     loading: false,
-    page: 1,
+    page: 0,
     swapType: SWAP_TYPE.LOKI_TO_BLOKI,
     address: '',
-    swapInfo: {
-      bnbAddress: 'tbnb19rem68yzsjgdcmrjk4lv9jv9gd37d9gtmwfcul',
-      lokiAddress: 'TRrPPz1eru2WpJa1KiAb2ZhDfnJYzuFVDLJKUrJGdy1HEfFrxfdGgfRYbbdvkQHDQMM2a3BYo3tFsU5omwtDqxuW1ggv7hWDX',
-      userAddressType: 'bnb',
-      uuid: '5c6ca27e-b347-7c31-614f-fb06db725302',
-      swaps: [{
-        uuid: '5c6ca27e-b347-7c31-614f-fb06db725302',
-        amount: 10000000,
-        txHash: 'test',
-        transferTxHashes: [],
-        created: Date.now(),
-        type: SWAP_TYPE.LOKI_TO_BLOKI,
-      },
-      {
-        uuid: '5c6ca27e-b347-7c31-614f-fb06db725303',
-        amount: 2000000000000,
-        txHash: 'test',
-        transferTxHashes: ['hash1'],
-        created: Date.now(),
-        type: SWAP_TYPE.LOKI_TO_BLOKI,
-      }]
-    },
-    transactions: [],
+    swapInfo: {}
   };
 
   navigateToBNBAccountCreation = () => {
@@ -70,7 +37,7 @@ class Swap extends Component {
   }
 
   onError = (error) => {
-    this.props.showError(error);
+    this.props.showMessage(error, 'error');
     this.setState({ loading: false });
   }
 
@@ -88,19 +55,11 @@ class Swap extends Component {
   }
 
   onTokenSwapFinalized = (transactions) => {
-    this.setState({ transactions, loading: false });
-    this.getSwaps();
-  }
+    this.setState({ loading: false });
+    const message = transactions.length === 1 ? 'Added 1 new swap' : `Added ${transactions.length} new swaps`;
+    this.props.showMessage(message, 'success');
 
-  resetState = () => {
-    this.setState({
-      loading: false,
-      page: 0,
-      swapType: SWAP_TYPE.LOKI_TO_BLOKI,
-      address: '',
-      swapInfo: {},
-      transactions: []
-    });
+    setImmediate(() => this.getSwaps());
   }
 
   onNext = () => {
@@ -110,9 +69,6 @@ class Swap extends Component {
         break;
       case 1:
         this.finalizeSwap();
-        break;
-      case 2:
-        this.resetState();
         break;
       default:
 
@@ -156,7 +112,7 @@ class Swap extends Component {
   render() {
     const { classes } = this.props;
 
-    const { page, loading, swapType, swapInfo, transactions } = this.state;
+    const { page, loading, swapType, swapInfo } = this.state;
 
     return (
       <Grid container className={ classes.root }>
@@ -195,6 +151,7 @@ class Swap extends Component {
 Swap.propTypes = {
   classes: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  showMessage: PropTypes.func.isRequired
 };
 
 export default withRouter(withStyles(styles)(Swap));

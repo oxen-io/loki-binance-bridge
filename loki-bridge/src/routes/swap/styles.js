@@ -49,31 +49,20 @@ const styles = theme => ({
     display: 'inline-block',
     float: 'right'
   },
-  transaction: {
-    padding: theme.spacing(2),
-    minWidth: '150px'
+  stats: {
+    marginTop: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end'
   },
-  transactionGrid: {
-    marginBottom: theme.spacing(1)
+  statTitle: {
+    marginRight: '4px',
+    fontSize: '0.84rem'
   },
-  transactionGridItem: {
-    maxWidth: '100%'
-  },
-  transactionItemTitle: {
-    fontSize: '0.9rem',
-    marginBottom: '4px',
-    maxWidth: '100%',
-    fontWeight: 'bold'
-  },
-  transactionItemValue: {
-    marginBottom: theme.spacing(1),
-    overflowWrap: 'break-word',
-  },
-  swapList: {
-    marginTop: theme.spacing(1)
-  },
-  swapInfo: {
-    padding: theme.spacing(2)
+  statAmount: {
+    fontWeight: '600',
+    fontSize: '0.94rem'
   }
 });
 

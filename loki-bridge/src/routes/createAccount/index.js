@@ -33,7 +33,7 @@ class CreateAccount extends Component {
   }
 
   onError = (error) => {
-    this.props.showError(error);
+    this.props.showMessage(error, 'error');
     this.setState({ loading: false });
   }
 
@@ -138,7 +138,7 @@ class CreateAccount extends Component {
 }
 
 CreateAccount.propTypes = {
-  showError: PropTypes.func.isRequired,
+  showMessage: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
 };

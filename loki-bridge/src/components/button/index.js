@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import clxs from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Button
@@ -18,7 +19,7 @@ function StyledButton(props) {
 
   return (
     <Button
-      className={[classes.root, secondary && classes.secondary].join(' ')}
+      className={clxs(classes.root, secondary && classes.secondary)}
       fullWidth={ fullWidth }
       variant="outlined"
       color={ secondary ? 'secondary' : 'primary'}

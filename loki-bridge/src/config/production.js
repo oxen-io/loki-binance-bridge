@@ -1,3 +1,6 @@
 export default {
-  useAPIEncryption: true
+  useAPIEncryption: true,
+  loki: {
+    txExplorerUrl: 'https://lokiblocks.com/tx'
+  }
 };
