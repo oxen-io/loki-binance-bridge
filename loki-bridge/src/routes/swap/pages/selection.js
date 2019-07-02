@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography, Link } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Input, Button, Select } from '@components';
 import { SWAP_TYPE, TYPE } from '@constants';
+import config from '@config';
 import styles from '../styles';
+
+const walletCreationUrl = {
+  [TYPE.LOKI]: config.loki.walletCreationUrl,
+  [TYPE.BNB]: config.binance.walletCreationUrl,
+};
 
 class Selection extends Component {
   state = {
@@ -43,12 +49,14 @@ class Selection extends Component {
   }
 
   render() {
-    const { swapType, loading, classes, onCreateAccount } = this.props;
+    const { swapType, loading, classes } = this.props;
     const { options, address, addressError } = this.state;
 
     const addressType = this.getAddressType();
     const inputLabel = addressType === TYPE.LOKI ? 'Loki Address' : 'BNB Address';
     const inputPlaceholder = addressType === TYPE.LOKI ? 'L...' : 'bnb...';
+
+    const url = walletCreationUrl[addressType];
 
     return (
       <React.Fragment>
@@ -72,11 +80,11 @@ class Selection extends Component {
             onChange={this.onAddressChanged}
             disabled={loading}
           />
-          { addressType === TYPE.BNB && (
-            <Typography className={ classes.createAccount } onClick={ onCreateAccount }>
+          <Typography className={ classes.createAccount }>
+            <Link href={url} target="_blank" rel="noreferrer">
               Don't have an account? Create one
-            </Typography>
-          )}
+            </Link>
+          </Typography>
         </Grid>
         <Grid item xs={ 12 } align='right' className={ classes.button }>
           <Button
@@ -95,7 +103,6 @@ Selection.propTypes = {
   classes: PropTypes.object.isRequired,
   swapType: PropTypes.string.isRequired,
   onSwapTypeChanged: PropTypes.func.isRequired,
-  onCreateAccount: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,
   loading: PropTypes.bool,
 };

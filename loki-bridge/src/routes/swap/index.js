@@ -18,10 +18,6 @@ class Swap extends Component {
     swapInfo: {}
   };
 
-  navigateToBNBAccountCreation = () => {
-    this.props.history.push('/createWallet');
-  }
-
   componentWillMount() {
     store.on(Events.ERROR, this.onError);
     store.on(Events.FETCHED_SWAPS, this.onSwapsFetched);
@@ -130,7 +126,6 @@ class Swap extends Component {
           <Selection
             swapType={swapType}
             onSwapTypeChanged={(swapType) => this.setState({ swapType })}
-            onCreateAccount={this.navigateToBNBAccountCreation}
             onNext={(address) => {
               this.setState({ address });
               // Wait for state to refresh correctly
