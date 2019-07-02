@@ -19,7 +19,7 @@ class Swap extends Component {
   };
 
   navigateToBNBAccountCreation = () => {
-    this.props.history.push('/createAccount');
+    this.props.history.push('/createWallet');
   }
 
   componentWillMount() {

@@ -4,7 +4,7 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
 import { Swap, CreateAccount } from '@routes';
-import { Snackbar } from '@components';
+import { Snackbar, LokiAppBar } from '@components';
 import theme from '@theme';
 
 export default class App extends PureComponent {
@@ -54,7 +54,7 @@ export default class App extends PureComponent {
     return (
       <Switch>
         <Route exact path='/' render={(props) => <Swap {...props} showMessage={this.showMessage} />} />
-        <Route path='/createAccount' render={(props) => <CreateAccount {...props} showMessage={this.showMessage} />} />
+        <Route path='/createWallet' render={(props) => <CreateAccount {...props} showMessage={this.showMessage} />} />
       </Switch>
     );
   }
@@ -70,17 +70,20 @@ export default class App extends PureComponent {
     return (
       <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
-        <Grid
-          style={{ padding, overflow: 'auto', minWidth: '280px' }}
-          container
-          justify="center"
-          alignItems="center"
-        >
-          <Grid item style={{ maxWidth: '100%' }}>
-            { this.renderRoutes() }
-            { this.renderSnackbar() }
+        <LokiAppBar />
+        <div id="content">
+          <Grid
+            style={{ padding }}
+            container
+            justify="center"
+            alignItems="center"
+          >
+            <Grid item style={{ maxWidth: '100%' }}>
+              { this.renderRoutes() }
+              { this.renderSnackbar() }
+            </Grid>
           </Grid>
-        </Grid>
+        </div>
       </MuiThemeProvider>
     );
   }

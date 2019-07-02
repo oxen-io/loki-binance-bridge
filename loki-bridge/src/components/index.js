@@ -5,6 +5,7 @@ import Input from './input';
 import Label from './label';
 import PageLoader from './pageLoader';
 import Select from './select';
+import LokiAppBar from './lokiAppbar';
 
 export {
   Button,
@@ -14,4 +15,5 @@ export {
   Label,
   PageLoader,
   Select,
+  LokiAppBar
 };
