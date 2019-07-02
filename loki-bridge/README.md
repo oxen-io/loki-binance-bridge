@@ -18,7 +18,7 @@ Install all the dependencies:
 npm install
 ```
 
-TODO: Edit config instructions
+Edit `config/production.js` with your required settings.
 
 ### Development
 
