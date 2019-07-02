@@ -29,6 +29,10 @@ class Swap extends Component {
     store.on(Events.TOKEN_SWAP_FINALIZED, this.onTokenSwapFinalized);
   }
 
+  componentDidMount() {
+    dispatcher.dispatch({ type: Actions.GET_WITHDRAWAL_FEES });
+  }
+
   componentWillUnmount() {
     store.removeListener(Events.ERROR, this.onError);
     store.removeListener(Events.FETCHED_SWAPS, this.onSwapsFetched);

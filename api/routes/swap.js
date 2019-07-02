@@ -1,4 +1,5 @@
 /* eslint-disable no-extend-native */
+import config from 'config';
 import { bnb, loki } from '../helpers';
 import { db, crypto, transaction, validation, SWAP_TYPE, TYPE } from '../utils';
 
@@ -126,6 +127,11 @@ export function finalizeSwap(req, res, next) {
   });
 }
 
+/**
+ * Get all the swaps for the given client uuid.
+ * Request Data:
+ *  - uuid: The uuid that was returned in `swapToken` (client account uuid)
+ */
 export async function getSwaps(req, res, next) {
   const data = req.query;
 
@@ -183,5 +189,20 @@ export async function getSwaps(req, res, next) {
     res.body = { status: 500, success: false, result: message || error };
   }
 
+  return next(null, req, res, next);
+}
+
+/**
+ * Get the withdrawal fees
+ */
+export function getWithdrawalFees(req, res, next) {
+  const lokiFee = config.get('loki.withdrawalFee');
+  const lokiAmount = (parseFloat(lokiFee) * 1e9).toFixed(0);
+  res.status(205);
+  res.body = {
+    status: 200,
+    success: true,
+    result: { loki: lokiAmount },
+  };
   return next(null, req, res, next);
 }

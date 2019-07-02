@@ -3,6 +3,9 @@ import config from 'config';
 import { db, SWAP_TYPE } from '../utils';
 import { bnb, loki } from '../helpers';
 
+// The fee charged for withdrawing loki
+const lokiWithdrawalFee = config.get('loki.withdrawalFee');
+
 /**
  * Process any pending swaps and send out the coins.
  *
@@ -64,8 +67,17 @@ export async function send(swapType, transactions) {
     // Send BNB to the users
     return bnb.multiSend(config.get('binance.wallet.mnemonic'), outputs, 'Loki Bridge');
   } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
+    // Deduct the loki withdrawal fees
+    const outputs = transactions.map(({ address, amount }) => {
+      const fee = (parseFloat(lokiWithdrawalFee) * 1e9).toFixed(0);
+      return {
+        address,
+        amount: Math.max(0, amount - fee),
+      };
+    });
+
     // Send Loki to the users
-    return loki.multiSend(transactions);
+    return loki.multiSend(outputs);
   }
 
   throw new Error('Invalid swap type');

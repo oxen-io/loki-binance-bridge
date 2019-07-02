@@ -12,10 +12,10 @@ class Selection extends Component {
     addressError: false,
     options: [{
       value: SWAP_TYPE.LOKI_TO_BLOKI,
-      description: 'Loki to B-Loki',
+      description: 'LOKI to B-LOKI',
     }, {
       value: SWAP_TYPE.BLOKI_TO_LOKI,
-      description: 'B-Loki to Loki',
+      description: 'B-LOKI to LOKI',
     }],
   };
 

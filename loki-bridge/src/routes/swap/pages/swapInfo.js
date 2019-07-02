@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button } from '@components';
 import { SWAP_TYPE, TYPE } from '@constants';
+import { store, Events } from '@store';
 import SwapList from '../components/swapList';
 import styles from '../styles';
 
@@ -30,13 +31,29 @@ class SwapInfo extends Component {
     }
   };
 
+  componentWillMount() {
+    this.onWithdrawalFeesUpdated();
+    store.on(Events.FETCHED_WITHDRAWAL_FEES, this.onWithdrawalFeesUpdated);
+  }
+
+  componentWillUnmount() {
+    store.removeListener(Events.FETCHED_WITHDRAWAL_FEES, this.onWithdrawalFeesUpdated);
+  }
+
+  onWithdrawalFeesUpdated = () => {
+    this.setState({ fees: store.getStore('fees') || {} });
+  }
+
   renderInstructions = () => {
+    const { fees } = this.state;
     const { swapType, classes, swapInfo } = this.props;
 
     const { userAddressType, lokiAddress, bnbAddress } = swapInfo;
 
-    const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'Loki' : 'B-Loki';
+    const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
     const depositAddress = userAddressType === TYPE.LOKI ? bnbAddress : lokiAddress;
+
+    const lokiFee = (fees && fees.loki / 1e9) || 0;
 
     return (
       <React.Fragment>
@@ -71,6 +88,12 @@ class SwapInfo extends Component {
             You can leave this page and come back later to refresh your swap requests. <br/>
             If you run into any trouble, or your swap request has not gone through after 12 confirmations, please contact us.
           </Typography>
+
+          { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (
+            <Typography className={ classes.instructionBold }>
+              There will be a processing fee of {lokiFee} LOKI which will be charged when processing all your pending swaps.
+            </Typography>
+          )}
         </Grid>
       </React.Fragment>
     );
@@ -80,7 +103,7 @@ class SwapInfo extends Component {
     const { classes, swapType, swapInfo } = this.props;
     if (!swapInfo || !swapInfo.swaps || swapInfo.swaps.length === 0) return null;
 
-    const receivingCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'B-Loki' : 'Loki';
+    const receivingCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'B-LOKI' : 'LOKI';
     const total = swapInfo.swaps.reduce((total, swap) => total + parseFloat(swap.amount), 0);
     const displayTotal = total / 1e9;
 

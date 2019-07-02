@@ -65,7 +65,7 @@ class SwapList extends Component {
     const { classes } = this.props;
 
     const isPending = transferTxHashes && transferTxHashes.length === 0;
-    const depositCurrency = type === SWAP_TYPE.LOKI_TO_BLOKI ? 'Loki' : 'B-Loki';
+    const depositCurrency = type === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
     const displayAmount = amount / 1e9;
 
     return (

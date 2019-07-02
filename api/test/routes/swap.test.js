@@ -1,3 +1,4 @@
+import config from 'config';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import * as swapRoutes from '../../routes/swap';
@@ -10,6 +11,7 @@ const sandbox = sinon.createSandbox();
 const swapToken = params => wrapRouterFunction(swapRoutes.swapToken, params);
 const finalizeSwapToken = params => wrapRouterFunction(swapRoutes.finalizeSwap, params);
 const getSwaps = params => wrapRouterFunction(swapRoutes.getSwaps, params);
+const getWithdrawalFees = params => wrapRouterFunction(swapRoutes.getWithdrawalFees, params);
 
 describe('Swap API', () => {
   beforeEach(async () => {
@@ -291,92 +293,103 @@ describe('Swap API', () => {
         // Make sure we hit the validate
         assert.equal(spy.callCount, failingData.length);
       });
+
+      it('should return 400 if no client account for the given uuid exists', async () => {
+        const spy = sandbox.spy(db, 'getClientAccountForUuid');
+
+        const { count } = await postgres.one('select count(*) from client_accounts');
+        assert.equal(count, 0);
+
+        const { status, success, result } = await getSwaps({ uuid: 'fake' });
+        assert(spy.called, 'db.getClientAccountForUuid was not called');
+        assert.equal(status, 400);
+        assert.isFalse(success);
+        assert.strictEqual(result, 'Unable to find swap details');
+      });
     });
 
-    it('should return 400 if no client account for the given uuid exists', async () => {
-      const spy = sandbox.spy(db, 'getClientAccountForUuid');
+    describe('success', () => {
+      const clientAccount = {
+        uuid: 'd27efff4-988b-11e9-a2a3-2a2ae2dbcce4',
+        address: 'LOKI',
+        addressType: TYPE.LOKI,
+        accountAddress: 'BNB',
+        accountType: TYPE.BNB,
+      };
 
-      const { count } = await postgres.one('select count(*) from client_accounts');
-      assert.equal(count, 0);
+      beforeEach(() => {
+        sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
+      });
 
-      const { status, success, result } = await getSwaps({ uuid: 'fake' });
-      assert(spy.called, 'db.getClientAccountForUuid was not called');
-      assert.equal(status, 400);
-      assert.isFalse(success);
-      assert.strictEqual(result, 'Unable to find swap details');
+      it('should return all the swaps for the given client account', async () => {
+        const swaps = [1, 2, 3].map(id => ({
+          uuid: id,
+          type: SWAP_TYPE.BLOKI_TO_LOKI,
+          amount: id * 100,
+          txHash: id,
+        }));
+        sandbox.stub(db, 'getSwapsForClientAccount').returns(swaps);
+
+        const { status, success, result } = await getSwaps({ uuid: 'fake' });
+        assert.equal(status, 200);
+        assert.isTrue(success);
+        assert.lengthOf(result, swaps.length);
+      });
+
+      it('should return the correct data if swap has not been processed', async () => {
+        const swap = {
+          uuid: 'swapuuid',
+          type: SWAP_TYPE.BLOKI_TO_LOKI,
+          amount: 100,
+          deposit_transaction_hash: 'deposit',
+          created: 'now',
+        };
+        sandbox.stub(db, 'getSwapsForClientAccount').returns([swap]);
+
+        const { status, result } = await getSwaps({ uuid: 'fake' });
+        assert.equal(status, 200);
+        assert.lengthOf(result, 1);
+
+        const returnedSwap = result[0];
+        assert.strictEqual(returnedSwap.uuid, swap.uuid);
+        assert.strictEqual(returnedSwap.type, swap.type);
+        assert.equal(returnedSwap.amount, swap.amount);
+        assert.strictEqual(returnedSwap.lokiAddress, clientAccount.address);
+        assert.strictEqual(returnedSwap.bnbAddress, clientAccount.accountAddress);
+        assert.strictEqual(returnedSwap.txHash, swap.deposit_transaction_hash);
+        assert.isEmpty(returnedSwap.transferTxHashes);
+        assert.strictEqual(returnedSwap.created, 'now');
+      });
+
+      it('should return the array of transaction hashes if swap has been processed', async () => {
+        const swap = {
+          uuid: 'swapuuid',
+          type: SWAP_TYPE.BLOKI_TO_LOKI,
+          amount: 100,
+          deposit_transaction_hash: 'deposit',
+          transfer_transaction_hash: 'hash1,hash2',
+          created: 'now',
+        };
+        sandbox.stub(db, 'getSwapsForClientAccount').returns([swap]);
+
+        const { status, result } = await getSwaps({ uuid: 'fake' });
+        assert.equal(status, 200);
+        assert.lengthOf(result, 1);
+
+        const returnedSwap = result[0];
+        assert.deepEqual(returnedSwap.transferTxHashes, ['hash1', 'hash2']);
+      });
     });
   });
 
-  describe('success', () => {
-    const clientAccount = {
-      uuid: 'd27efff4-988b-11e9-a2a3-2a2ae2dbcce4',
-      address: 'LOKI',
-      addressType: TYPE.LOKI,
-      accountAddress: 'BNB',
-      accountType: TYPE.BNB,
-    };
-
-    beforeEach(() => {
-      sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
-    });
-
-    it('should return all the swaps for the given client account', async () => {
-      const swaps = [1, 2, 3].map(id => ({
-        uuid: id,
-        type: SWAP_TYPE.BLOKI_TO_LOKI,
-        amount: id * 100,
-        txHash: id,
-      }));
-      sandbox.stub(db, 'getSwapsForClientAccount').returns(swaps);
-
-      const { status, success, result } = await getSwaps({ uuid: 'fake' });
+  describe('#getWithdrawalFees', () => {
+    it('should return the correct fees', async () => {
+      const lokiFee = config.get('loki.withdrawalFee');
+      const { status, success, result } = await getWithdrawalFees();
       assert.equal(status, 200);
       assert.isTrue(success);
-      assert.lengthOf(result, swaps.length);
-    });
-
-    it('should return the correct data if swap has not been processed', async () => {
-      const swap = {
-        uuid: 'swapuuid',
-        type: SWAP_TYPE.BLOKI_TO_LOKI,
-        amount: 100,
-        deposit_transaction_hash: 'deposit',
-        created: 'now',
-      };
-      sandbox.stub(db, 'getSwapsForClientAccount').returns([swap]);
-
-      const { status, result } = await getSwaps({ uuid: 'fake' });
-      assert.equal(status, 200);
-      assert.lengthOf(result, 1);
-
-      const returnedSwap = result[0];
-      assert.strictEqual(returnedSwap.uuid, swap.uuid);
-      assert.strictEqual(returnedSwap.type, swap.type);
-      assert.equal(returnedSwap.amount, swap.amount);
-      assert.strictEqual(returnedSwap.lokiAddress, clientAccount.address);
-      assert.strictEqual(returnedSwap.bnbAddress, clientAccount.accountAddress);
-      assert.strictEqual(returnedSwap.txHash, swap.deposit_transaction_hash);
-      assert.isEmpty(returnedSwap.transferTxHashes);
-      assert.strictEqual(returnedSwap.created, 'now');
-    });
-
-    it('should return the array of transaction hashes if swap has been processed', async () => {
-      const swap = {
-        uuid: 'swapuuid',
-        type: SWAP_TYPE.BLOKI_TO_LOKI,
-        amount: 100,
-        deposit_transaction_hash: 'deposit',
-        transfer_transaction_hash: 'hash1,hash2',
-        created: 'now',
-      };
-      sandbox.stub(db, 'getSwapsForClientAccount').returns([swap]);
-
-      const { status, result } = await getSwaps({ uuid: 'fake' });
-      assert.equal(status, 200);
-      assert.lengthOf(result, 1);
-
-      const returnedSwap = result[0];
-      assert.deepEqual(returnedSwap.transferTxHashes, ['hash1', 'hash2']);
+      assert.isNotNull(result);
+      assert.equal(result.loki, lokiFee * 1e9);
     });
   });
 });

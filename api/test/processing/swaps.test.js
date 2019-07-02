@@ -40,7 +40,7 @@ describe('Processing Swaps', () => {
   });
 
   describe('#send', () => {
-    const transactions = [{ address: '1', amount: 10 }];
+    const transactions = [{ address: '1', amount: 7 * 1e9 }];
 
     let bnbStub;
     let lokiStub;
@@ -78,11 +78,27 @@ describe('Processing Swaps', () => {
       const outputs = args[1];
       assert.isNotNull(outputs);
       assert.deepEqual(outputs, [{
-        to: '1',
+        to: transactions[0].address,
         coins: [{
           denom: 'TEST', // Defines in test.json
-          amount: 10,
+          amount: transactions[0].amount,
         }],
+      }]);
+    });
+
+    it('should deduct the widthdrawal fee from each transaction for Loki', async () => {
+      const fee = config.get('loki.withdrawalFee');
+
+      await functions.send(SWAP_TYPE.BLOKI_TO_LOKI, transactions);
+
+      const { args } = lokiStub.getCalls()[0];
+      assert.lengthOf(args, 1);
+
+      const outputs = args[0];
+      assert.isNotNull(outputs);
+      assert.deepEqual(outputs, [{
+        address: transactions[0].address,
+        amount: transactions[0].amount - (fee * 1e9),
       }]);
     });
   });
