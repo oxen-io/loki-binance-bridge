@@ -155,19 +155,20 @@ const db = {
   /**
    * Insert a bnb account.
    *
-   * @param {{ address: string, privateKey: string }} account A bnb account.
+   * @param {{ address: string, privateKey: string, mnemonic: string }} account A bnb account.
    * @returns {Promise<{ uuid, address }>} The inserted bnb account or `null` if we failed.
    */
   async insertBNBAccount(account) {
-    if (!account) return null;
+    if (!account || !account.privateKey || !account.mnemonic) return null;
 
     const key = config.get('encryptionKey');
     const salt = bip39.generateMnemonic();
     const encryptedPrivateKey = hexEncrypt(account.privateKey, key + salt);
+    const encryptedMnemonic = hexEncrypt(account.mnemonic, key + salt);
 
     // eslint-disable-next-line max-len
-    const query = 'insert into accounts_bnb(uuid, address, encrypted_private_key, salt, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid, address;';
-    return postgres.oneOrNone(query, [account.address, encryptedPrivateKey, salt]);
+    const query = 'insert into accounts_bnb(uuid, address, encrypted_private_key, encrypted_mnemonic, salt, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now()) returning uuid, address;';
+    return postgres.oneOrNone(query, [account.address, encryptedPrivateKey, encryptedMnemonic, salt]);
   },
 
   /**
@@ -192,12 +193,14 @@ const db = {
     const account = await postgres.oneOrNone(query, [address]);
     if (!account) return null;
 
-    const { uuid, encrypted_private_key: encrypted, salt } = account;
+    const { uuid, encrypted_private_key: encryptedPrivateKey, encrypted_mnemonic: encryptedMnemonic, salt } = account;
     const key = config.get('encryptionKey');
-    const privateKey = hexDecrypt(encrypted, key + salt);
+    const privateKey = hexDecrypt(encryptedPrivateKey, key + salt);
+    const mnemonic = hexDecrypt(encryptedMnemonic, key + salt);
     return {
       uuid,
       privateKey,
+      mnemonic,
       address,
     };
   },

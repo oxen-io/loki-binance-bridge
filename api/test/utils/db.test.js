@@ -165,7 +165,7 @@ describe('Database', () => {
 
       it('should insert a BNB account if address type is LOKI', async () => {
         const bnbAddress = 'bnb-address';
-        await db.insertClientAccount('1234', TYPE.LOKI, { address: bnbAddress, privateKey: 'abc' });
+        await db.insertClientAccount('1234', TYPE.LOKI, { address: bnbAddress, privateKey: 'abc', mnemonic: '123' });
 
         const accounts = await postgres.manyOrNone('select * from accounts_bnb');
         assert.isNotNull(accounts);
@@ -177,7 +177,7 @@ describe('Database', () => {
         const lokiAddress = '123';
         const bnbAddress = '456';
 
-        const clientAccount = await db.insertClientAccount(lokiAddress, TYPE.LOKI, { address: bnbAddress, privateKey: 'abc' });
+        const clientAccount = await db.insertClientAccount(lokiAddress, TYPE.LOKI, { address: bnbAddress, privateKey: 'abc', mnemonic: '123' });
         assert.isNotNull(clientAccount);
         assert.strictEqual(clientAccount.lokiAddress, lokiAddress);
         assert.strictEqual(clientAccount.bnbAddress, bnbAddress);
@@ -238,9 +238,20 @@ describe('Database', () => {
         assert.isNull(account);
       });
 
+      it('should return null if private key or mnemonic is not set', async () => {
+        const account = await db.insertBNBAccount({ address: 123, mnemonic: '123' });
+        assert.isNull(account);
+
+        const account1 = await db.insertBNBAccount({ address: 123, privateKey: '123' });
+        assert.isNull(account1);
+
+        const valid = await db.insertBNBAccount({ address: 123, mnemonic: '123', privateKey: '123' });
+        assert.isNotNull(valid);
+      });
+
       it('should return the uuid and address if it exists', async () => {
         const address = 'abcdef';
-        const account = await db.insertBNBAccount({ address, privateKey: 'abc' });
+        const account = await db.insertBNBAccount({ address, privateKey: 'abc', mnemonic: '123' });
         assert.isNotNull(account);
         assert.strictEqual(account.address, address);
         assert.deepEqual(Object.keys(account), ['uuid', 'address']);
@@ -248,11 +259,20 @@ describe('Database', () => {
 
       it('should store the encrypted private key', async () => {
         const privateKey = 'abcdef';
-        const account = await db.insertBNBAccount({ address: '123', privateKey });
+        const account = await db.insertBNBAccount({ address: '123', privateKey, mnemonic: '123' });
         assert.isNotNull(account);
 
         const { key } = await postgres.one('select encrypted_private_key as key from accounts_bnb where uuid = $1', [account.uuid]);
         assert.notStrictEqual(privateKey, key);
+      });
+
+      it('should store the encrypted mnemonic key', async () => {
+        const mnemonic = '123';
+        const account = await db.insertBNBAccount({ address: '123', privateKey: 'abcdef', mnemonic });
+        assert.isNotNull(account);
+
+        const { encrypted } = await postgres.one('select encrypted_mnemonic as encrypted from accounts_bnb where uuid = $1', [account.uuid]);
+        assert.notStrictEqual(mnemonic, encrypted);
       });
     });
 
@@ -268,7 +288,8 @@ describe('Database', () => {
       it('should return the account with the private key decrypted', async () => {
         const address = '123';
         const privateKey = 'private';
-        const inserted = await db.insertBNBAccount({ address, privateKey });
+        const mnemonic = 'abc def hij';
+        const inserted = await db.insertBNBAccount({ address, privateKey, mnemonic });
         assert.isNotNull(inserted);
 
         const account = await db.getBNBAccount(address);
@@ -277,6 +298,7 @@ describe('Database', () => {
           uuid: inserted.uuid,
           address,
           privateKey,
+          mnemonic,
         });
       });
     });

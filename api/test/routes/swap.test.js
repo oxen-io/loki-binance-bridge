@@ -123,6 +123,7 @@ describe('Swap API', () => {
         const generatedBNBAccount = {
           privateKey: '123',
           address: 'generatedBNB',
+          mnemonic: 'mnemonic',
         };
         sandbox.stub(bnb, 'createAccountWithMnemonic').returns(generatedBNBAccount);
 

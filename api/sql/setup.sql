@@ -37,6 +37,7 @@ create table if not exists accounts_bnb (
   uuid char(36) primary key,
   address text,
   encrypted_private_key text,
+  encrypted_mnemonic text,
   salt text,
   created timestamp
 );
