@@ -1,26 +1,26 @@
 {
-    "serverPort": 8000,
-    "useAPIEncryption": true,
-    "binance": {
-        "cli": "./cli/prod/0.5.8.1/mac/bnbcli",
-        "api": "https://dex.binance.org/",
-        "network": "mainnet"
+  "serverPort": 8000,
+  "useAPIEncryption": true,
+  "binance": {
+    "cli": "./cli/prod/0.5.8.1/mac/bnbcli",
+    "api": "https://dex.binance.org/",
+    "network": "mainnet"
+  },
+  "database": {
+    "user": "",
+    "password": ""
+  },
+  "loki": {
+    "walletRPC": {
+      "host": "localhost",
+      "port": 18082,
+      "username": "",
+      "password": ""
     },
-    "database": {
-        "user": "",
-        "password": ""
-    },
-    "loki": {
-      "walletRPC": {
-        "host": "localhost",
-        "port": 18082,
-        "username": "",
-        "password": ""
-      },
-      "wallet": {
-        "filename": "My production wallet",
-        "password": ""
-      }
-    },
-    "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT YOU SHOULD CHANGE AND KEEP SAFE"
+    "wallet": {
+      "filename": "My production wallet",
+      "password": ""
+    }
+  },
+  "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT YOU SHOULD CHANGE AND KEEP SAFE"
 }

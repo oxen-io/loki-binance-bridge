@@ -24,7 +24,7 @@ Edit `config/production.js` with your required settings.
 
 To run the app in development mode, simply run:
 ```
-npm start
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
@@ -39,5 +39,12 @@ npm run build
 
 This should build everything and place it in the `build` folder.<br>
 All that needs to be done is to deploy the application.
+
+You can deploy by running the provided server
+```
+npm start
+```
+
+Or you can choose your own deployment method.
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.

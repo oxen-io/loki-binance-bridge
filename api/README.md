@@ -68,3 +68,18 @@ Any values that you don't set in those files will be fetched from `config/defaul
 | npm run start | Run the API server in **Production** mode |
 | npm run dev | Run the API server in **Development** mode |
 | npm run test | Run the test suite |
+
+
+## Testnet Coins
+
+If you would like to issue some tokens on the binance testnet, please follow this guide: [How to create binance token](https://lightrains.com/blogs/how-create-binance-token)
+
+Once you have done so, edit `config/development.json` and set the following fields:
+```json
+"binance": {
+  "symbol": "<Your issued token symbol>",
+  "wallet": {
+    "mnemonic": "<Wallet that was funded your issues coins>"
+  }
+},
+```

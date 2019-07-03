@@ -1,14 +1,14 @@
 {
-    "useAPIEncryption": false,
-    "database": {
-        "database": "lokibridge-test"
-    },
-    "binance": {
-      "symbol": "TEST"
-    },
-    "loki": {
-      "minConfirmations": 6,
-      "withdrawalFee": 5
-    },
-    "encryptionKey": "Test encryption key"
+  "useAPIEncryption": false,
+  "database": {
+    "database": "lokibridge-test"
+  },
+  "binance": {
+    "symbol": "TEST"
+  },
+  "loki": {
+    "minConfirmations": 6,
+    "withdrawalFee": 5
+  },
+  "encryptionKey": "Test encryption key"
 }

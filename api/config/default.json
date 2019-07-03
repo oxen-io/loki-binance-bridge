@@ -1,36 +1,36 @@
 {
-    "serverPort": 8000,
-    "useAPIEncryption": false,
-    "binance": {
-        "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
-        "api": "https://testnet-dex.binance.org/",
-        "network": "testnet",
-        "symbol": "BLOKI",
-        "wallet": {
-          "mnemonic": ""
-        }
+  "serverPort": 8000,
+  "useAPIEncryption": false,
+  "binance": {
+    "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
+    "api": "https://testnet-dex.binance.org/",
+    "network": "testnet",
+    "symbol": "BLOKI",
+    "wallet": {
+      "mnemonic": ""
+    }
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "lokibridge",
+    "user": "postgres",
+    "password": ""
+  },
+  "loki": {
+    "walletRPC": {
+      "host": "localhost",
+      "port": 18082,
+      "username": "",
+      "password": ""
     },
-    "database": {
-        "host": "localhost",
-        "port": 5432,
-        "database": "lokibridge",
-        "user": "postgres",
-        "password": ""
+    "wallet": {
+      "filename": "lokibridge",
+      "password": "",
+      "accountIndex": 0
     },
-    "loki": {
-      "walletRPC": {
-        "host": "localhost",
-        "port": 18082,
-        "username": "",
-        "password": ""
-      },
-      "wallet": {
-        "filename": "lokibridge",
-        "password": "",
-        "accountIndex": 0
-      },
-      "minConfirmations": 12,
-      "withdrawalFee": 5
-    },
-    "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT IS USED TO ENCRYPT GENERATED ACCOUNTS"
+    "minConfirmations": 12,
+    "withdrawalFee": 5
+  },
+  "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT IS USED TO ENCRYPT GENERATED ACCOUNTS"
 }
