@@ -20,7 +20,8 @@
     "wallet": {
       "filename": "My production wallet",
       "password": ""
-    }
-  },
-  "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT YOU SHOULD CHANGE AND KEEP SAFE"
+    },
+    "minConfirmations": 12,
+    "withdrawalFee": 5
+  }
 }

@@ -3,8 +3,6 @@ import config from 'config';
 import { bnb, loki } from '../helpers';
 import { db, crypto, transaction, validation, SWAP_TYPE, TYPE } from '../utils';
 
-const bnbAddress = bnb.getAddressFromMnemonic(config.get('binance.wallet.mnemonic'));
-
 // - Public
 
 /**
@@ -39,17 +37,19 @@ export function swapToken(req, res, next) {
         return next(null, req, res, next);
       }
 
+      // Account type is the that of the currency we are swapping from
+      const accountType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.LOKI : TYPE.BNB;
+
       let newAccount = null;
-      if (addressType === TYPE.LOKI) {
-        // Create a BNB account
-        // TODO: Generate a random memo here
-        newAccount = bnb.createAccountWithMnemonic();
-      } else if (addressType === TYPE.BNB) {
+      if (accountType === TYPE.BNB) {
+        // Generate a random memo
+        newAccount = { memo: crypto.generateRandomString(64) };
+      } else if (accountType === TYPE.LOKI) {
         newAccount = await loki.createAccount();
       }
 
       if (!newAccount) {
-        console.error('Failed to make new account for: ', addressType);
+        console.error('Failed to make new account for: ', accountType);
         throw new Error('Invalid swap');
       }
 
@@ -118,7 +118,7 @@ export function finalizeSwap(req, res, next) {
       // Give back the new swaps to the user
       const newSwaps = await db.insertSwaps(newTransactions, clientAccount);
       res.status(205);
-      res.body = { status: 200, success: true, result: newSwaps };
+      res.body = { status: 200, success: true, result: formatSwaps(newSwaps) };
     } catch (error) {
       console.log(error);
       const message = (error && error.message);
@@ -206,19 +206,22 @@ export function getWithdrawalFees(req, res, next) {
 // - Util
 
 function formatClientAccount({ uuid, accountType: type, account }) {
-  if (type === TYPE.LOKI) {
-    return {
-      uuid,
-      type,
-      address: account.address,
-    };
-  }
-
-  // BNB
-  return {
+  const depositAddress = type === TYPE.LOKI ? account.address : bnb.getOurAddress();
+  const result = {
     uuid,
     type,
-    address: bnbAddress,
-    memo: account.memo,
+    depositAddress,
   };
+  if (type === TYPE.BNB) result.memo = account.memo;
+
+  return result;
+}
+
+function formatSwaps(swaps) {
+  return swaps.map(swap => ({
+    uuid: swap.uuid,
+    type: swap.type,
+    amount: swap.amount,
+    txHash: swap.deposit_transaction_hash,
+  }));
 }

@@ -4,6 +4,14 @@ import crypto from 'crypto';
 import config from 'config';
 
 /**
+ * Generate a random string of the given length
+ * @param {number} length The length of the string.
+ */
+export function generateRandomString(length) {
+  return crypto.randomBytes(Math.floor(length / 2)).toString('hex');
+}
+
+/**
  * Encrypt the given text using `aes-256-ctr` and get the hex output.
  * @param {string} text The text to encrypt
  * @param {string} password The encryption password.

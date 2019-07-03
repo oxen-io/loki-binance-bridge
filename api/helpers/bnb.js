@@ -3,6 +3,18 @@ import config from 'config';
 
 const { api, network, symbol } = config.get('binance');
 
+let ourAddress = null;
+
+/**
+ * Get the public address of the wallet provided in the config
+ */
+export function getOurAddress() {
+  if (!ourAddress) {
+    ourAddress = getAddressFromMnemonic(config.get('binance.wallet.mnemonic'));
+  }
+  return ourAddress;
+}
+
 /**
  * Create an account.
  * This account will be created with a random mnemonic.
@@ -30,7 +42,7 @@ export function generateKeyStore(privateKey, password) {
  * @returns {boolean} Wether the given `address` is valid or not.
  */
 export function validateAddress(address) {
-  return this.getClient().checkAddress(address);
+  return getClient().checkAddress(address);
 }
 
 /**
@@ -39,7 +51,7 @@ export function validateAddress(address) {
  */
 export function getAddressFromMnemonic(mnemonic) {
   const cleanedMnemonic = mnemonic.replace(/(\r\n|\n|\r)/gm, '');
-  const { address } = this.getClient().recoverAccountFromMnemonic(cleanedMnemonic);
+  const { address } = getClient().recoverAccountFromMnemonic(cleanedMnemonic);
 
   return address;
 }
@@ -49,29 +61,33 @@ export function getAddressFromMnemonic(mnemonic) {
  * This will only fetch transactions up to a month before the current date.
  *
  * @param {string} address The address we are getting the transactions from.
+ * @param {number} since The date in milliseconds. The minimum time is 3 months before now.
  * @returns {Promise<[object]>} An array of BNB transactions with the value being in 1e9 format.
  */
-export async function getIncomingTransactions(address) {
+export async function getIncomingTransactions(address, since = null) {
   if (!address) {
     throw new Error('Address should not be falsy');
   }
 
-  const client = getClient();
+  // Get the time x months before now
+  const getXMonthBeforeNow = number => {
+    // We want to get all transaction from a month before
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - number);
+    startDate.setHours(0, 0, 0, 0);
+    return startDate.getTime();
+  };
 
-  // We want to get all transaction from a month before
-  const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - 1);
-  startDate.setHours(0, 0, 0, 0);
-  const startTime = startDate.getTime();
+  const time = since || getXMonthBeforeNow(1);
+  const minTime = getXMonthBeforeNow(3);
+  const startTime = Math.max(minTime, time);
 
   try {
-    // eslint-disable-next-line no-underscore-dangle
+    const client = getClient();
+    // eslint-disable-next-line no-underscore-dangle, max-len
     const data = await client._httpClient.request('get', `/api/v1/transactions?address=${address}&startTime=${startTime}&txAsset=${symbol}&side=RECEIVE&txType=TRANSFER`);
     const transactions = data.result.tx || [];
-    return transactions.map(t => ({
-      ...t,
-      value: to1e9Amount(t.value),
-    }));
+    return get1e9Transactions(transactions);
   } catch (err) {
     return [];
   }
@@ -103,14 +119,7 @@ export async function getBalances(address) {
  * @returns {Promise<[string]>} The transaction hashes
  */
 export async function multiSend(mnemonic, outputs, message) {
-  const normalised = outputs.map(o => {
-    const normalisedCoins = o.coins.map(c => ({ ...c, amount: toDecimalAmount(c.amount) }));
-    return {
-      ...o,
-      coins: normalisedCoins,
-    };
-  });
-
+  const normalised = getDecimalOutputs(outputs);
   const cleanedMnemonic = mnemonic.replace(/(\r\n|\n|\r)/gm, '');
 
   const client = getClient();
@@ -132,6 +141,37 @@ export async function multiSend(mnemonic, outputs, message) {
   } catch (e) {
     throw new Error(e.message);
   }
+}
+
+/**
+ * Convert given outputs and format them for sending to BNB.
+ * This function assumes the `amount` in outputs is in 1e9 format.
+ *
+ * @param {[{ to: string, coins: [{ denom: string, amount: number }]}]} outputs The outputs.
+ * @returns The outputs with the `amount` in decimal format
+ */
+export function getDecimalOutputs(outputs) {
+  return outputs.map(o => {
+    const normalisedCoins = o.coins.map(c => ({ ...c, amount: toDecimalAmount(c.amount) }));
+    return {
+      ...o,
+      coins: normalisedCoins,
+    };
+  });
+}
+
+/**
+ * Convert given transactions and format them for sending to BNB.
+ * This function assumes the `value` in transactions is in decimal format.
+ *
+ * @param {[object]} transactions The transactions.
+ * @returns The transactions with the `value` in 1e9 format
+ */
+export function get1e9Transactions(transactions) {
+  return transactions.map(t => ({
+    ...t,
+    value: to1e9Amount(t.value),
+  }));
 }
 
 /**

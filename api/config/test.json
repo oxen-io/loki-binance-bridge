@@ -9,6 +9,5 @@
   "loki": {
     "minConfirmations": 6,
     "withdrawalFee": 5
-  },
-  "encryptionKey": "Test encryption key"
+  }
 }

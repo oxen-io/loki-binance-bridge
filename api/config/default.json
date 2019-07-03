@@ -29,8 +29,7 @@
       "password": "",
       "accountIndex": 0
     },
-    "minConfirmations": 12,
-    "withdrawalFee": 5
-  },
-  "encryptionKey": "THIS IS AN ENCRYPTION KEY THAT IS USED TO ENCRYPT GENERATED ACCOUNTS"
+    "minConfirmations": 2,
+    "withdrawalFee": 1
+  }
 }

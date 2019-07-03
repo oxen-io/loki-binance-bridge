@@ -5,20 +5,30 @@ import dateformat from 'dateformat';
 import { Grid, Typography, Paper, Divider, Link } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import config from '@config';
-import { SWAP_TYPE } from '@constants';
+import { SWAP_TYPE, TYPE } from '@constants';
 import styles from './styles';
+
+const hashUrls = {
+  [TYPE.LOKI]: config.loki.txExplorerUrl,
+  [TYPE.BNB]: config.binance.txExplorerUrl,
+};
 
 class SwapList extends Component {
   renderHash = (type, txHash, transferTxHashes) => {
     const { classes } = this.props;
 
-    const baseUrl = type === SWAP_TYPE.LOKI_TO_BLOKI ? config.loki.txExplorerUrl : '';
-    const hashes = transferTxHashes.length === 0 ? [txHash] : transferTxHashes;
+    const hasTransferHashes = transferTxHashes.length > 0;
+    const depositHashType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
+    const transferHashType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
+    const hashType = hasTransferHashes ? transferHashType : depositHashType;
+    const baseUrl = hashUrls[hashType];
+
+    const hashes = hasTransferHashes? transferTxHashes : [txHash];
     const hashItems = hashes.map(hash => {
       const url = `${baseUrl}/${hash}`;
       return (
         <Typography key={hash} className={classes.hash}>
-          <Link href={url}>
+          <Link href={url} target="_blank" rel="noreferrer">
             {hash}
           </Link>
         </Typography>

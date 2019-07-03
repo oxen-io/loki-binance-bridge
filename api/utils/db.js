@@ -84,7 +84,7 @@ const db = {
   * @return The client account or `null` if we failed to get the client account.
   */
   async getClientAccount(address, addressType) {
-    const clientQuery = 'select uuid where address = $1 and address_type = $2;';
+    const clientQuery = 'select uuid from client_accounts where address = $1 and address_type = $2;';
     const clientAccount = await postgres.oneOrNone(clientQuery, [address, addressType]);
     if (!clientAccount) return null;
 
@@ -199,7 +199,7 @@ const db = {
   *
   * @export
   * @param {[{ hash: string, amount: number }]} transactions An array of transactions.
-  * @param {{ uuid: string, addressType: string, address: string, accountAddress: string }} clientAccount The client account to associate with the swap.
+  * @param {{ uuid: string, addressType: string }} clientAccount The client account to associate with the swap.
   * @returns {Promise<[{ uuid, type, amount, txHash }]>} An array of inserted swaps.
   */
   async insertSwaps(transactions, clientAccount) {
@@ -208,13 +208,8 @@ const db = {
     const swaps = await postgres.tx(t => t.batch(transactions.map(tx => db.insertSwap(tx, clientAccount))));
     if (!swaps) return [];
 
-    // Filter out any null swaps and map it to sanitized values
-    return swaps.filter(s => !!s).map(swap => ({
-      uuid: swap.uuid,
-      type: swap.type,
-      amount: swap.amount,
-      txHash: swap.deposit_transaction_hash,
-    }));
+    // Filter out any null swaps
+    return swaps.filter(s => !!s);
   },
 
   /**

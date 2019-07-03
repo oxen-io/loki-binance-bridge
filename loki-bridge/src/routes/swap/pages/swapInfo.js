@@ -48,10 +48,8 @@ class SwapInfo extends Component {
     const { fees } = this.state;
     const { swapType, classes, swapInfo } = this.props;
 
-    const { userAddressType, lokiAddress, bnbAddress } = swapInfo;
-
+    const { depositAddress } = swapInfo;
     const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
-    const depositAddress = userAddressType === TYPE.LOKI ? bnbAddress : lokiAddress;
 
     const lokiFee = (fees && fees.loki / 1e9) || 0;
 
