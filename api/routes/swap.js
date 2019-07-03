@@ -3,6 +3,8 @@ import config from 'config';
 import { bnb, loki } from '../helpers';
 import { db, crypto, transaction, validation, SWAP_TYPE, TYPE } from '../utils';
 
+const bnbAddress = bnb.getAddressFromMnemonic(config.get('binance.wallet.mnemonic'));
+
 // - Public
 
 /**
@@ -33,13 +35,14 @@ export function swapToken(req, res, next) {
       const account = await db.getClientAccount(address, addressType);
       if (account) {
         res.status(205);
-        res.body = { status: 200, success: true, result: account };
+        res.body = { status: 200, success: true, result: formatClientAccount(account) };
         return next(null, req, res, next);
       }
 
       let newAccount = null;
       if (addressType === TYPE.LOKI) {
         // Create a BNB account
+        // TODO: Generate a random memo here
         newAccount = bnb.createAccountWithMnemonic();
       } else if (addressType === TYPE.BNB) {
         newAccount = await loki.createAccount();
@@ -52,7 +55,7 @@ export function swapToken(req, res, next) {
 
       const clientAccount = await db.insertClientAccount(address, addressType, newAccount);
       res.status(205);
-      res.body = { status: 200, success: true, result: clientAccount };
+      res.body = { status: 200, success: true, result: formatClientAccount(clientAccount) };
     } catch (error) {
       console.log(error);
       const message = (error && error.message);
@@ -91,10 +94,10 @@ export function finalizeSwap(req, res, next) {
         return next(null, req, res, next);
       }
 
-      const { accountAddress, accountType } = clientAccount;
+      const { account, accountType } = clientAccount;
 
       const [transactions, swaps] = await Promise.all([
-        transaction.getIncomingTransactions(accountAddress, accountType),
+        transaction.getIncomingTransactions(account, accountType),
         db.getSwapsForClientAccount(uuid),
       ]);
 
@@ -152,17 +155,12 @@ export async function getSwaps(req, res, next) {
       return next(null, req, res, next);
     }
 
-    const { address, addressType, accountAddress } = clientAccount;
-
     const swaps = await db.getSwapsForClientAccount(uuid);
     if (!swaps) {
       res.status(400);
       res.body = { status: 400, success: false, result: 'Failed to fetch swaps' };
       return next(null, req, res, next);
     }
-
-    const lokiAddress = addressType === TYPE.LOKI ? address : accountAddress;
-    const bnbAddress = addressType === TYPE.BNB ? address : accountAddress;
 
     const formatted = swaps.map(swap => {
       const transactionHashes = swap.transfer_transaction_hash;
@@ -171,8 +169,6 @@ export async function getSwaps(req, res, next) {
       return {
         uuid: swap.uuid,
         type: swap.type,
-        lokiAddress,
-        bnbAddress,
         amount: swap.amount,
         txHash: swap.deposit_transaction_hash,
         transferTxHashes: transactionHashArray,
@@ -205,4 +201,24 @@ export function getWithdrawalFees(req, res, next) {
     result: { loki: lokiAmount },
   };
   return next(null, req, res, next);
+}
+
+// - Util
+
+function formatClientAccount({ uuid, accountType: type, account }) {
+  if (type === TYPE.LOKI) {
+    return {
+      uuid,
+      type,
+      address: account.address,
+    };
+  }
+
+  // BNB
+  return {
+    uuid,
+    type,
+    address: bnbAddress,
+    memo: account.memo,
+  };
 }

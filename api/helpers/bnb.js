@@ -30,7 +30,18 @@ export function generateKeyStore(privateKey, password) {
  * @returns {boolean} Wether the given `address` is valid or not.
  */
 export function validateAddress(address) {
-  return ApiClient.crypto.checkAddress(address);
+  return this.getClient().checkAddress(address);
+}
+
+/**
+ * Get the wallet address from a mnemonic.
+ * @param {string} mnemonic The mnemonic words.
+ */
+export function getAddressFromMnemonic(mnemonic) {
+  const cleanedMnemonic = mnemonic.replace(/(\r\n|\n|\r)/gm, '');
+  const { address } = this.getClient().recoverAccountFromMnemonic(cleanedMnemonic);
+
+  return address;
 }
 
 /**
@@ -101,13 +112,13 @@ export async function multiSend(mnemonic, outputs, message) {
   });
 
   const cleanedMnemonic = mnemonic.replace(/(\r\n|\n|\r)/gm, '');
-  const privateKey = ApiClient.crypto.getPrivateKeyFromMnemonic(cleanedMnemonic);
 
   const client = getClient();
+  const { privateKey, address } = client.recoverAccountFromMnemonic(cleanedMnemonic);
+
   await client.setPrivateKey(privateKey);
   await client.initChain();
 
-  const address = client.getClientKeyAddress();
   // eslint-disable-next-line no-underscore-dangle
   const data = await client._httpClient.request('get', `/api/v1/account/${address}/sequence`);
   const sequence = (data && data.result && data.result.sequence) || 0;

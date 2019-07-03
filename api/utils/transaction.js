@@ -7,11 +7,11 @@ import db from './db';
 /**
  * Get incoming transactions to the given address.
  *
- * @param {string} accountAddress The account address.
+ * @param {any} account The account.
  * @param {'loki'|'bnb'} accountType The account type.
  * @return {Promise<{ hash, amount }>} An array of incoming transactions
  */
-export async function getIncomingTransactions(accountAddress, accountType) {
+export async function getIncomingTransactions(account, accountType) {
   switch (accountType) {
     case TYPE.BNB: {
       const transactions = await bnb.getIncomingTransactions(accountAddress);
