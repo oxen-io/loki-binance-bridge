@@ -176,14 +176,14 @@ export async function getBalances(addressIndicies) {
  * @returns {Promise<[string]>} The transaction hashes
  */
 export async function multiSend(destinations) {
-  const data = rpc('transfer_split', {
+  const data = await rpc('transfer_split', {
     destinations,
     account_index: accountIndex,
   });
 
   if (data.error || !data.result) {
-    const error = data.error || 'No result found';
-    throw new Error('[Loki Wallet] Failed to send transactions: ', error);
+    const error = (data.error && data.error.message) || 'No result found';
+    throw new Error(`[Loki Wallet] Failed to send transactions - ${error}`);
   }
 
   return data.result.tx_hash_list;

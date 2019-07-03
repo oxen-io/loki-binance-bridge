@@ -17,7 +17,7 @@ class SwapList extends Component {
     const hashItems = hashes.map(hash => {
       const url = `${baseUrl}/${hash}`;
       return (
-        <Typography className={classes.hash}>
+        <Typography key={hash} className={classes.hash}>
           <Link href={url}>
             {hash}
           </Link>

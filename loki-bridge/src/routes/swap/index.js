@@ -98,6 +98,11 @@ class Swap extends Component {
     this.setState({ loading: true });
   }
 
+  onRefresh = () => {
+    this.getSwaps();
+    this.finalizeSwap();
+  }
+
   finalizeSwap = () => {
     const { swapInfo } = this.state;
     dispatcher.dispatch({
@@ -138,7 +143,7 @@ class Swap extends Component {
           <SwapInfo
             swapType={swapType}
             swapInfo={swapInfo}
-            onRefresh={this.finalizeSwap}
+            onRefresh={this.onRefresh}
             loading={loading}
           />
         )}

@@ -104,7 +104,9 @@ class SwapInfo extends Component {
     if (!swapInfo || !swapInfo.swaps || swapInfo.swaps.length === 0) return null;
 
     const receivingCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'B-LOKI' : 'LOKI';
-    const total = swapInfo.swaps.reduce((total, swap) => total + parseFloat(swap.amount), 0);
+
+    const pendingSwaps = swapInfo.swaps.filter(s => s.transferTxHashes && s.transferTxHashes.length === 0);
+    const total = pendingSwaps.reduce((total, swap) => total + parseFloat(swap.amount), 0);
     const displayTotal = total / 1e9;
 
     return (

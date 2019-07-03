@@ -23,13 +23,14 @@ export async function processSwaps(swapType) {
 
   if (!transactions || transactions.length === 0) {
     console.info(`No swaps found for ${swapType}`);
+    return;
   }
 
   try {
     const txHashes = await send(swapType, transactions);
     await db.updateSwapsTransferTransactionHash(ids, txHashes.join(','));
   } catch (e) {
-    console.log(`Failed to process swaps: ${e.message}`);
+    console.log(`Error: ${e.message}`);
   }
 }
 

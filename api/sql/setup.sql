@@ -48,7 +48,10 @@ create table if not exists swaps (
   /* The type of swap: loki_to_bloki or bloki_to_loki */
   type text,
 
-  /* The amount to swap. String instead of numeric to preserve the precise value. */
+  /*
+    The amount to swap represented as 1e9 values.
+    String instead of numeric to preserve the precise value.
+  */
   amount text,
   client_account_uuid char(36),
 
