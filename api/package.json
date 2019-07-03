@@ -7,14 +7,17 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node -r esm server.js",
     "dev": "cross-env NODE_ENV=development node -r esm server.js",
-    "test": "cross-env NODE_ENV=test mocha -r esm --recursive"
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive",
+    "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
+    "swapDev": "cross-env NODE_ENV=development node -r esm process.js --swap"
   },
   "author": "Loki Network",
   "license": "ISC",
   "dependencies": {
-    "@binance-chain/javascript-sdk": "^2.10.0",
+    "@binance-chain/javascript-sdk": "^2.14.0",
     "bip39": "^3.0.2",
     "body-parser": "^1.19.0",
+    "commander": "^2.20.0",
     "compression": "^1.7.4",
     "config": "^3.1.0",
     "cross-env": "^5.2.0",

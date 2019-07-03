@@ -12,15 +12,24 @@ const lokiWithdrawalFee = config.get('loki.withdrawalFee');
  * @param {string} swapType The type of swap.
  */
 export async function processSwaps(swapType) {
+  if (!swapType) {
+    console.error('Swap type must not be null or undefined.');
+    return;
+  }
+
   const swaps = await db.getPendingSwaps(swapType);
   const ids = swaps.map(s => s.uuid);
   const transactions = getTransactions(swaps);
+
+  if (!transactions || transactions.length === 0) {
+    console.info(`No swaps found for ${swapType}`);
+  }
 
   try {
     const txHashes = await send(swapType, transactions);
     await db.updateSwapsTransferTransactionHash(ids, txHashes.join(','));
   } catch (e) {
-    console.log('[Processing] Failed to process swaps: ', e);
+    console.log(`Failed to process swaps: ${e.message}`);
   }
 }
 

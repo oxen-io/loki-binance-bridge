@@ -69,6 +69,12 @@ Any values that you don't set in those files will be fetched from `config/defaul
 | npm run dev | Run the API server in **Development** mode |
 | npm run test | Run the test suite |
 
+## Processing
+
+To process simply run:
+```
+npm run swap
+```
 
 ## Testnet Coins
 
