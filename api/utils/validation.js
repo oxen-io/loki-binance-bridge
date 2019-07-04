@@ -26,13 +26,3 @@ export function validateUuidPresent(body) {
   if (!uuid) return 'uuid is required';
   return null;
 }
-
-export function validateBNBDownloadKeyStore(body) {
-  if (!body) return 'invalid params';
-  const { password, privateKey } = body;
-
-  if (!privateKey) return 'privateKey is required';
-  if (!password) return 'password is required';
-
-  return null;
-}

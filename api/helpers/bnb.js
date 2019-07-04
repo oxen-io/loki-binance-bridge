@@ -131,7 +131,9 @@ export async function multiSend(mnemonic, outputs, message) {
  */
 export function getDecimalOutputs(outputs) {
   return outputs.map(o => {
-    const normalisedCoins = o.coins.map(c => ({ ...c, amount: toDecimalAmount(c.amount) }));
+    // The amount in the output must be 8 decimals in length
+    const normaliseAmount = amount => roundDown(toDecimalAmount(amount), 8);
+    const normalisedCoins = o.coins.map(c => ({ ...c, amount: normaliseAmount(c.amount) }));
     return {
       ...o,
       coins: normalisedCoins,
@@ -173,4 +175,8 @@ function getClient() {
   const client = new ApiClient(api);
   client.chooseNetwork(network);
   return client;
+}
+
+function roundDown(number, decimals = 0) {
+  return (Math.floor(number * (10 ** decimals)) / (10 ** decimals));
 }

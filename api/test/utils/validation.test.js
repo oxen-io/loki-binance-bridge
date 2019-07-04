@@ -75,26 +75,4 @@ describe('Validation', () => {
       assert.isNull(error);
     });
   });
-
-  describe('#validateBNBDownloadKeyStore', () => {
-    it('should return an error if body is null', async () => {
-      const error = await validation.validateBNBDownloadKeyStore(null);
-      assert.strictEqual(error, 'invalid params');
-    });
-
-    it('should return an error if privateKey is not present', async () => {
-      const error = await validation.validateBNBDownloadKeyStore({ password: '123' });
-      assert.strictEqual(error, 'privateKey is required');
-    });
-
-    it('should return an error if password is not present', async () => {
-      const error = await validation.validateBNBDownloadKeyStore({ privateKey: '123' });
-      assert.strictEqual(error, 'password is required');
-    });
-
-    it('should not return an error if correct params are present', async () => {
-      const error = await validation.validateBNBDownloadKeyStore({ privateKey: '1', password: '2' });
-      assert.isNull(error);
-    });
-  });
 });

@@ -1,3 +1,5 @@
+import { red } from '@material-ui/core/colors';
+
 const styles = theme => ({
   root: {
     maxWidth: '800px'
@@ -63,6 +65,30 @@ const styles = theme => ({
   statAmount: {
     fontWeight: '600',
     fontSize: '0.94rem'
+  },
+  memoFrame: {
+    border: '1px solid #e1e1e1',
+    borderRadius: '3px',
+    backgroundColor: '#efefef',
+    padding: '1rem',
+    marginBottom: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  memo: {
+    border: '1px solid #e1e1e1',
+    borderRadius: '3px',
+    backgroundColor: '#7F7F7F',
+    color: 'white',
+    padding: '1rem',
+    overflowWrap: 'break-word',
+    maxWidth: '100%',
+    textAlign: 'center'
+  },
+  redText: {
+    color: red[500],
+    margin: theme.spacing(1, 0)
   }
 });
 

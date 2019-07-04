@@ -10,8 +10,8 @@ import SwapList from '../components/swapList';
 import styles from '../styles';
 
 class SwapInfo extends Component {
-  onCopy = () => {
-    var elm = document.getElementById('depositAddress');
+  onCopy = (id) => {
+    var elm = document.getElementById(id);
     let range;
     // for Internet Explorer
 
@@ -44,11 +44,38 @@ class SwapInfo extends Component {
     this.setState({ fees: store.getStore('fees') || {} });
   }
 
+  renderMemo = () => {
+    const { classes, swapInfo: { memo }} = this.props;
+
+    return (
+      <div className={classes.memoFrame}>
+        <Typography className={classes.redText}>
+          PLEASE READ CAREFULLY
+        </Typography>
+        <Typography id='memo' className={classes.memo}>
+          {memo}
+        </Typography>
+        <IconButton
+          onClick={() => this.onCopy('memo')}
+        >
+          <CopyIcon/>
+        </IconButton>
+        <Typography>
+          When creating the transaction, please paste the string above into the <b>Memo</b> field. <br/>
+        </Typography>
+        <Typography>Ensure that this is the only thing that you put in the field.</Typography>
+        <Typography className={classes.redText}>
+          If done incorrectly then you will not receive <b>LOKI</b> into your designated address.
+        </Typography>
+      </div>
+    );
+  }
+
   renderInstructions = () => {
     const { fees } = this.state;
     const { swapType, classes, swapInfo } = this.props;
 
-    const { depositAddress } = swapInfo;
+    const { depositAddress, memo } = swapInfo;
     const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
 
     const lokiFee = (fees && fees.loki / 1e9) || 0;
@@ -68,15 +95,12 @@ class SwapInfo extends Component {
           <Typography component={'div'} className={ classes.instructionBold }>
             <div id='depositAddress'>{depositAddress}</div>
             <IconButton
-              style={{
-                verticalAlign: 'top',
-                marginRight: '-5px'
-              }}
-              onClick={this.onCopy}
+              onClick={() => this.onCopy('depositAddress')}
             >
               <CopyIcon/>
             </IconButton>
           </Typography>
+          {memo && this.renderMemo() }
           <Typography className={ classes.instructions }>
             After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through. <br/>
             <b>Note:</b> You will have to wait for there to be atleast 12 confirmations before your request is logged.

@@ -18,7 +18,7 @@ class SwapList extends Component {
     const { classes } = this.props;
 
     const hasTransferHashes = transferTxHashes.length > 0;
-    const depositHashType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
+    const depositHashType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.LOKI : TYPE.BNB;
     const transferHashType = type === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
     const hashType = hasTransferHashes ? transferHashType : depositHashType;
     const baseUrl = hashUrls[hashType];
