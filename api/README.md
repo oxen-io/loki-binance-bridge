@@ -61,6 +61,50 @@ If you need different values for either `test`, `development` or `production` th
 
 Any values that you don't set in those files will be fetched from `config/default.json`.
 
+<details>
+<summary>Properties</summary>
+
+### Descriptions
+
+| Property | Description |
+| --- | --- |
+| serverPort | The port to run the server on |
+| useAPIEncryption | Whether to encrypt `POST` requests |
+
+#### Binance
+
+| Property | Description |
+| --- | --- |
+| api | The binance api url |
+| network | The binance network (testnet/production) |
+| symbol | The symbol of the token you are swapping |
+| wallet.mnemonic | The mnemonic of the wallet to use for the swaps.<br>This is where you will receive and send your tokens.|
+
+#### Database
+| Property | Description |
+| --- | --- |
+| host | The ip or address of the database |
+| port | The database port |
+| database | The name of the database to use |
+| user | The database user |
+| password | The database password |
+
+#### Loki
+
+| Property | Description |
+| --- | --- |
+| minConfirmations | The minimum number of confirmations required before we add the incoming transaction to our swaps |
+| withdrawalFee | The amount of loki to deduct upon withdrawing |
+| walletRPC.host | The ip or address where the RPC can be accessed |
+| walletRPC.port | The RPC port |
+| walletRPC.username | The RPC username |
+| walletRPC.password | The RPC password |
+| wallet.filename | The name of the wallet to use for swaps.<br>This is where you will receive and send loki |
+| wallet.password | The password of the wallet |
+| wallet.accountIndex | The account index to use for the wallet |
+
+</details>
+
 ## Commands
 
 | Command | Description |

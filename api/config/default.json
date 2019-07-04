@@ -2,8 +2,7 @@
   "serverPort": 8000,
   "useAPIEncryption": false,
   "binance": {
-    "cli": "./cli/testnet/0.5.8.1/mac/tbnbcli",
-    "api": "https://testnet-dex.binance.org/",
+    "api": "https://testnet-dex.binance.org",
     "network": "testnet",
     "symbol": "BLOKI",
     "wallet": {
