@@ -31,13 +31,16 @@ const db = {
     };
 
     if (accountType === TYPE.LOKI) {
-      const accountQuery = 'select address, address_index as addressIndex from accounts_loki where uuid = $1;';
+      const accountQuery = 'select address, address_index from accounts_loki where uuid = $1;';
       const account = await postgres.oneOrNone(accountQuery, [accountUuid]);
       if (!account) return null;
 
       return {
         ...base,
-        account,
+        account: {
+          address: account.address,
+          addressIndex: account.address_index,
+        },
       };
     }
 
@@ -59,21 +62,13 @@ const db = {
   * @returns {Promise<[{ uuid, address, addressType, accountAddress, accountType }]>} An array of client accounts.
   */
   async getClientAccounts(accountType) {
-    const accountTable = accountType === TYPE.LOKI ? 'accounts_loki' : 'accounts_bnb';
-    const leftJoin = `${accountTable} a on a.uuid = ca.account_uuid`;
-
     // eslint-disable-next-line max-len
-    const query = `select ca.uuid, ca.address, ca.address_type, ca.account_type, a.address as account_address from client_accounts ca left join ${leftJoin} where account_type = $1`;
-    const accounts = await postgres.manyOrNone(query, [accountType]);
-    if (!accounts) return [];
+    const uuids = await postgres.manyOrNone('select uuid from client_accounts where account_type = $1', [accountType]);
+    if (!uuids) return [];
 
-    return accounts.map(a => ({
-      uuid: a.uuid,
-      address: a.address,
-      addressType: a.address_type,
-      accountAddress: a.account_address,
-      accountType: a.account_type,
-    }));
+    // Get all client accounts and filter out null
+    const accounts = await postgres.task(t => t.batch(uuids.map(({ uuid }) => db.getClientAccountForUuid(uuid))));
+    return accounts.filter(a => !!a);
   },
 
   /**
@@ -88,7 +83,7 @@ const db = {
     const clientAccount = await postgres.oneOrNone(clientQuery, [address, addressType]);
     if (!clientAccount) return null;
 
-    return this.getClientAccountForUuid(clientAccount.uuid);
+    return db.getClientAccountForUuid(clientAccount.uuid);
   },
 
   /**
@@ -117,7 +112,7 @@ const db = {
     const clientAccount = await postgres.oneOrNone(query, [address, addressType, dbAccount.uuid, accountType]);
     if (!clientAccount) return null;
 
-    return this.getClientAccountForUuid(clientAccount.uuid);
+    return db.getClientAccountForUuid(clientAccount.uuid);
   },
 
   /**

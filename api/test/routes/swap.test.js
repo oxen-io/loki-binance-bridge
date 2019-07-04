@@ -3,8 +3,10 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import * as swapRoutes from '../../routes/swap';
 import { bnb, loki, postgres } from '../../helpers';
-import { db, TYPE, SWAP_TYPE, validation, transaction } from '../../utils';
+import { db, TYPE, SWAP_TYPE, validation, transaction, crypto } from '../../utils';
 import { dbHelper, wrapRouterFunction } from '../helpers';
+
+const ourBnbAddress = 'ourAddress';
 
 const sandbox = sinon.createSandbox();
 
@@ -21,7 +23,7 @@ describe('Swap API', () => {
     // Pretend all our addresses we pass are valid for these tests
     sandbox.stub(loki, 'validateAddress').returns(true);
     sandbox.stub(bnb, 'validateAddress').returns(true);
-    sandbox.stub(bnb, 'getOurAddress').returns('ourAddress');
+    sandbox.stub(bnb, 'getOurAddress').returns(ourBnbAddress);
   });
 
   afterEach(() => {
@@ -58,110 +60,118 @@ describe('Swap API', () => {
         assert.equal(spy.callCount, failingData.length);
       });
 
-      it('should return 500 if we failed to create an account', async () => {
+      it('should return 500 if we failed to create a loki account', async () => {
         const lokiCreateAccount = sandbox.stub(loki, 'createAccount').returns(null);
-        const bnbCreateAccount = sandbox.stub(bnb, 'createAccountWithMnemonic').returns(null);
 
-        const data = Object.values(SWAP_TYPE).map(type => ({ address: '123', type }));
-        const results = await Promise.all(data.map(swapToken));
-        results.forEach(({ status, success, result }) => {
-          assert.equal(status, 500);
-          assert.isFalse(success);
-          assert.equal(result, 'Invalid swap');
-        });
+        const { status, success, result } = await swapToken({ address: '123', type: SWAP_TYPE.LOKI_TO_BLOKI });
+        assert.equal(status, 500);
+        assert.isFalse(success);
+        assert.equal(result, 'Invalid swap');
 
         assert(lokiCreateAccount.called, 'loki.createAccount was not called');
-        assert(bnbCreateAccount.called, 'bnb.createAccountWithMnemonic was not called');
       });
     });
 
     describe('success', () => {
-      it('should return the existing client account', async () => {
-        const lokiAccountUuid = 'd27efda6-988b-11e9-a2a3-2a2ae2dbcce4';
-        const bnbAccountUuid = 'd27efff4-988b-11e9-a2a3-2a2ae2dbcce4';
-        const lokiClientAccount = 'd27f01b6-988b-11e9-a2a3-2a2ae2dbcce4';
-        const bnbClientAccount = 'd27f031e-988b-11e9-a2a3-2a2ae2dbcce4';
+      context('LOKI To BLOKI', () => {
+        it('should return the existing client account', async () => {
+          const lokiAccountUuid = 'd27efda6-988b-11e9-a2a3-2a2ae2dbcce4';
+          const bnbClientAccount = 'd27f031e-988b-11e9-a2a3-2a2ae2dbcce4';
+          const bnbAddress = '456';
 
-        const bnbAddress = '456';
-        const lokiAddress = '123';
+          await postgres.tx(t => t.batch([
+            // Generated loki account
+            dbHelper.insertLokiAccount(lokiAccountUuid, 'lokiAddress', 0),
+            // Mapping user bnb address to generated loki
+            dbHelper.insertClientAccount(bnbClientAccount, bnbAddress, TYPE.BNB, lokiAccountUuid, TYPE.LOKI),
+          ]));
 
-        await postgres.tx(t => t.batch([
-          dbHelper.insertLokiAccount(lokiAccountUuid, 'lokiAddress', 0),
-          dbHelper.insertBNBAccount(bnbAccountUuid, 'bnbAddress'),
-          // Mapping user loki address to generated bnb
-          dbHelper.insertClientAccount(lokiClientAccount, lokiAddress, TYPE.LOKI, bnbAccountUuid, TYPE.BNB),
-          // Mapping user bnb address to generated loki
-          dbHelper.insertClientAccount(bnbClientAccount, bnbAddress, TYPE.BNB, lokiAccountUuid, TYPE.LOKI),
-        ]));
-
-        // LOKI_TO_BLOKI means we give the api our BNB address
-        const lokiToBnb = await swapToken({ type: SWAP_TYPE.LOKI_TO_BLOKI, address: bnbAddress });
-        assert.equal(lokiToBnb.status, 200);
-        assert.isTrue(lokiToBnb.success);
-        assert.deepEqual(lokiToBnb.result, {
-          uuid: bnbClientAccount,
-          userAddressType: TYPE.BNB,
-          lokiAddress: 'lokiAddress',
-          bnbAddress,
+          // LOKI_TO_BLOKI means we give the api our BNB address
+          const { status, success, result } = await swapToken({ type: SWAP_TYPE.LOKI_TO_BLOKI, address: bnbAddress });
+          assert.equal(status, 200);
+          assert.isTrue(success);
+          assert.deepEqual(result, {
+            uuid: bnbClientAccount,
+            type: TYPE.LOKI,
+            depositAddress: 'lokiAddress',
+          });
         });
 
-        // BLOKI_TO_LOKI means we give the api our LOKI address
-        const bnbToLoki = await swapToken({ type: SWAP_TYPE.BLOKI_TO_LOKI, address: lokiAddress });
-        assert.equal(bnbToLoki.status, 200);
-        assert.isTrue(bnbToLoki.success);
-        assert.deepEqual(bnbToLoki.result, {
-          uuid: lokiClientAccount,
-          userAddressType: TYPE.LOKI,
-          lokiAddress,
-          bnbAddress: 'bnbAddress',
+        it('should create a new account and return it if one does not exist', async () => {
+          const bnbAddress = '456';
+
+          const generateLokiAccount = {
+            address: 'generatedLoki',
+            address_index: 0,
+          };
+          sandbox.stub(loki, 'createAccount').returns(generateLokiAccount);
+
+          const { status, success, result } = await swapToken({ type: SWAP_TYPE.LOKI_TO_BLOKI, address: bnbAddress });
+          assert.equal(status, 200);
+          assert.isTrue(success);
+          assert.deepEqual(result, {
+            uuid: result.uuid,
+            type: TYPE.LOKI,
+            depositAddress: generateLokiAccount.address,
+          });
         });
       });
 
-      it('should create a new account and return it if one does not exist', async () => {
-        const bnbAddress = '456';
-        const lokiAddress = '123';
+      context('BLOKI to LOKI', () => {
+        it('should return the existing client account', async () => {
+          const bnbAccountUuid = 'd27efff4-988b-11e9-a2a3-2a2ae2dbcce4';
+          const lokiClientAccount = 'd27f01b6-988b-11e9-a2a3-2a2ae2dbcce4';
+          const lokiAddress = '123';
+          const memo = 'bnbMemo';
 
-        const generatedBNBAccount = {
-          privateKey: '123',
-          address: 'generatedBNB',
-          mnemonic: 'mnemonic',
-        };
-        sandbox.stub(bnb, 'createAccountWithMnemonic').returns(generatedBNBAccount);
+          await postgres.tx(t => t.batch([
+            // BNB account
+            dbHelper.insertBNBAccount(bnbAccountUuid, memo),
+            // Mapping user loki address to generated bnb
+            dbHelper.insertClientAccount(lokiClientAccount, lokiAddress, TYPE.LOKI, bnbAccountUuid, TYPE.BNB),
+          ]));
 
-        const generateLokiAccount = {
-          address: 'generatedLoki',
-          address_index: 0,
-        };
-        sandbox.stub(loki, 'createAccount').returns(generateLokiAccount);
+          // BLOKI_TO_LOKI means we give the api our LOKI address
+          const { status, success, result } = await swapToken({ type: SWAP_TYPE.BLOKI_TO_LOKI, address: lokiAddress });
+          assert.equal(status, 200);
+          assert.isTrue(success);
+          assert.deepEqual(result, {
+            uuid: result.uuid,
+            type: TYPE.BNB,
+            depositAddress: ourBnbAddress,
+            memo,
+          });
+        });
 
-        const lokiToBnb = await swapToken({ type: SWAP_TYPE.LOKI_TO_BLOKI, address: bnbAddress });
-        assert.equal(lokiToBnb.status, 200);
-        assert.isTrue(lokiToBnb.success);
+        it('should create a new account and return it if one does not exist', async () => {
+          const lokiAddress = '123';
 
-        const { result: lokiClientAccount } = lokiToBnb;
-        assert.strictEqual(lokiClientAccount.userAddressType, TYPE.BNB);
-        assert.strictEqual(lokiClientAccount.lokiAddress, 'generatedLoki');
-        assert.strictEqual(lokiClientAccount.bnbAddress, bnbAddress);
+          const memo = 'meme-mo';
+          sandbox.stub(crypto, 'generateRandomString').returns(memo);
 
-        const bnbToLoki = await swapToken({ type: SWAP_TYPE.BLOKI_TO_LOKI, address: lokiAddress });
-        assert.equal(bnbToLoki.status, 200);
-        assert.isTrue(bnbToLoki.success);
-
-        const { result: bnbClientAccount } = bnbToLoki;
-        assert.strictEqual(bnbClientAccount.userAddressType, TYPE.LOKI);
-        assert.strictEqual(bnbClientAccount.lokiAddress, lokiAddress);
-        assert.strictEqual(bnbClientAccount.bnbAddress, 'generatedBNB');
+          const { status, success, result } = await swapToken({ type: SWAP_TYPE.BLOKI_TO_LOKI, address: lokiAddress });
+          assert.equal(status, 200);
+          assert.isTrue(success);
+          assert.deepEqual(result, {
+            uuid: result.uuid,
+            type: TYPE.BNB,
+            depositAddress: ourBnbAddress,
+            memo,
+          });
+        });
       });
     });
   });
 
   describe('#finalizeSwap', () => {
+    // It doesn't matter what kind of client account we have here
+    // We stub the relevant functions which take this in anyway
     const clientAccount = {
       uuid: 'd27efff4-988b-11e9-a2a3-2a2ae2dbcce4',
       address: 'LOKI',
       addressType: TYPE.LOKI,
-      accountAddress: 'BNB',
       accountType: TYPE.BNB,
+      account: { memo: 'memo' },
     };
 
     describe('failure', () => {
@@ -195,7 +205,7 @@ describe('Swap API', () => {
       it('should return 400 if no incoming transactions were found', async () => {
         sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
         sandbox.stub(transaction, 'getIncomingTransactions').returns([]);
-        sandbox.stub(db, 'getSwapsForClientAccount').returns([]);
+        sandbox.stub(db, 'getSwapsForClientAccount').returns([{ deposit_transaction_hash: '1234' }]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
         assert.equal(status, 400);
@@ -259,9 +269,8 @@ describe('Swap API', () => {
         assert.lengthOf(result, 1);
 
         const swap = result[0];
+        assert.deepEqual(Object.keys(swap), ['uuid', 'type', 'amount', 'txHash']);
         assert.strictEqual(swap.type, SWAP_TYPE.BLOKI_TO_LOKI);
-        assert.strictEqual(swap.lokiAddress, clientAccount.address);
-        assert.strictEqual(swap.bnbAddress, clientAccount.accountAddress);
         assert.equal(swap.amount, 100);
         assert.strictEqual(swap.txHash, txHash);
       });
@@ -353,11 +362,10 @@ describe('Swap API', () => {
         assert.lengthOf(result, 1);
 
         const returnedSwap = result[0];
+        assert.deepEqual(Object.keys(returnedSwap), ['uuid', 'type', 'amount', 'txHash', 'transferTxHashes', 'created']);
         assert.strictEqual(returnedSwap.uuid, swap.uuid);
         assert.strictEqual(returnedSwap.type, swap.type);
         assert.equal(returnedSwap.amount, swap.amount);
-        assert.strictEqual(returnedSwap.lokiAddress, clientAccount.address);
-        assert.strictEqual(returnedSwap.bnbAddress, clientAccount.accountAddress);
         assert.strictEqual(returnedSwap.txHash, swap.deposit_transaction_hash);
         assert.isEmpty(returnedSwap.transferTxHashes);
         assert.strictEqual(returnedSwap.created, 'now');

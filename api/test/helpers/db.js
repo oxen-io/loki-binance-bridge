@@ -5,8 +5,8 @@ export const insertLokiAccount = async (uuid, address, addressIndex) => {
   return postgres.none('insert into accounts_loki(uuid, address, address_index, created) values($1, $2, $3, now())', [uuid, address, addressIndex]);
 };
 
-export const insertBNBAccount = async (uuid, address, encryptedPrivateKey = null, salt = null) => {
-  return postgres.none('insert into accounts_bnb(uuid, address, encrypted_private_key, salt, created) values($1, $2, $3, $4, now())', [uuid, address, encryptedPrivateKey, salt]);
+export const insertBNBAccount = async (uuid, memo) => {
+  return postgres.none('insert into accounts_bnb(uuid, memo, created) values($1, $2, now())', [uuid, memo]);
 };
 
 export const insertClientAccount = async (uuid, address, addressType, accountUuid, accountType) => {
