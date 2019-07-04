@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
 import { store, dispatcher, Actions, Events } from '@store';
@@ -154,8 +153,7 @@ class Swap extends Component {
 
 Swap.propTypes = {
   classes: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
   showMessage: PropTypes.func.isRequired
 };
 
-export default withRouter(withStyles(styles)(Swap));
+export default withStyles(styles)(Swap);

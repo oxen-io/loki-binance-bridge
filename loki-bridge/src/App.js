@@ -2,8 +2,7 @@ import React, { PureComponent } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
-import { Route, Switch } from 'react-router-dom';
-import { Swap } from '@routes';
+import { Swap } from 'pages';
 import { Snackbar } from '@components';
 import theme from '@theme';
 
@@ -50,14 +49,6 @@ export default class App extends PureComponent {
     this.setState({ snackbar });
   }
 
-  renderRoutes = () => {
-    return (
-      <Switch>
-        <Route exact path='/' render={(props) => <Swap {...props} showMessage={this.showMessage} />} />
-      </Switch>
-    );
-  }
-
   renderSnackbar = () => {
     const { snackbar } = this.state;
     return <Snackbar message={snackbar.message} open={snackbar.open} onClose={this.closeMessage} variant={snackbar.variant} />;
@@ -77,7 +68,7 @@ export default class App extends PureComponent {
             alignItems="center"
           >
             <Grid item style={{ maxWidth: '100%' }}>
-              { this.renderRoutes() }
+              <Swap showMessage={this.showMessage} />
               { this.renderSnackbar() }
             </Grid>
           </Grid>
