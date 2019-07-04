@@ -4,7 +4,7 @@ import { Grid, Typography, IconButton } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button } from '@components';
-import { SWAP_TYPE, TYPE } from '@constants';
+import { SWAP_TYPE } from '@constants';
 import { store, Events } from '@store';
 import SwapList from '../components/swapList';
 import styles from '../styles';

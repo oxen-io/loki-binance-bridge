@@ -3,8 +3,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 import { Route, Switch } from 'react-router-dom';
-import { Swap, CreateAccount } from '@routes';
-import { Snackbar, LokiAppBar } from '@components';
+import { Swap } from '@routes';
+import { Snackbar } from '@components';
 import theme from '@theme';
 
 export default class App extends PureComponent {
@@ -54,7 +54,6 @@ export default class App extends PureComponent {
     return (
       <Switch>
         <Route exact path='/' render={(props) => <Swap {...props} showMessage={this.showMessage} />} />
-        <Route path='/createWallet' render={(props) => <CreateAccount {...props} showMessage={this.showMessage} />} />
       </Switch>
     );
   }
@@ -70,7 +69,6 @@ export default class App extends PureComponent {
     return (
       <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
-        <LokiAppBar />
         <div id="content">
           <Grid
             style={{ padding }}

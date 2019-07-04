@@ -21,6 +21,7 @@ describe('Swap API', () => {
     // Pretend all our addresses we pass are valid for these tests
     sandbox.stub(loki, 'validateAddress').returns(true);
     sandbox.stub(bnb, 'validateAddress').returns(true);
+    sandbox.stub(bnb, 'getOurAddress').returns('ourAddress');
   });
 
   afterEach(() => {

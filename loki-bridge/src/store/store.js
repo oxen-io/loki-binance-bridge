@@ -1,5 +1,4 @@
 import axios from 'axios';
-import FileSaver from 'file-saver';
 import { EventEmitter } from 'events';
 import { encrypt } from '@utils/crypto';
 import config from '@config';
@@ -37,12 +36,6 @@ class Store extends EventEmitter {
           break;
         case Actions.FINALIZE_SWAP_TOKEN:
           this.finalizeSwap(payload);
-          break;
-        case Actions.CREATE_BNB_ACCOUNT:
-          this.createBNBAccount();
-          break;
-        case Actions.DOWNLOAD_BNB_KEYSTORE:
-          this.downloadBNBKeystore(payload);
           break;
         default: break;
       }
@@ -85,26 +78,6 @@ class Store extends EventEmitter {
     try {
       const data = await this.fetch(endpoints.finalizeSwap, 'POST', payload.content);
       this.emit(Events.TOKEN_SWAP_FINALIZED, data.result);
-    } catch (e) {
-      this.emit(Events.ERROR, e);
-    }
-  }
-
-  async createBNBAccount() {
-    try {
-      const data = await this.fetch(endpoints.createBNBAccount, 'POST', {});
-      this.emit(Events.BNB_ACCOUNT_CREATED, data.result);
-    } catch (e) {
-      this.emit(Events.ERROR, e);
-    }
-  }
-
-  async downloadBNBKeystore(payload) {
-    try {
-      const data = await this.fetch(endpoints.downloadBNBKeystore, 'POST', payload.content);
-      const blob = new Blob([JSON.stringify(data)], { type: 'application/json;charset=utf-8' });
-      FileSaver.saveAs(blob, `${data.id}_keystore.json`);
-      this.emit(Events.BNB_KEYSTORE_DOWNLOADED, data);
     } catch (e) {
       this.emit(Events.ERROR, e);
     }
