@@ -1,15 +1,29 @@
 /* eslint-disable no-else-return */
 import { db, SWAP_TYPE, TYPE, transaction } from '../utils';
-import { bnb, loki } from '../helpers';
+import { bnb } from '../helpers';
 
 export async function checkAllBalances() {
   const lokiBalance = await getBalances(SWAP_TYPE.LOKI_TO_BLOKI);
-  console.log(lokiBalance);
+  printBalance(SWAP_TYPE.LOKI_TO_BLOKI, lokiBalance);
 
   const bnbBalance = await getBalances(SWAP_TYPE.BLOKI_TO_LOKI);
-  console.log(bnbBalance);
+  printBalance(SWAP_TYPE.BLOKI_TO_LOKI, bnbBalance);
 }
 
+function printBalance(swapType, balance) {
+  const receiveCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'BLOKI';
+  const swapCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
+  console.log(`${receiveCurrency} to ${swapCurrency}:`);
+  console.log(` received: ${balance.transaction / 1e9} ${receiveCurrency}`);
+  console.log(` swapped: ${balance.swap / 1e9} ${swapCurrency}`);
+  if (balance.transaction !== balance.swap) console.log(' \n WARNING: AMOUNTS DO NOT MATCH! PLEASE TRY SWEEPING');
+  console.log('');
+}
+
+/**
+ * Get both the transaction and swap balance for the given swap type.
+ * @param {string} swapType The swap type.
+ */
 export async function getBalances(swapType) {
   const now = Date.now();
   const twoDaysAgo = now - (2 * 24 * 60 * 60 * 1000);
@@ -18,11 +32,17 @@ export async function getBalances(swapType) {
   const transactionBalance = await getBalanceFromIncomingTransactions(accountType, twoDaysAgo, now);
   const swapBalance = await getSwapBalance(swapType, twoDaysAgo, now);
   return {
-    transactionBalance,
-    swapBalance,
+    transaction: transactionBalance,
+    swap: swapBalance,
   };
 }
 
+/**
+ * Get the total balance of the swaps in the database of the given type.
+ * @param {string} swapType The swap type
+ * @param {number} from The date to get incoming transactions from. The lower bound.
+ * @param {number} to The date to get incoming transactions to. The upper bound.
+ */
 export async function getSwapBalance(swapType, from, to) {
   const swaps = await db.getAllSwaps(swapType);
   const filtered = swaps.filter(s => !(s.created > to || s.created < from));
@@ -31,7 +51,7 @@ export async function getSwapBalance(swapType, from, to) {
 }
 
 /**
- * Get balance of the incoming transactions for the given account types.
+ * Get the total balance of the incoming transactions for the given account types.
  * @param {string} accountType The account type
  * @param {number} from The date to get incoming transactions from. The lower bound.
  * @param {number} to The date to get incoming transactions to. The upper bound.
