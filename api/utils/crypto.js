@@ -60,12 +60,12 @@ export function decryptAPIPayload(req, res, next, callback) {
 
   if (!m || !e || !t || !s || !u || !p) {
     res.status(501);
-    res.body = { status: 501, success: false, message: 'Invalid payload' };
+    res.body = { status: 501, success: false, result: 'Invalid payload' };
     return next(null, req, res, next);
   }
 
-  const mnemonic = m.hexDecode();
-  const encrypted = e.hexDecode();
+  const mnemonic = hexDecode(m);
+  const encrypted = hexDecode(e);
   const signature = s;
 
   const sig = { e, m, u, p, t };
@@ -74,7 +74,7 @@ export function decryptAPIPayload(req, res, next, callback) {
 
   if (hashedSignature !== signature) {
     res.status(501);
-    res.body = { status: 501, success: false, message: 'Signature mismatch' };
+    res.body = { status: 501, success: false, result: 'Signature mismatch' };
     return next(null, req, res, next);
   }
 
@@ -85,28 +85,17 @@ export function decryptAPIPayload(req, res, next, callback) {
     callback(data);
   } catch (error) {
     res.status(501);
-    res.body = { status: 501, success: false, message: error };
+    res.body = { status: 501, success: false, result: error };
     return next(null, req, res, next);
   }
 
   return null;
 }
 
-String.prototype.hexEncode = () => {
-  let hex;
-  let result = '';
-  for (let i = 0; i < this.length; i += 1) {
-    hex = this.charCodeAt(i).toString(16);
-    result += (`000${hex}`).slice(-4);
+function hexDecode(hex) {
+  let str = '';
+  for (let i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2) {
+    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
   }
-  return result;
-};
-
-String.prototype.hexDecode = () => {
-  const hexes = this.match(/.{1,4}/g) || [];
-  let back = '';
-  for (let j = 0; j < hexes.length; j += 1) {
-    back += String.fromCharCode(parseInt(hexes[j], 16));
-  }
-  return back;
-};
+  return str;
+}

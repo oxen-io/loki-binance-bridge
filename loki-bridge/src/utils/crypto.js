@@ -9,26 +9,26 @@ export function encrypt(data, url) {
   const cipher = crypto.createCipher('aes-256-cbc', signMnemonic);
   const signEncrypted =
     cipher.update(signJson, 'utf8', 'base64') + cipher.final('base64');
+
   let signData = {
-    e: signEncrypted.hexEncode(),
-    m: signMnemonic.hexEncode(),
+    e: toHex(signEncrypted),
+    m: toHex(signMnemonic),
     u: sha256(url).toUpperCase(),
     p: sha256(sha256(url).toUpperCase()).toUpperCase(),
     t: new Date().getTime()
   };
+
   const signSeed = JSON.stringify(signData);
   const signSignature = sha256(signSeed);
   signData.s = signSignature;
-  return JSON.stringify(signData);
+
+  return signData;
 }
 
-// eslint-disable-next-line no-extend-native
-String.prototype.hexEncode = () => {
-  let hex;
+function toHex(str) {
   let result = '';
-  for (let i = 0; i < this.length; i += 1) {
-    hex = this.charCodeAt(i).toString(16);
-    result += (`000${hex}`).slice(-4);
+  for (let i = 0; i < str.length; i += 1) {
+    result += str.charCodeAt(i).toString(16);
   }
   return result;
-};
+}
