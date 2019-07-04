@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { SWAP_TYPE } from './utils';
 import { processSwaps } from './processing/swaps';
 import { sweepAllPendingSwaps } from './processing/sweep';
+import { checkAllBalances } from './processing/balance';
 
 const program = new Command();
 
@@ -18,12 +19,15 @@ program
   .description('Perform processing')
   .option('--swap', 'Process all swaps.')
   .option('--sweep', 'Go through all transactions and add any new pending swaps.')
+  .option('--check', 'Check that')
   .parse(process.argv);
 
 if (program.swap) {
   swap();
 } else if (program.sweep) {
   sweepAllPendingSwaps();
+} else if (program.check) {
+  checkAllBalances();
 } else {
   program.help();
 }

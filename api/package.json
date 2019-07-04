@@ -11,7 +11,9 @@
     "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
     "swapDev": "cross-env NODE_ENV=development node -r esm process.js --swap",
     "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
-    "sweepDev": "cross-env NODE_ENV=development node -r esm process.js --sweep"
+    "sweepDev": "cross-env NODE_ENV=development node -r esm process.js --sweep",
+    "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",
+    "checkBalanceDev": "cross-env NODE_ENV=development node -r esm process.js --check"
   },
   "author": "Loki Network",
   "license": "ISC",

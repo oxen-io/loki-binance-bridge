@@ -59,7 +59,7 @@ const db = {
   * Get all client accounts with the given `accountType`
   *
   * @param {'loki'|'bnb'} accountType The account type.
-  * @returns {Promise<[{ uuid, address, addressType, accountAddress, accountType }]>} An array of client accounts.
+  * @returns {Promise<[{ uuid, address, addressType, accountType, account }]>} An array of client accounts.
   */
   async getClientAccounts(accountType) {
     // eslint-disable-next-line max-len
@@ -219,6 +219,15 @@ const db = {
   async getAllSwapDepositHashes(swapType) {
     const swaps = await postgres.manyOrNone('select deposit_transaction_hash from swaps where type = $1', [swapType]);
     return swaps.map(s => s.deposit_transaction_hash);
+  },
+
+  /**
+   * Get all swaps of the given type.
+   * @param {string} swapType The swap type
+   */
+  async getAllSwaps(swapType) {
+    const query = 'select * from swaps where type = $1';
+    return postgres.manyOrNone(query, [swapType]);
   },
 
   /**
