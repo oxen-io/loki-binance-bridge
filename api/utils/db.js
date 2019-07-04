@@ -87,6 +87,28 @@ const db = {
   },
 
   /**
+   * Get all client accounts which have the given memos
+   * @param {[string]} memos An array of memos
+   * @returns {Promise<{ uuid, address, addressType, accountType, account: { memo }}>} An array of client accounts.
+   */
+  async getClientAccountsWithMemos(memos) {
+    const query = 'select ca.* , a.memo from client_accounts ca left join accounts_bnb a on ca.account_uuid = a.uuid where a.memo in ($1:csv);';
+    const clientAccounts = await postgres.manyOrNone(query, [memos]);
+    if (clientAccounts.length === 0) {
+      console.error('Failed to insert new transactions. Could not find any client accounts');
+      return [];
+    }
+
+    return clientAccounts.map(({ uuid, address, address_type: addressType, account_type: accountType, memo }) => ({
+      uuid,
+      address,
+      addressType,
+      accountType,
+      account: { memo },
+    }));
+  },
+
+  /**
   * Insert a client account with the given address and account.
   *
   * @param {string} address The address.
@@ -187,6 +209,16 @@ const db = {
     // eslint-disable-next-line max-len
     const query = 'select s.*, ca.address_type, ca.address, ca.account_type, ca.account_uuid from swaps s left join client_accounts ca on ca.uuid = s.client_account_uuid where type = $1 and deposit_transaction_hash is not null and transfer_transaction_hash is null and processed is null;';
     return postgres.manyOrNone(query, [swapType]);
+  },
+
+  /**
+   * Get all the `deposit_transaction_hash` of the swaps in the database of the given type
+   * @param {string} swapType The swap type.
+   * @returns {Promise<string>} An array of deposit hashes.
+   */
+  async getAllSwapDepositHashes(swapType) {
+    const swaps = await postgres.manyOrNone('select deposit_transaction_hash from swaps where type = $1', [swapType]);
+    return swaps.map(s => s.deposit_transaction_hash);
   },
 
   /**

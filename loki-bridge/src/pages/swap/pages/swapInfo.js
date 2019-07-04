@@ -46,6 +46,7 @@ class SwapInfo extends Component {
 
   renderMemo = () => {
     const { classes, swapInfo: { memo }} = this.props;
+    if (!memo) return null;
 
     return (
       <div className={classes.memoFrame}>
@@ -71,14 +72,30 @@ class SwapInfo extends Component {
     );
   }
 
-  renderInstructions = () => {
+  renderLokiInstructions = () => {
     const { fees } = this.state;
-    const { swapType, classes, swapInfo } = this.props;
-
-    const { depositAddress, memo } = swapInfo;
-    const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
+    const { swapType, classes } = this.props;
+    if (swapType !== SWAP_TYPE.LOKI_TO_BLOKI) return null;
 
     const lokiFee = (fees && fees.loki / 1e9) || 0;
+
+    return (
+      <React.Fragment>
+        <Typography className={ classes.instructionsNoMargin }>
+          <b>Note:</b> You will have to wait for there to be atleast 12 confirmations before your request is logged.
+        </Typography>
+        <Typography className={ classes.instructionBold }>
+          There will be a processing fee of {lokiFee} LOKI which will be charged when processing all your pending swaps.
+        </Typography>
+      </React.Fragment>
+    );
+  }
+
+  renderInstructions = () => {
+    const { swapType, classes, swapInfo } = this.props;
+
+    const { depositAddress } = swapInfo;
+    const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
 
     return (
       <React.Fragment>
@@ -100,22 +117,15 @@ class SwapInfo extends Component {
               <CopyIcon/>
             </IconButton>
           </Typography>
-          {memo && this.renderMemo() }
+          {this.renderMemo() }
           <Typography className={ classes.instructions }>
-            After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through. <br/>
-            <b>Note:</b> You will have to wait for there to be atleast 12 confirmations before your request is logged.
+            After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through.
           </Typography>
-
+          {this.renderLokiInstructions()}
           <Typography className={ classes.instructions }>
             You can leave this page and come back later to refresh your swap requests. <br/>
-            If you run into any trouble, or your swap request has not gone through after 12 confirmations, please contact us.
+            If you run into any trouble, or your swap request has not gone through, please contact us.
           </Typography>
-
-          { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (
-            <Typography className={ classes.instructionBold }>
-              There will be a processing fee of {lokiFee} LOKI which will be charged when processing all your pending swaps.
-            </Typography>
-          )}
         </Grid>
       </React.Fragment>
     );

@@ -19,14 +19,12 @@ describe('Transaction', () => {
   describe('#getIncomingTransactions', async () => {
     context('BNB', () => {
       it('should correctly return the incoming transactions', async () => {
-        const txHash = 'tx_hash';
-        const value = '100';
-        const memo = 'memo';
-
+        const memo = 'meme-mos';
         const mockAPIResult = [{
-          txHash,
-          value,
+          txHash: 'hash',
+          value: '100',
           memo,
+          timestamp: 100,
         }];
 
         const stub = sandbox.stub(bnb, 'getIncomingTransactions').returns(mockAPIResult);
@@ -36,35 +34,37 @@ describe('Transaction', () => {
         assert.lengthOf(transactions, 1);
 
         assert.deepEqual(transactions[0], {
-          hash: txHash,
-          amount: value,
-          memo,
+          hash: 'hash',
+          amount: '100',
         });
       });
 
       it('should should only return the tx with the same account memo', async () => {
         const mockAPIResult = ['memo1', 'memo2', 'memo3'].map((memo, i) => ({
-          txHash: i,
-          value: i,
+          txHash: String(i),
+          value: String(i),
           memo,
+          timestamp: 100,
         }));
 
         sandbox.stub(bnb, 'getIncomingTransactions').returns(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions({ memo: 'memo1' }, TYPE.BNB);
         assert.lengthOf(transactions, 1);
+        assert.deepEqual(transactions[0], {
+          hash: '0',
+          amount: '0',
+        });
       });
     });
 
     context('Loki', () => {
       it('should correctly return the incoming transactions', async () => {
-        const txid = 'tx_hash';
-        const amount = '100';
-
         const mockAPIResult = [{
-          txid,
-          amount,
+          txid: 'hash',
+          amount: '100',
           confirmations: 6,
+          timestamp: 100,
         }];
 
         const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(mockAPIResult);
@@ -73,9 +73,8 @@ describe('Transaction', () => {
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');
         assert.lengthOf(transactions, 1);
         assert.deepEqual(transactions[0], {
-          hash: txid,
-          amount,
-          confirmations: 6,
+          hash: 'hash',
+          amount: '100',
         });
       });
 

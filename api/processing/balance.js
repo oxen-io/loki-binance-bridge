@@ -9,6 +9,14 @@ export async function checkBalances(swapType) {
 
 }
 
+async function getBalanceFromIncomingTransactions(accountType, since) {
+  const clientAccounts = await db.getClientAccounts(accountType);
+
+  if (accountType === TYPE.LOKI) {
+    const addressIndicies = clientAccounts.map(a => a.accountAddress);
+  }
+}
+
 export async function getTotalClientAccountsBalance(accountType) {
   const clientAccounts = await db.getClientAccounts(accountType);
   const addresses = clientAccounts.map(a => a.accountAddress);

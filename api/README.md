@@ -71,10 +71,11 @@ Any values that you don't set in those files will be fetched from `config/defaul
 
 ## Processing
 
-To process simply run:
-```
-npm run swap
-```
+| Command | Description |
+| --- | --- |
+| npm run swap | Perform any pending swaps in the database |
+| npm run sweep | Go through transactions and add new swaps if needed |
+
 
 ## Testnet Coins
 

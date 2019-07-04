@@ -22,6 +22,10 @@ const styles = theme => ({
     textAlign: 'center',
     marginBottom: '16px'
   },
+  instructionsNoMargin: {
+    fontSize: '0.9rem',
+    textAlign: 'center',
+  },
   instructionBold: {
     fontSize: '0.9rem',
     fontWeight: 'bold',
