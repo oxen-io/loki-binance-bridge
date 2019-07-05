@@ -16,7 +16,7 @@ nvm use
 
 Install all the dependencies:
 ```
-npm install --production
+npm install
 ```
 
 If you haven't setup a postgres database then do so and edit `config/production.json` with the database info.
@@ -32,7 +32,21 @@ psql -h <host> -U <username> <password> "<database name>" < sql/setup.sql
 
 After everything is setup, all you have to do is run:
 ```
-npm run start
+npm run dev
+```
+
+## Production
+
+Make sure you have [PM2](http://pm2.keymetrics.io/docs/usage/quick-start/) installed.
+
+Then simply run:
+```
+npm start
+```
+
+To stop run:
+```
+npm stop
 ```
 
 ## Loki Wallet RPC
