@@ -74,6 +74,15 @@ class Swap extends Component {
     }
   }
 
+  resetState = () => {
+    this.setState({
+      loading: false,
+      page: 0,
+      address: '',
+      swapInfo: {}
+    });
+  }
+
   getSwaps = () => {
     const { swapInfo } = this.state;
     dispatcher.dispatch({
@@ -143,6 +152,7 @@ class Swap extends Component {
             swapType={swapType}
             swapInfo={swapInfo}
             onRefresh={this.onRefresh}
+            onBack={this.resetState}
             loading={loading}
           />
         )}

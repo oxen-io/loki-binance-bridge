@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Grid, Typography, IconButton } from '@material-ui/core';
+import { Grid, Typography, IconButton, Link } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button } from '@components';
 import { SWAP_TYPE } from '@constants';
 import { store, Events } from '@store';
+import config from '@config';
 import SwapList from '../components/swapList';
 import styles from '../styles';
 
@@ -72,30 +73,14 @@ class SwapInfo extends Component {
     );
   }
 
-  renderLokiInstructions = () => {
-    const { fees } = this.state;
-    const { swapType, classes } = this.props;
-    if (swapType !== SWAP_TYPE.LOKI_TO_BLOKI) return null;
-
-    const lokiFee = (fees && fees.loki / 1e9) || 0;
-
-    return (
-      <React.Fragment>
-        <Typography className={ classes.instructionsNoMargin }>
-          <b>Note:</b> You will have to wait for there to be atleast 12 confirmations before your request is logged.
-        </Typography>
-        <Typography className={ classes.instructionBold }>
-          There will be a processing fee of {lokiFee} LOKI which will be charged when processing all your pending swaps.
-        </Typography>
-      </React.Fragment>
-    );
-  }
-
   renderInstructions = () => {
+    const { fees } = this.state;
     const { swapType, classes, swapInfo } = this.props;
 
     const { depositAddress } = swapInfo;
     const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
+
+    const lokiFee = (fees && fees.loki / 1e9) || 0;
 
     return (
       <React.Fragment>
@@ -121,7 +106,16 @@ class SwapInfo extends Component {
           <Typography className={ classes.instructions }>
             After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through.
           </Typography>
-          {this.renderLokiInstructions()}
+          { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
+            <Typography className={ classes.instructions }>
+              <b>Note:</b> You will have to wait for there to be atleast {config.loki.minConfirmations} confirmations before your request is logged.
+            </Typography>
+          )}
+          { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (
+            <Typography className={ classes.instructionBold }>
+              There will be a processing fee of {lokiFee} LOKI which will be charged when processing all your pending swaps.
+            </Typography>
+          )}
           <Typography className={ classes.instructions }>
             You can leave this page and come back later to refresh your swap requests. <br/>
             If you run into any trouble, or your swap request has not gone through, please contact us.
@@ -150,10 +144,17 @@ class SwapInfo extends Component {
   }
 
   render() {
-    const { classes, loading, onRefresh, swapInfo } = this.props;
+    const { classes, loading, onRefresh, swapInfo, onBack } = this.props;
 
     return (
       <React.Fragment>
+        <Grid item xs={ 12 } align='left' className={ classes.back }>
+          <Typography>
+            <Link className={classes.link} onClick={onBack}>
+              &lt; Back
+            </Link>
+          </Typography>
+        </Grid>
         {this.renderInstructions()}
         <Grid item xs={ 12 } align='right' className={ classes.button }>
           <Button
@@ -175,6 +176,7 @@ SwapInfo.propTypes = {
   swapType: PropTypes.string.isRequired,
   swapInfo: PropTypes.object.isRequired,
   onRefresh: PropTypes.func.isRequired,
+  onBack: PropTypes.func.isRequired,
   loading: PropTypes.bool,
 };
 

@@ -7,6 +7,9 @@ const styles = theme => ({
   button: {
     marginTop: '24px'
   },
+  back: {
+    marginBottom: theme.spacing(2),
+  },
   heading: {
     fontSize: '24px',
     marginBottom: '24px'
@@ -93,6 +96,9 @@ const styles = theme => ({
   redText: {
     color: red[500],
     margin: theme.spacing(1, 0)
+  },
+  link: {
+    cursor: 'pointer'
   }
 });
 

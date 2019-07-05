@@ -7,6 +7,7 @@ export default {
   },
   loki: {
     walletCreationUrl: 'https://lokilocker.com',
-    txExplorerUrl: 'https://lokitestnet.com/tx'
+    txExplorerUrl: 'https://lokitestnet.com/tx',
+    minConfirmations: 12,
   }
 };
