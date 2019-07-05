@@ -79,7 +79,14 @@ export async function getBalanceFromIncomingTransactions(accountType, from, to) 
     // Get all our incoming transactions which contain a memo
     const ourAddress = bnb.getOurAddress();
     const transactions = await transaction.getIncomingBNBTransactions(ourAddress, from);
-    const memoTransactions = transactions.filter(t => t.memo && t.memo.length > 0);
+    const bnbClientAccounts = await db.getClientAccounts(TYPE.BNB);
+    const clientMemos = bnbClientAccounts.map(c => c.account.memo);
+
+    // Only get the transactions with memos that we have
+    const memoTransactions = transactions.filter(t => {
+      const { memo } = t;
+      return memo && memo.length > 0 && clientMemos.includes(memo);
+    });
 
     // Filter out all transactions that don't fit our date ranges
     filtered = memoTransactions.filter(tx => {
@@ -90,4 +97,20 @@ export async function getBalanceFromIncomingTransactions(accountType, from, to) 
 
   // Sum up the amounts
   return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
+}
+
+export async function printBNBTransactionsWithIncorrectMemo() {
+  // Get all our incoming transactions which contain a memo
+  const ourAddress = bnb.getOurAddress();
+  const transactions = await transaction.getIncomingBNBTransactions(ourAddress);
+  const bnbClientAccounts = await db.getClientAccounts(TYPE.BNB);
+  const clientMemos = bnbClientAccounts.filter(c => c.account.memo);
+  const unkownMemoTransactions = transactions.filter(t => {
+    const { memo } = t;
+    return memo && memo.length > 0 && !clientMemos.includes(memo);
+  });
+
+  unkownMemoTransactions.forEach(t => {
+    console.info(`hash: ${t.hash}\namount: ${t.amount / 1e9} BLOKI\nmemo: ${t.memo}\ntimestamp: ${t.timeStamp}\n\n`);
+  });
 }

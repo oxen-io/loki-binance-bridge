@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { SWAP_TYPE } from './utils';
 import { processSwaps } from './processing/swaps';
 import { sweepAllPendingSwaps } from './processing/sweep';
-import { checkAllBalances } from './processing/balance';
+import { checkAllBalances, printBNBTransactionsWithIncorrectMemo } from './processing/balance';
 
 const program = new Command();
 
@@ -19,7 +19,8 @@ program
   .description('Perform processing')
   .option('--swap', 'Process all swaps.')
   .option('--sweep', 'Go through all transactions and add any new pending swaps.')
-  .option('--check', 'Check that')
+  .option('--check', 'Verify incoming transaction amounts with the amounts we have stored in the database')
+  .option('--printInvalid', 'Print any transactions for which we do not have the memo for')
   .parse(process.argv);
 
 if (program.swap) {
@@ -28,6 +29,8 @@ if (program.swap) {
   sweepAllPendingSwaps();
 } else if (program.check) {
   checkAllBalances();
+} else if (program.printInvalid) {
+  printBNBTransactionsWithIncorrectMemo();
 } else {
   program.help();
 }

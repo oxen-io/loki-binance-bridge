@@ -10,11 +10,9 @@
     "dev": "cross-env NODE_ENV=development node -r esm server.js",
     "test": "cross-env NODE_ENV=test mocha -r esm --recursive",
     "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
-    "swapDev": "cross-env NODE_ENV=development node -r esm process.js --swap",
     "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
-    "sweepDev": "cross-env NODE_ENV=development node -r esm process.js --sweep",
     "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",
-    "checkBalanceDev": "cross-env NODE_ENV=development node -r esm process.js --check"
+    "printInvalid": "cross-env NODE_ENV=production node -r esm process.js --printInvalid"
   },
   "author": "Loki Network",
   "license": "ISC",
