@@ -18,7 +18,7 @@ Install all the dependencies:
 npm install
 ```
 
-Edit `config/production.js` with your required settings.
+Edit `config/config.js` with your required settings.
 
 ### Development
 
