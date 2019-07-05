@@ -3,7 +3,8 @@ import config from 'config';
 import request from 'request-promise';
 import nodeCleanup from 'node-cleanup';
 
-const accountIndex = config.get('loki.wallet.accountIndex');
+const walletConfig = config.get('loki.wallet');
+const { accountIndex } = walletConfig;
 const rpcConfig = config.get('loki.walletRPC');
 let id = 0;
 
@@ -15,7 +16,7 @@ nodeCleanup(() => {
 });
 
 // Do the rpc!
-async function rpc(method, params = {}) {
+async function rpc(method, params = {}, callCount = 0) {
   id += 1;
   const options = {
     uri: `http://${rpcConfig.host}:${rpcConfig.port}/json_rpc`,
@@ -38,6 +39,14 @@ async function rpc(method, params = {}) {
   try {
     const response = await request(options);
     if (response.error) {
+      // If wallet is not opened, then open it and call the rpc
+      if (method !== 'close_wallet' && response.error.message === 'No wallet file') {
+        await openWallet(walletConfig.filename, walletConfig.password);
+
+        // Make sure we're not forever opening the wallet
+        if (callCount <= 3) return rpc(method, params, callCount + 1);
+      }
+
       return {
         method,
         params,
