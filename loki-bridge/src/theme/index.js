@@ -1,7 +1,11 @@
 export const colors = {
+  lokiGreen: '#5BCA5B',
+  lokiBlack90: '#0A0A0A',
+  lokiBlack80: '#252525',
+  lokiBlack60: '#313131',
+  lokiBlack50: '#7E7E7E',
   white: '#fff',
   black: '#000',
-  yellow: '#f5bc00',
   gray: '#e1e1e1',
   lightGray: '#fafafa',
   lightBlack: '#6a6a6a',
@@ -16,7 +20,7 @@ const theme =  {
     h6: {
       fontFamily: ['Source Sans Pro','sans-serif'].join(','),
       fontSize: '0.8rem',
-      color: colors.darkBlack,
+      // color: colors.darkBlack,
       fontWeight: 600,
       marginBottom: '.5rem'
     }
@@ -26,7 +30,7 @@ const theme =  {
     MuiInputBase: {
       root: {
         fontSize: '13px',
-        background: colors.lightGray
+        background: colors.lokiBlack60
       }
     },
     MuiOutlinedInput: {
@@ -46,19 +50,20 @@ const theme =  {
     },
   },
   palette: {
+    type: 'dark',
     primary: {
-      main: colors.yellow
+      main: colors.lokiGreen
     },
     secondary: {
       main: colors.lightBlack
     },
     background:{
-      paper: colors.white,
-      default: colors.white
+      paper: colors.lokiBlack60,
+      default: colors.lokiBlack80
     },
     text: {
-      primary: colors.lightBlack,
-      secondary: colors.yellow
+      primary: colors.gray,
+      secondary: colors.lokiGreen
     }
   }
 };

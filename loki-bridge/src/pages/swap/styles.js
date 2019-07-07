@@ -1,4 +1,5 @@
 import { red } from '@material-ui/core/colors';
+import { colors } from '@theme';
 
 const styles = theme => ({
   root: {
@@ -15,9 +16,8 @@ const styles = theme => ({
     marginBottom: '24px'
   },
   frame: {
-    border: '1px solid #e1e1e1',
     borderRadius: '3px',
-    backgroundColor: '#fafafa',
+    backgroundColor: theme.palette.background.paper,
     padding: '1rem'
   },
   instructions: {
@@ -25,11 +25,8 @@ const styles = theme => ({
     textAlign: 'center',
     marginBottom: '16px'
   },
-  instructionsNoMargin: {
-    fontSize: '0.9rem',
-    textAlign: 'center',
-  },
   instructionBold: {
+    color: colors.white,
     fontSize: '0.9rem',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -74,19 +71,16 @@ const styles = theme => ({
     fontSize: '0.94rem'
   },
   memoFrame: {
-    border: '1px solid #e1e1e1',
-    borderRadius: '3px',
-    backgroundColor: '#efefef',
-    padding: '1rem',
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
   memo: {
-    border: '1px solid #e1e1e1',
+    border: '1px solid',
+    borderColor: colors.lokiBlack90,
     borderRadius: '3px',
-    backgroundColor: '#7F7F7F',
+    backgroundColor: colors.lokiBlack80,
     color: 'white',
     padding: '1rem',
     overflowWrap: 'break-word',
@@ -94,7 +88,7 @@ const styles = theme => ({
     textAlign: 'center'
   },
   redText: {
-    color: red[500],
+    color: theme.palette.text.secondary,
     margin: theme.spacing(1, 0)
   },
   link: {

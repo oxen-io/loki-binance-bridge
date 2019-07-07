@@ -132,7 +132,7 @@ class Swap extends Component {
         { loading && <PageLoader /> }
         <Grid item xs={12}>
           <Typography className={ classes.heading }>
-            Swap Currencies
+            Loki Bridge
           </Typography>
         </Grid>
         { page === 0 && (

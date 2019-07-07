@@ -15,6 +15,7 @@ const styles = theme => ({
   },
   icon: {
     fontSize: 20,
+    color: theme.palette.text.primary,
   },
   iconVariant: {
     opacity: 0.9,
@@ -23,6 +24,7 @@ const styles = theme => ({
   message: {
     display: 'flex',
     alignItems: 'center',
+    color: theme.palette.text.primary,
   },
 });
 
