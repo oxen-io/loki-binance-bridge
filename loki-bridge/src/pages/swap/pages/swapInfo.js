@@ -36,8 +36,14 @@ class SwapInfo extends Component {
     store.on(Events.FETCHED_INFO, this.onInfoUpdated);
   }
 
+  componentDidMount() {
+    // Run a timer every 10 seconds to refresh
+    this.timer = setInterval(this.props.onRefresh, 30 * 1000);
+  }
+
   componentWillUnmount() {
     store.removeListener(Events.FETCHED_INFO, this.onInfoUpdated);
+    clearInterval(this.timer);
   }
 
   onInfoUpdated = () => {

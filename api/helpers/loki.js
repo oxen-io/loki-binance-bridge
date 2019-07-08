@@ -1,7 +1,6 @@
 import http from 'http';
 import config from 'config';
 import request from 'request-promise';
-import nodeCleanup from 'node-cleanup';
 
 const walletConfig = config.get('loki.wallet');
 const { accountIndex } = walletConfig;
