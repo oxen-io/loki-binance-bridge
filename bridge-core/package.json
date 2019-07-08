@@ -1,0 +1,28 @@
+{
+  "name": "bridge-core",
+  "version": "1.0.0",
+  "description": "The loki bridge core code which is shared between the api and processing",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@binance-chain/javascript-sdk": "^2.14.0",
+    "esm": "^3.2.25",
+    "pg-promise": "^8.7.3",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "mocha": "^6.1.4",
+    "sinon": "^7.3.2"
+  }
+}
