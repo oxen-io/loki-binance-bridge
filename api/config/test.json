@@ -8,6 +8,6 @@
   },
   "loki": {
     "minConfirmations": 6,
-    "withdrawalFee": 5
+    "withdrawalFee": 1
   }
 }
