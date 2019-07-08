@@ -145,7 +145,20 @@ class SwapInfo extends Component {
   }
 
   render() {
-    const { classes, loading, onRefresh, swapInfo, onBack } = this.props;
+    const { classes, swapType, loading, onRefresh, swapInfo, unconfirmedTxs, onBack } = this.props;
+
+    const unconfirmed = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? unconfirmedTxs : [];
+    const unconfirmedSwaps = (unconfirmed || []).map(({ hash, amount, created }) => ({
+      uuid: hash,
+      type: SWAP_TYPE.LOKI_TO_BLOKI,
+      amount,
+      txHash: hash,
+      transferTxHashes: [],
+      created,
+      unconfirmed: true,
+    }));
+
+    const swaps = [...unconfirmedSwaps, ...(swapInfo.swaps || [])];
 
     return (
       <React.Fragment>
@@ -166,7 +179,7 @@ class SwapInfo extends Component {
           />
         </Grid>
         {this.renderReceivingAmount()}
-        <SwapList swaps={swapInfo.swaps} />
+        <SwapList swaps={swaps} />
       </React.Fragment>
     );
   }
@@ -176,6 +189,7 @@ SwapInfo.propTypes = {
   classes: PropTypes.object.isRequired,
   swapType: PropTypes.string.isRequired,
   swapInfo: PropTypes.object.isRequired,
+  unconfirmedTxs: PropTypes.array,
   onRefresh: PropTypes.func.isRequired,
   onBack: PropTypes.func.isRequired,
   loading: PropTypes.bool,

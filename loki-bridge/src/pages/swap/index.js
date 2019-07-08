@@ -14,12 +14,14 @@ class Swap extends Component {
     page: 0,
     swapType: SWAP_TYPE.LOKI_TO_BLOKI,
     address: '',
-    swapInfo: {}
+    swapInfo: {},
+    unconfirmed: [],
   };
 
   componentWillMount() {
     store.on(Events.ERROR, this.onError);
     store.on(Events.FETCHED_SWAPS, this.onSwapsFetched);
+    store.on(Events.FETCHED_UNCONFIRMED_LOKI_TXS, this.onUnconfirmedTransactionsFetched);
     store.on(Events.TOKEN_SWAPPED, this.onTokenSwapped);
     store.on(Events.TOKEN_SWAP_FINALIZED, this.onTokenSwapFinalized);
   }
@@ -31,6 +33,7 @@ class Swap extends Component {
   componentWillUnmount() {
     store.removeListener(Events.ERROR, this.onError);
     store.removeListener(Events.FETCHED_SWAPS, this.onSwapsFetched);
+    store.removeListener(Events.FETCHED_UNCONFIRMED_LOKI_TXS, this.onUnconfirmedTransactionsFetched);
     store.removeListener(Events.TOKEN_SWAPPED, this.onTokenSwapped);
     store.removeListener(Events.TOKEN_SWAP_FINALIZED, this.onTokenSwapFinalized);
   }
@@ -38,6 +41,10 @@ class Swap extends Component {
   onError = (error) => {
     this.props.showMessage(error, 'error');
     this.setState({ loading: false });
+  }
+
+  onUnconfirmedTransactionsFetched = (transactions) => {
+    this.setState({ unconfirmed: transactions });
   }
 
   onSwapsFetched = (swaps) => {
@@ -50,6 +57,7 @@ class Swap extends Component {
 
   onTokenSwapped = (swapInfo) => {
     this.setState({ swapInfo, page: 1 });
+    setImmediate(() => this.getUnconfirmedTransactions());
     setImmediate(() => this.getSwaps());
   }
 
@@ -58,6 +66,7 @@ class Swap extends Component {
     const message = transactions.length === 1 ? 'Added 1 new swap' : `Added ${transactions.length} new swaps`;
     this.props.showMessage(message, 'success');
 
+    setImmediate(() => this.getUnconfirmedTransactions());
     setImmediate(() => this.getSwaps());
   }
 
@@ -79,7 +88,19 @@ class Swap extends Component {
       loading: false,
       page: 0,
       address: '',
-      swapInfo: {}
+      swapInfo: {},
+      unconfirmed: [],
+    });
+  }
+
+  getUnconfirmedTransactions = () => {
+    const { swapType, swapInfo } = this.state;
+    if (swapType !== SWAP_TYPE.LOKI_TO_BLOKI) return;
+    dispatcher.dispatch({
+      type: Actions.GET_UNCONFIRMED_LOKI_TXS,
+      content: {
+        uuid: swapInfo.uuid
+      }
     });
   }
 
@@ -107,6 +128,7 @@ class Swap extends Component {
   }
 
   onRefresh = () => {
+    this.getUnconfirmedTransactions();
     this.getSwaps();
     this.finalizeSwap();
   }
@@ -125,7 +147,7 @@ class Swap extends Component {
   render() {
     const { classes } = this.props;
 
-    const { page, loading, swapType, swapInfo } = this.state;
+    const { page, loading, swapType, swapInfo, unconfirmed } = this.state;
 
     return (
       <Grid container className={ classes.root }>
@@ -151,6 +173,7 @@ class Swap extends Component {
           <SwapInfo
             swapType={swapType}
             swapInfo={swapInfo}
+            unconfirmedTxs={unconfirmed}
             onRefresh={this.onRefresh}
             onBack={this.resetState}
             loading={loading}

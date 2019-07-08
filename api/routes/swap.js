@@ -188,6 +188,42 @@ export async function getSwaps(req, res, next) {
   return next(null, req, res, next);
 }
 
+/**
+ * Get all unconfirmed loki transactions
+ * Request Data:
+ *  - uuid: The uuid that was returned in `swapToken` (client account uuid)
+ */
+export async function getUncomfirmedLokiTransactions(req, res, next) {
+  const data = req.query;
+
+  const result = validation.validateUuidPresent(data);
+  if (result != null) {
+    res.status(400);
+    res.body = { status: 400, success: false, result };
+    return next(null, req, res, next);
+  }
+
+  const { uuid } = data;
+  const minConfirmations = config.get('loki.minConfirmations');
+
+  try {
+    const clientAccount = await db.getClientAccountForUuid(uuid);
+    const transactions = await transaction.getIncomingLokiTransactions(clientAccount.account.addressIndex);
+    const unconfirmed = transactions.filter(tx => tx.confirmations < minConfirmations)
+      .map(({ hash, amount, timestamp }) => ({ hash, amount, created: timestamp }));
+
+    res.status(205);
+    res.body = { status: 200, success: true, result: unconfirmed };
+  } catch (error) {
+    console.log(error);
+    const message = (error && error.message);
+    res.status(500);
+    res.body = { status: 500, success: false, result: message || error };
+  }
+
+  return next(null, req, res, next);
+}
+
 // - Util
 
 function formatClientAccount({ uuid, accountType: type, account }) {

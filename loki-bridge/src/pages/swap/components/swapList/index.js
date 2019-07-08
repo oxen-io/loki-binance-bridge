@@ -71,12 +71,17 @@ class SwapList extends Component {
     return <TimeAgo className={classes.time} datetime={timestamp} />;
   }
 
-  renderSwapItem = ({ uuid, type, amount, txHash, transferTxHashes, created }) => {
+  renderSwapItem = ({ uuid, type, amount, txHash, transferTxHashes, created, unconfirmed }) => {
     const { classes } = this.props;
 
     const isPending = transferTxHashes && transferTxHashes.length === 0;
     const depositCurrency = type === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
     const displayAmount = amount / 1e9;
+
+    let status = 'Completed';
+    if (isPending) {
+      status = unconfirmed ? 'Waiting for Confirmations' : 'Pending';
+    }
 
     return (
       <Grid item xs={12} key={uuid} className={classes.item}>
@@ -85,7 +90,7 @@ class SwapList extends Component {
             <Typography className={classes.amount}>{displayAmount} {depositCurrency}</Typography>
             <div className={classes.rowCenter}>
               <Typography className={isPending ? classes.pending : classes.completed}>
-                {isPending ? 'Pending' : 'Completed'}
+                {status}
               </Typography>
               <Typography className={classes.timeSeperator}> • </Typography>
               { this.renderTime(created) }
