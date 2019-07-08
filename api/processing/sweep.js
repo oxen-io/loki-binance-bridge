@@ -7,7 +7,7 @@ import { bnb, postgres } from '../helpers';
  */
 export async function sweepAllPendingSwaps() {
   await sweepPendingLokiToBloki();
-  await sweepBlokiToLoki();
+  await sweepPendingBlokiToLoki();
 }
 
 /**
@@ -53,7 +53,7 @@ export async function sweepPendingLokiToBloki() {
 /**
  * Sweep any pending bloki_to_loki swaps
  */
-export async function sweepBlokiToLoki() {
+export async function sweepPendingBlokiToLoki() {
   console.info(`Sweeping ${SWAP_TYPE.BLOKI_TO_LOKI}`);
   const ourAddress = bnb.getOurAddress();
 

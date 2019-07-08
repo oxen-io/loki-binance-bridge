@@ -8,13 +8,6 @@ const { accountIndex } = walletConfig;
 const rpcConfig = config.get('loki.walletRPC');
 let id = 0;
 
-// Create a http agent.
-// Without this we fail to connect to the wallet RPC
-const agent = new http.Agent({ keepAlive: true, maxSockets: 1 });
-nodeCleanup(() => {
-  agent.destroy();
-});
-
 // Do the rpc!
 async function rpc(method, params = {}, callCount = 0) {
   id += 1;
@@ -32,7 +25,10 @@ async function rpc(method, params = {}, callCount = 0) {
       pass: rpcConfig.password,
       sendImmediately: false,
     },
-    agent,
+    agent: new http.Agent({
+      keepAlive: true,
+      maxSockets: 1,
+    }),
   };
 
 
