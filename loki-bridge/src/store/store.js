@@ -10,7 +10,7 @@ const { apiUrl, useAPIEncryption } = config;
 
 const httpClient = axios.create({ baseURL: apiUrl });
 const endpoints = {
-  getWithdrawalFees: '/api/v1/getWithdrawalFees',
+  getInfo: '/api/v1/getInfo',
   getSwaps: '/api/v1/getSwaps',
   swap: '/api/v1/swap',
   finalizeSwap: '/api/v1/finalizeSwap',
@@ -25,8 +25,8 @@ class Store extends EventEmitter {
 
     dispatcher.register(async payload => {
       switch(payload.type) {
-        case Actions.GET_WITHDRAWAL_FEES:
-          this.getWithdrawalFees();
+        case Actions.GET_INFO:
+          this.getInfo();
           break;
         case Actions.GET_SWAPS:
           this.getSwaps(payload);
@@ -46,11 +46,11 @@ class Store extends EventEmitter {
     return this.store[key];
   };
 
-  async getWithdrawalFees() {
+  async getInfo() {
     try {
-      const data = await this.fetch(endpoints.getWithdrawalFees, 'GET');
-      this.store.fees = data.result;
-      this.emit(Events.FETCHED_WITHDRAWAL_FEES, data.result);
+      const data = await this.fetch(endpoints.getInfo, 'GET');
+      this.store.info = data.result;
+      this.emit(Events.FETCHED_INFO, data.result);
     } catch (e) {
       this.emit(Events.ERROR, e);
     }

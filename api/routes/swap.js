@@ -188,21 +188,6 @@ export async function getSwaps(req, res, next) {
   return next(null, req, res, next);
 }
 
-/**
- * Get the withdrawal fees
- */
-export function getWithdrawalFees(req, res, next) {
-  const lokiFee = config.get('loki.withdrawalFee');
-  const lokiAmount = (parseFloat(lokiFee) * 1e9).toFixed(0);
-  res.status(205);
-  res.body = {
-    status: 200,
-    success: true,
-    result: { loki: lokiAmount },
-  };
-  return next(null, req, res, next);
-}
-
 // - Util
 
 function formatClientAccount({ uuid, accountType: type, account }) {

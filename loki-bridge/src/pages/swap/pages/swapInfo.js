@@ -6,7 +6,6 @@ import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button } from '@components';
 import { SWAP_TYPE } from '@constants';
 import { store, Events } from '@store';
-import config from '@config';
 import SwapList from '../components/swapList';
 import styles from '../styles';
 
@@ -33,16 +32,16 @@ class SwapInfo extends Component {
   };
 
   componentWillMount() {
-    this.onWithdrawalFeesUpdated();
-    store.on(Events.FETCHED_WITHDRAWAL_FEES, this.onWithdrawalFeesUpdated);
+    this.onInfoUpdated();
+    store.on(Events.FETCHED_INFO, this.onInfoUpdated);
   }
 
   componentWillUnmount() {
-    store.removeListener(Events.FETCHED_WITHDRAWAL_FEES, this.onWithdrawalFeesUpdated);
+    store.removeListener(Events.FETCHED_INFO, this.onInfoUpdated);
   }
 
-  onWithdrawalFeesUpdated = () => {
-    this.setState({ fees: store.getStore('fees') || {} });
+  onInfoUpdated = () => {
+    this.setState({ info: store.getStore('info') || {} });
   }
 
   renderMemo = () => {
@@ -74,13 +73,15 @@ class SwapInfo extends Component {
   }
 
   renderInstructions = () => {
-    const { fees } = this.state;
+    const { info } = this.state;
     const { swapType, classes, swapInfo } = this.props;
 
     const { depositAddress } = swapInfo;
     const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
 
-    const lokiFee = (fees && fees.loki / 1e9) || 0;
+    const lokiFee = (info && info.fees && info.fees.loki / 1e9) || 0;
+    let lokiConfirmations = (info && info.minLokiConfirmations);
+    if (typeof lokiConfirmations != 'number') { lokiConfirmations = '-'; }
 
     return (
       <React.Fragment>
@@ -108,7 +109,7 @@ class SwapInfo extends Component {
           </Typography>
           { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
             <Typography className={ classes.instructions }>
-              <b>Note:</b> You will have to wait for there to be atleast {config.loki.minConfirmations} confirmations before your request is logged.
+              <b>Note:</b> You will have to wait for there to be atleast {lokiConfirmations} confirmations before your request is logged.
             </Typography>
           )}
           { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (

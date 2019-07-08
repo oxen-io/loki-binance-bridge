@@ -25,7 +25,7 @@ class Swap extends Component {
   }
 
   componentDidMount() {
-    dispatcher.dispatch({ type: Actions.GET_WITHDRAWAL_FEES });
+    dispatcher.dispatch({ type: Actions.GET_INFO });
   }
 
   componentWillUnmount() {

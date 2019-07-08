@@ -1,4 +1,4 @@
-export const GET_WITHDRAWAL_FEES = 'GET_WITHDRAWAL_FEES';
+export const GET_INFO = 'GET_INFO';
 
 export const GET_SWAPS = 'GET_SWAPS';
 export const SWAP_TOKEN = 'SWAP_TOKEN';

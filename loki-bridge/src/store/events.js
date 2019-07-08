@@ -1,6 +1,6 @@
 export const ERROR = 'ERROR';
 
-export const FETCHED_WITHDRAWAL_FEES = 'FETCHED_WITHDRAWAL_FEES';
+export const FETCHED_INFO = 'FETCHED_INFO';
 
 export const FETCHED_SWAPS = 'FETCHED_SWAPS';
 export const TOKEN_SWAPPED = 'TOKEN_SWAPPED';

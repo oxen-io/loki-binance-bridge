@@ -1,4 +1,3 @@
-import config from 'config';
 import { assert } from 'chai';
 import sinon from 'sinon';
 import * as swapRoutes from '../../routes/swap';
@@ -13,7 +12,6 @@ const sandbox = sinon.createSandbox();
 const swapToken = params => wrapRouterFunction(swapRoutes.swapToken, params);
 const finalizeSwapToken = params => wrapRouterFunction(swapRoutes.finalizeSwap, params);
 const getSwaps = params => wrapRouterFunction(swapRoutes.getSwaps, params);
-const getWithdrawalFees = params => wrapRouterFunction(swapRoutes.getWithdrawalFees, params);
 
 describe('Swap API', () => {
   beforeEach(async () => {
@@ -389,17 +387,6 @@ describe('Swap API', () => {
         const returnedSwap = result[0];
         assert.deepEqual(returnedSwap.transferTxHashes, ['hash1', 'hash2']);
       });
-    });
-  });
-
-  describe('#getWithdrawalFees', () => {
-    it('should return the correct fees', async () => {
-      const lokiFee = config.get('loki.withdrawalFee');
-      const { status, success, result } = await getWithdrawalFees();
-      assert.equal(status, 200);
-      assert.isTrue(success);
-      assert.isNotNull(result);
-      assert.equal(result.loki, lokiFee * 1e9);
     });
   });
 });
