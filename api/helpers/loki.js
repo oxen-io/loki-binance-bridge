@@ -125,7 +125,8 @@ export async function getIncomingTransactions(addressIndex, options = {}) {
     return [];
   }
 
-  return data.result.in || [];
+  const results = ['in', 'pool'].map(k => data.result[k] || []);
+  return results.flat();
 }
 
 /**

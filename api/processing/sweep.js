@@ -25,7 +25,7 @@ export async function sweepPendingLokiToBloki() {
     const transactions = await transaction.getIncomingTransactions(c.account, TYPE.LOKI);
     return transactions.map(t => ({ ...t, address }));
   });
-  const lokiTransactions = await Promise.all(promises).then(array => array.flatMap(t => t));
+  const lokiTransactions = await Promise.all(promises).then(array => array.flat());
 
   // Get all the deposit hases from the db
   const hashes = await db.getAllSwapDepositHashes(SWAP_TYPE.LOKI_TO_BLOKI);

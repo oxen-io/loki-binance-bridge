@@ -64,7 +64,7 @@ export async function getBalanceFromIncomingTransactions(accountType, from, to) 
   if (accountType === TYPE.LOKI) {
     // Get all incoming transactions from the client accounts
     const promises = clientAccounts.map(async c => transaction.getIncomingLokiTransactions(c.account.addressIndex));
-    const lokiTransactions = await Promise.all(promises).then(array => array.flatMap(t => t));
+    const lokiTransactions = await Promise.all(promises).then(array => array.flat());
 
     // Filter out all transactions that don't fit our date ranges
     filtered = lokiTransactions.filter(tx => {
