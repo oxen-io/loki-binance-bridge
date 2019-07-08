@@ -53,9 +53,10 @@ const transaction = {
   /**
    * Get incoming transactions from the given LOKI address.
    * @param {number} addressIndex The LOKI address index.
+   * @param {{ pool: boolean }} options Any additional options
    */
-  async getIncomingLokiTransactions(addressIndex) {
-    const transactions = await loki.getIncomingTransactions(addressIndex);
+  async getIncomingLokiTransactions(addressIndex, options = {}) {
+    const transactions = await loki.getIncomingTransactions(addressIndex, options);
     return transactions.map(tx => ({
       ...tx,
       hash: tx.txid,

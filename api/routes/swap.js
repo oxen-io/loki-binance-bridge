@@ -208,7 +208,7 @@ export async function getUncomfirmedLokiTransactions(req, res, next) {
 
   try {
     const clientAccount = await db.getClientAccountForUuid(uuid);
-    const transactions = await transaction.getIncomingLokiTransactions(clientAccount.account.addressIndex);
+    const transactions = await transaction.getIncomingLokiTransactions(clientAccount.account.addressIndex, { pool: true });
     const unconfirmed = transactions.filter(tx => tx.confirmations < minConfirmations)
       .map(({ hash, amount, timestamp }) => ({ hash, amount, created: timestamp }));
 

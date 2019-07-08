@@ -110,13 +110,13 @@ export async function createAccount() {
  * @param {number} addressIndex The index of the sub-address.
  * @returns {Promise<[object]>} An array of LOKI transactions.
  */
-export async function getIncomingTransactions(addressIndex) {
+export async function getIncomingTransactions(addressIndex, options = {}) {
   const data = await rpc('get_transfers', {
     in: true,
     out: false,
     pending: false,
     failed: false,
-    pool: false,
+    pool: options.pool || false,
     account_index: accountIndex,
     subaddr_indices: [addressIndex],
   });
