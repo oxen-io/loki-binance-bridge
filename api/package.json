@@ -30,7 +30,6 @@
     "helmet": "^3.16.0",
     "https": "^1.0.0",
     "morgan": "^1.9.1",
-    "node-cleanup": "^2.1.2",
     "node-pty": "^0.8.1",
     "pg-promise": "^8.6.5",
     "request": "^2.88.0",
