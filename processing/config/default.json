@@ -19,7 +19,7 @@
       "username": "",
       "password": ""
     },
-    "minConfirmations": 2,
-    "withdrawalFee": 1
+    "minConfirmations": 12,
+    "withdrawalFee": 5
   }
 }
