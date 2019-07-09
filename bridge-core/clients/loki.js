@@ -196,7 +196,7 @@ export default class LokiClient {
   async multiSend(destinations) {
     const data = await this._request('transfer_split', {
       destinations,
-      account_index: this.wallet.this.accountIndex,
+      account_index: this.accountIndex,
     });
 
     if (data.error || !data.result) {
