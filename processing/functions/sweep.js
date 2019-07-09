@@ -47,7 +47,7 @@ export async function sweepPendingLokiToBloki() {
   }
 
   const count = await postgres.tx(t => t.batch(promises));
-  console.info(`Inserted ${count.length} swaps for ${SWAP_TYPE.LOKI_TO_BLOKI}`);
+  console.info(`Inserted ${count.length} swaps for ${SWAP_TYPE.LOKI_TO_BLOKI}\n`);
 }
 
 /**

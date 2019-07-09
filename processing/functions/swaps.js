@@ -16,6 +16,7 @@ export async function processAllSwaps() {
 
   console.info(`Processing swaps for ${SWAP_TYPE.BLOKI_TO_LOKI}`);
   await processSwaps(SWAP_TYPE.BLOKI_TO_LOKI);
+  console.info();
 }
 
 /**
