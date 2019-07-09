@@ -1,8 +1,8 @@
 import { Command } from 'commander';
-import { SWAP_TYPE } from './utils';
-import { processSwaps } from './processing/swaps';
-import { sweepAllPendingSwaps } from './processing/sweep';
-import { checkAllBalances, printBNBTransactionsWithIncorrectMemo } from './processing/balance';
+import { SWAP_TYPE } from 'bridge-core';
+import { processSwaps } from './functions/swaps';
+import { sweepAllPendingSwaps } from './functions/sweep';
+import { checkAllBalances, printBNBTransactionsWithIncorrectMemo } from './functions/balance';
 
 const program = new Command();
 

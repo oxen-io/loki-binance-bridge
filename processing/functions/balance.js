@@ -14,8 +14,8 @@ function printBalance(swapType, balance) {
   const receiveCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'BLOKI';
   const swapCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
   console.log(`${receiveCurrency} to ${swapCurrency}:`);
-  console.log(` received: ${balance.transaction / 1e9} ${receiveCurrency}`);
-  console.log(` swapped: ${balance.swap / 1e9} ${swapCurrency}`);
+  console.log(` Transaction balance: ${balance.transaction / 1e9} ${receiveCurrency}`);
+  console.log(` Swap balance: ${balance.swap / 1e9} ${swapCurrency}`);
   if (balance.transaction !== balance.swap) console.log(' \n WARNING: AMOUNTS DO NOT MATCH! PLEASE TRY SWEEPING');
   console.log('');
 }

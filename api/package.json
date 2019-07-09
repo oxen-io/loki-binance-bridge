@@ -8,20 +8,14 @@
     "start": "pm2 start ecosystem.config.js --env production --no-daemon",
     "stop": "pm2 stop all",
     "dev": "cross-env NODE_ENV=development node -r esm server.js",
-    "test": "cross-env NODE_ENV=test mocha -r esm --recursive",
-    "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
-    "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
-    "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",
-    "printInvalid": "cross-env NODE_ENV=production node -r esm process.js --printInvalid"
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive"
   },
   "author": "Loki Network",
   "license": "ISC",
   "dependencies": {
-    "@binance-chain/javascript-sdk": "^2.14.0",
     "bip39": "^3.0.2",
     "body-parser": "^1.19.0",
     "bridge-core": "file:../bridge-core",
-    "commander": "^2.20.0",
     "compression": "^1.7.4",
     "config": "^3.1.0",
     "cross-env": "^5.2.0",
@@ -31,10 +25,6 @@
     "helmet": "^3.16.0",
     "https": "^1.0.0",
     "morgan": "^1.9.1",
-    "node-pty": "^0.8.1",
-    "pg-promise": "^8.6.5",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.4",
     "sha256": "^0.2.0"
   },
   "devDependencies": {

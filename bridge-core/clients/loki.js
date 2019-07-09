@@ -8,15 +8,13 @@ import request from 'request-promise';
 export default class LokiClient {
   /**
    * Create a Loki client
-   * @param {{ rpc: { hostname, port, username, password }, wallet: { filename, password, accountIndex }}} config The client configuration
+   * @param {{ hostname, port, username, password }} rpcConfig The rpc config.
+   * @param {{ filename, password, accountIndex }} [walletConfig] The wallet config.
    */
-  constructor(config) {
-    const { rpc, wallet } = config;
-    this.rpc = rpc;
-    this.wallet = {
-      accountIndex: 0,
-      ...wallet,
-    };
+  constructor(rpcConfig, walletConfig = null) {
+    this.rpc = rpcConfig;
+    this.accountIndex = (walletConfig && walletConfig.accountIndex) || 0;
+    this.wallet = walletConfig;
   }
 
   async _request(method, params = {}, callCount = 0) {
@@ -45,7 +43,7 @@ export default class LokiClient {
       const response = await request(options);
       if (response.error) {
         // If wallet is not opened, then open it and call the rpc
-        if (method !== 'close_wallet' && response.error.message === 'No wallet file') {
+        if (this.wallet && method !== 'close_wallet' && response.error.message === 'No wallet file') {
           await this.openWallet();
 
           // Make sure we're not forever opening the wallet
@@ -84,6 +82,8 @@ export default class LokiClient {
    * @throws Will throw an error if opening a wallet failed.
    */
   async openWallet() {
+    if (!this.wallet) return;
+
     // close any open wallet
     await this._request('close_wallet');
 
@@ -102,7 +102,7 @@ export default class LokiClient {
    * @returns {Promise<{ address: string, address_index: number }>} A new loki account or `null` if we failed to make one.
    */
   async createAccount() {
-    const data = await this._request('create_address', { account_index: this.wallet.accountIndex });
+    const data = await this._request('create_address', { account_index: this.accountIndex });
     if (data.error) {
       console.log('[Loki Wallet] Failed to create account: ', data.error);
       return null;
@@ -126,7 +126,7 @@ export default class LokiClient {
       pending: false,
       failed: false,
       pool: options.pool || false,
-      account_index: this.wallet.accountIndex,
+      account_index: this.accountIndex,
       subaddr_indices: [addressIndex],
     });
 
@@ -166,7 +166,7 @@ export default class LokiClient {
    */
   async getBalances(addressIndicies) {
     const data = await this._request('getbalance', {
-      account_index: this.wallet.accountIndex,
+      account_index: this.accountIndex,
       address_indices: addressIndicies,
     });
 
@@ -193,7 +193,7 @@ export default class LokiClient {
   async multiSend(destinations) {
     const data = await this._request('transfer_split', {
       destinations,
-      account_index: this.wallet.this.wallet.accountIndex,
+      account_index: this.wallet.this.accountIndex,
     });
 
     if (data.error || !data.result) {

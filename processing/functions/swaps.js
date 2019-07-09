@@ -29,6 +29,12 @@ export async function processSwaps(swapType) {
   try {
     const txHashes = await send(swapType, transactions);
     await db.updateSwapsTransferTransactionHash(ids, txHashes.join(','));
+
+    const totalAmount = transactions.reduce((total, current) => total + current.amount, 0);
+    const sentCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
+
+    console.info(`Completed ${swaps.length} swaps`);
+    console.info(`Amount sent: ${totalAmount / 1e9} ${sentCurrency}`);
   } catch (e) {
     console.log(`Error: ${e.message}`);
   }
@@ -75,7 +81,7 @@ export async function send(swapType, transactions) {
     }));
 
     // Send BNB to the users
-    return bnb.multiSend('mnemonic', outputs, 'Loki Bridge');
+    return bnb.multiSend(config.get('binance.mnemonic'), outputs, 'Loki Bridge');
   } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
     // Deduct the loki withdrawal fees
     const outputs = transactions.map(({ address, amount }) => {

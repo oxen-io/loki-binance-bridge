@@ -67,12 +67,12 @@ For development, you can use `lokitestnet.com:38157` as the `daemon-address`
 
 ## Configuration
 
-Any properties found in `config/default.json` can be modified to your needs.
-If you need different values for either `test`, `development` or `production` then add those values to the corresponsing config files.
+We use [node-config](https://github.com/lorenwest/node-config) for configurations.
 
-`config/test.json` for `testing`. <br>
-`config/development.json` for `development`.<br>
-`config/production.json` for `production`.<br>
+Any properties found in `config/default.json` can be modified to your needs.
+
+For production, we reccommend you copy `config/production.example.json` to `config/production.json` and edit any values in there.
+
 
 Any values that you don't set in those files will be fetched from `config/default.json`.
 
@@ -127,34 +127,3 @@ Any values that you don't set in those files will be fetched from `config/defaul
 | npm run start | Run the API server in **Production** mode |
 | npm run dev | Run the API server in **Development** mode |
 | npm run test | Run the test suite |
-
-## Processing
-
-| Command | Description |
-| --- | --- |
-| npm run swap | Perform any pending swaps in the database |
-| npm run sweep | Go through transactions and add new swaps if needed |
-| npm run checkBalance | Check if the amount received matches the amount we have swapped |
-
-The flow for processing would be the following:
-- Sweep transactions
-  - This ensures that we don't miss any swaps from incoming transactions
-- Check balance
-  - We need to verify manually that the amount we received is the amount we'll send out
-  - If these don't match then something went wrong, sweeping might fix it.
-- Swap
-  - Send out all amounts to the users
-
-## Testnet Coins
-
-If you would like to issue some tokens on the binance testnet, please follow this guide: [How to create binance token](https://lightrains.com/blogs/how-create-binance-token)
-
-Once you have done so, edit `config/development.json` and set the following fields:
-```json
-"binance": {
-  "symbol": "<Your issued token symbol>",
-  "wallet": {
-    "mnemonic": "<Wallet that was funded your issues coins>"
-  }
-},
-```

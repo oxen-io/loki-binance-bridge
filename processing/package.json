@@ -1,0 +1,31 @@
+{
+  "name": "loki-bridge-processing",
+  "version": "1.0.0",
+  "description": "The processing backend for the loki bridge",
+  "main": "process.js",
+  "private": true,
+  "scripts": {
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive",
+    "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
+    "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
+    "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",
+    "printInvalid": "cross-env NODE_ENV=production node -r esm process.js --printInvalid"
+  },
+  "author": "Loki Network",
+  "license": "ISC",
+  "dependencies": {
+    "bridge-core": "file:../bridge-core",
+    "commander": "^2.20.0",
+    "config": "^3.1.0",
+    "cross-env": "^5.2.0",
+    "esm": "^3.2.25"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "mocha": "^6.1.4",
+    "sinon": "^7.3.2"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "binance": {
+    "api": "https://dex.binance.org",
+    "network": "mainnet"
+  },
+  "database": {
+    "user": "",
+    "password": ""
+  },
+  "loki": {
+    "walletRPC": {
+      "host": "localhost",
+      "port": 18082,
+      "username": "",
+      "password": ""
+    },
+    "minConfirmations": 12,
+    "withdrawalFee": 5
+  }
+}

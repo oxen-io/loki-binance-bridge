@@ -1,0 +1,25 @@
+{
+  "binance": {
+    "api": "https://testnet-dex.binance.org",
+    "network": "testnet",
+    "symbol": "BLOKI",
+    "mnemonic": ""
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "lokibridge",
+    "user": "postgres",
+    "password": ""
+  },
+  "loki": {
+    "walletRPC": {
+      "host": "localhost",
+      "port": 18082,
+      "username": "",
+      "password": ""
+    },
+    "minConfirmations": 2,
+    "withdrawalFee": 1
+  }
+}

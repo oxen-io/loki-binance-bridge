@@ -101,10 +101,6 @@ export default class Database {
   async getClientAccountsWithMemos(memos) {
     const query = 'select ca.* , a.memo from client_accounts ca left join accounts_bnb a on ca.account_uuid = a.uuid where a.memo in ($1:csv);';
     const clientAccounts = await this.postgres.manyOrNone(query, [memos]);
-    if (clientAccounts.length === 0) {
-      console.error('Failed to insert new transactions. Could not find any client accounts');
-      return [];
-    }
 
     return clientAccounts.map(({ uuid, address, address_type: addressType, account_type: accountType, memo }) => ({
       uuid,

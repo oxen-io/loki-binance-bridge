@@ -1,16 +1,14 @@
 import { PostgresClient, LokiClient, BinanceClient } from '../../clients';
 
 export const loki = new LokiClient({
-  rpc: {
-    hostname: 'localhost',
-    port: 18083,
-    username: '',
-    password: '',
-  },
-  wallet: {
-    filename: 'lokibridge',
-    password: '',
-  },
+  hostname: 'localhost',
+  port: 18083,
+  username: '',
+  password: '',
+},
+{
+  filename: 'lokibridge',
+  password: '',
 });
 
 export const bnb = new BinanceClient({
