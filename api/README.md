@@ -14,6 +14,11 @@ If you're using `nvm` then run:
 nvm use
 ```
 
+Install dependencies from bridge core:
+```
+cd ../bridge-core/ && npm install && cd ../api
+```
+
 Install all the dependencies:
 ```
 npm install
