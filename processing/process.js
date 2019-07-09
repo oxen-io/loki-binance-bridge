@@ -1,19 +1,9 @@
 import { Command } from 'commander';
-import { SWAP_TYPE } from 'bridge-core';
-import { processSwaps } from './functions/swaps';
+import { processAllSwaps } from './functions/swaps';
 import { sweepAllPendingSwaps } from './functions/sweep';
 import { checkAllBalances, printBNBTransactionsWithIncorrectMemo } from './functions/balance';
 
 const program = new Command();
-
-const swap = async () => {
-  console.info(`Processing swaps for ${SWAP_TYPE.LOKI_TO_BLOKI}`);
-  await processSwaps(SWAP_TYPE.LOKI_TO_BLOKI);
-  console.info();
-
-  console.info(`Processing swaps for ${SWAP_TYPE.BLOKI_TO_LOKI}`);
-  await processSwaps(SWAP_TYPE.BLOKI_TO_LOKI);
-};
 
 program
   .description('Perform processing')
@@ -23,14 +13,19 @@ program
   .option('--printInvalid', 'Print any transactions for which we do not have the memo for')
   .parse(process.argv);
 
-if (program.swap) {
-  swap();
-} else if (program.sweep) {
-  sweepAllPendingSwaps();
-} else if (program.check) {
-  checkAllBalances();
-} else if (program.printInvalid) {
-  printBNBTransactionsWithIncorrectMemo();
-} else {
-  program.help();
+async function run(options) {
+  if (options.swap) {
+    await processAllSwaps();
+  } else if (options.sweep) {
+    await sweepAllPendingSwaps();
+  } else if (options.check) {
+    await checkAllBalances();
+  } else if (options.printInvalid) {
+    await printBNBTransactionsWithIncorrectMemo();
+  } else {
+    program.help();
+  }
 }
+
+// Exit after running commands
+run(program).then(() => process.exit());

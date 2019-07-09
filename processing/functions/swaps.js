@@ -7,6 +7,18 @@ import { db, bnb, loki } from '../core';
 const lokiWithdrawalFee = config.get('loki.withdrawalFee');
 
 /**
+ * Process all pending swaps and send out the coins.
+ */
+export async function processAllSwaps() {
+  console.info(`Processing swaps for ${SWAP_TYPE.LOKI_TO_BLOKI}`);
+  await processSwaps(SWAP_TYPE.LOKI_TO_BLOKI);
+  console.info();
+
+  console.info(`Processing swaps for ${SWAP_TYPE.BLOKI_TO_LOKI}`);
+  await processSwaps(SWAP_TYPE.BLOKI_TO_LOKI);
+}
+
+/**
  * Process any pending swaps and send out the coins.
  *
  * @param {string} swapType The type of swap.
