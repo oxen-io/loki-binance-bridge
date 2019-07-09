@@ -135,8 +135,11 @@ export default class LokiClient {
       return [];
     }
 
-    const results = ['in', 'pool'].map(k => data.result[k] || []);
-    return results.flat();
+    const incoming = (data.result.in || []);
+    // Set all the confirmations of the pool transactions to 0
+    const pool = (data.result.pool || []).map(t => ({ ...t, confirmations: 0 }));
+
+    return [incoming, pool].flat();
   }
 
   /**
