@@ -21,10 +21,15 @@ const variantIcon = {
   info: InfoIcon,
 };
 
+const textClasses = {
+  warning: 'blackText',
+};
+
 function StyledSnackbar(props) {
   const { classes, className, message, onClose, variant, open } = props;
   const Icon = variantIcon[variant];
 
+  const text = textClasses[variant] || 'primaryText';
   return (
     <Snackbar
       anchorOrigin={{
@@ -40,14 +45,14 @@ function StyledSnackbar(props) {
         className: clsx(classes[variant], className)
       }}
       message={
-        <span id="message-id" className={classes.message}>
+        <span id="message-id" className={clsx(classes.message, classes[text])}>
           <Icon className={clsx(classes.icon, classes.iconVariant)} />
           {message && message.toString()}
         </span>
       }
       action={[
         <IconButton key="close" aria-label="Close" color="inherit" onClick={onClose}>
-          <CloseIcon className={classes.icon} />
+          <CloseIcon className={clsx(classes.icon, classes[text])} />
         </IconButton>,
       ]}
     />

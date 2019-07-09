@@ -102,16 +102,16 @@ export function finalizeSwap(req, res, next) {
       ]);
 
       if (!transactions || transactions.length === 0) {
-        res.status(400);
-        res.body = { status: 400, success: false, result: 'Unable to find a deposit' };
+        res.status(205);
+        res.body = { status: 200, success: false, result: 'Unable to find a deposit' };
         return next(null, req, res, next);
       }
 
       // Filter out any transactions we haven't added to our swaps db
       const newTransactions = transactions.filter(tx => !swaps.find(s => s.deposit_transaction_hash === tx.hash));
       if (newTransactions.length === 0) {
-        res.status(400);
-        res.body = { status: 400, success: false, result: 'Unable to find any new deposits' };
+        res.status(205);
+        res.body = { status: 200, success: false, result: 'Unable to find any new deposits' };
         return next(null, req, res, next);
       }
 

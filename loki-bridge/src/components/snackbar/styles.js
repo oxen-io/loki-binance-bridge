@@ -1,4 +1,5 @@
 import { amber, green } from '@material-ui/core/colors';
+import { colors } from '@theme';
 
 const styles = theme => ({
   success: {
@@ -15,7 +16,6 @@ const styles = theme => ({
   },
   icon: {
     fontSize: 20,
-    color: theme.palette.text.primary,
   },
   iconVariant: {
     opacity: 0.9,
@@ -24,8 +24,13 @@ const styles = theme => ({
   message: {
     display: 'flex',
     alignItems: 'center',
+  },
+  primaryText: {
     color: theme.palette.text.primary,
   },
+  blackText: {
+    color: colors.lokiBlack80,
+  }
 });
 
 export default styles;

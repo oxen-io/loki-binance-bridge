@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { EventEmitter } from 'events';
 import { encrypt } from '@utils/crypto';
+import { Warning } from '@utils/error';
 import config from '@config';
 import * as Actions from './actions';
 import * as Events from './events';
@@ -110,6 +111,11 @@ class Store extends EventEmitter {
         url,
         [field]: encrypted
       });
+
+      if (data.status === 200 && !data.success) {
+        throw new Warning(data.result);
+      }
+
       return data;
     } catch (e) {
       console.log(`Failed fetch ${url}: `, e);

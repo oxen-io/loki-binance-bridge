@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { instanceOf } from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography } from '@material-ui/core';
+import { Warning } from '@utils/error';
 import { store, dispatcher, Actions, Events } from '@store';
 import { SWAP_TYPE } from '@constants';
 import { PageLoader } from '@components';
@@ -39,7 +40,10 @@ class Swap extends Component {
   }
 
   onError = (error) => {
-    this.props.showMessage(error, 'error');
+    const isWarning = error instanceof Warning;
+    const message = error.message;
+    const variant = isWarning ? 'warning' : 'error';
+    this.props.showMessage(message, variant);
     this.setState({ loading: false });
   }
 
