@@ -9,7 +9,8 @@
     "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
     "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
     "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",
-    "printInvalid": "cross-env NODE_ENV=production node -r esm process.js --printInvalid"
+    "printInvalid": "cross-env NODE_ENV=production node -r esm process.js --printInvalid",
+    "preinstall": "npm link ../bridge-core"
   },
   "author": "Loki Network",
   "license": "ISC",

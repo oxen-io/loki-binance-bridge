@@ -1,7 +1,6 @@
 import { TYPE, SWAP_TYPE } from './constants';
 
 export default class Database {
-
   /**
    * Create a Database instance
    * @param {*} postgres The postgres client
