@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import http from 'http';
 import request from 'request-promise';
 
@@ -5,7 +6,6 @@ import request from 'request-promise';
  * A client to communicate with Loki Wallet.
  */
 export default class LokiClient {
-
   /**
    * Create a Loki client
    * @param {{ rpc: { hostname, port, username, password }, wallet: { filename, password, accountIndex }}} config The client configuration
@@ -46,7 +46,7 @@ export default class LokiClient {
       if (response.error) {
         // If wallet is not opened, then open it and call the rpc
         if (method !== 'close_wallet' && response.error.message === 'No wallet file') {
-          await this._openWallet();
+          await this.openWallet();
 
           // Make sure we're not forever opening the wallet
           if (callCount <= 3) return this._request(method, params, callCount + 1);
@@ -83,7 +83,7 @@ export default class LokiClient {
    *
    * @throws Will throw an error if opening a wallet failed.
    */
-  async _openWallet() {
+  async openWallet() {
     // close any open wallet
     await this._request('close_wallet');
 

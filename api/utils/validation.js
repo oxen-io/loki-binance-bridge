@@ -1,5 +1,5 @@
-import { bnb, loki } from '../helpers';
-import { SWAP_TYPE } from './constants';
+import { SWAP_TYPE } from 'bridge-core';
+import { bnb, loki } from '../core';
 
 export async function validateSwap(body) {
   if (!body) return 'invalid params';

@@ -1,7 +1,7 @@
 /* eslint-disable no-extend-native */
-import config from 'config';
-import { bnb, loki } from '../helpers';
-import { db, crypto, transaction, validation, SWAP_TYPE, TYPE } from '../utils';
+import { TYPE, SWAP_TYPE } from 'bridge-core';
+import { loki, transactionHelper, db } from '../core';
+import { crypto, validation } from '../utils';
 
 // - Public
 
@@ -97,7 +97,7 @@ export function finalizeSwap(req, res, next) {
       const { account, accountType } = clientAccount;
 
       const [transactions, swaps] = await Promise.all([
-        transaction.getIncomingTransactions(account, accountType),
+        transactionHelper.getIncomingTransactions(account, accountType),
         db.getSwapsForClientAccount(uuid),
       ]);
 
@@ -204,12 +204,11 @@ export async function getUncomfirmedLokiTransactions(req, res, next) {
   }
 
   const { uuid } = data;
-  const minConfirmations = config.get('loki.minConfirmations');
 
   try {
     const clientAccount = await db.getClientAccountForUuid(uuid);
-    const transactions = await transaction.getIncomingLokiTransactions(clientAccount.account.addressIndex, { pool: true });
-    const unconfirmed = transactions.filter(tx => tx.confirmations < minConfirmations)
+    const transactions = await transactionHelper.getIncomingLokiTransactions(clientAccount.account.addressIndex, { pool: true });
+    const unconfirmed = transactions.filter(tx => tx.confirmations < transactionHelper.minLokiConfirmations)
       .map(({ hash, amount, timestamp }) => ({ hash, amount, created: timestamp }));
 
     res.status(205);
@@ -227,7 +226,7 @@ export async function getUncomfirmedLokiTransactions(req, res, next) {
 // - Util
 
 function formatClientAccount({ uuid, accountType: type, account }) {
-  const depositAddress = type === TYPE.LOKI ? account.address : bnb.getOurAddress();
+  const depositAddress = type === TYPE.LOKI ? account.address : transactionHelper.ourBNBAddress;
   const result = {
     uuid,
     type,

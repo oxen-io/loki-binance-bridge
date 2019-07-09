@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import ApiClient from '@binance-chain/javascript-sdk';
 
 function roundDown(number, decimals = 0) {
@@ -8,7 +9,6 @@ function roundDown(number, decimals = 0) {
  * A client to communicate with Binance chain.
  */
 export default class BinanceClient {
-
   /**
    * Create a Binance client
    * @param {{ api: string, network: string, symbol: string }} config The client configuration
@@ -137,7 +137,7 @@ export default class BinanceClient {
   getDecimalOutputs(outputs) {
     return outputs.map(o => {
       // The amount in the output must be 8 decimals in length
-      const normaliseAmount = amount => roundDown(toDecimalAmount(amount), 8);
+      const normaliseAmount = amount => roundDown(this.toDecimalAmount(amount), 8);
       const normalisedCoins = o.coins.map(c => ({ ...c, amount: normaliseAmount(c.amount) }));
       return {
         ...o,

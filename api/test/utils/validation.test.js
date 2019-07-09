@@ -1,8 +1,9 @@
 /* eslint-disable max-len, arrow-body-style, no-restricted-syntax */
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { validation, SWAP_TYPE } from '../../utils';
-import { bnb, loki } from '../../helpers';
+import { SWAP_TYPE } from 'bridge-core';
+import { validation } from '../../utils';
+import { bnb, loki } from '../../core';
 
 const sandbox = sinon.createSandbox();
 

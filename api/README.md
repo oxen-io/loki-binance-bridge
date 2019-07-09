@@ -41,6 +41,7 @@ Make sure you have [PM2](http://pm2.keymetrics.io/docs/usage/quick-start/) insta
 
 Then simply run:
 ```
+npm install
 npm start
 ```
 
@@ -69,9 +70,9 @@ For development, you can use `lokitestnet.com:38157` as the `daemon-address`
 Any properties found in `config/default.json` can be modified to your needs.
 If you need different values for either `test`, `development` or `production` then add those values to the corresponsing config files.
 
-`config/test.json` for `testing`
-`config/development.json` for `development`
-`config/production.json` for `production`.
+`config/test.json` for `testing`. <br>
+`config/development.json` for `development`.<br>
+`config/production.json` for `production`.<br>
 
 Any values that you don't set in those files will be fetched from `config/default.json`.
 
@@ -92,7 +93,7 @@ Any values that you don't set in those files will be fetched from `config/defaul
 | api | The binance api url |
 | network | The binance network (testnet/production) |
 | symbol | The symbol of the token you are swapping |
-| wallet.mnemonic | The mnemonic of the wallet to use for the swaps.<br>This is where you will receive and send your tokens.|
+| depositAddress | The address to where users will deposit the binance currency to |
 
 #### Database
 | Property | Description |

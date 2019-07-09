@@ -5,7 +5,6 @@ import { TYPE } from './constants';
  * Helper class for incoming transactions
  */
 export default class TransactionHelper {
-
   /**
    * Create a helper instance.
    * @param {{ binance: { client, ourAddress }, loki: { client, minConfirmations }}} config The helper config.
@@ -19,6 +18,7 @@ export default class TransactionHelper {
     this.loki = loki.client;
     this.minLokiConfirmations = loki.minConfirmations;
   }
+
   /**
    * Get incoming transactions to the given account.
    *
@@ -76,5 +76,4 @@ export default class TransactionHelper {
       amount: tx.amount,
     }));
   }
-};
-
+}

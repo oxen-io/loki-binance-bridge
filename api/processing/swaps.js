@@ -1,7 +1,7 @@
 /* eslint-disable no-else-return */
 import config from 'config';
-import { db, SWAP_TYPE } from '../utils';
-import { bnb, loki } from '../helpers';
+import { SWAP_TYPE } from 'bridge-core';
+import { db, bnb, loki } from '../core';
 
 // The fee charged for withdrawing loki
 const lokiWithdrawalFee = config.get('loki.withdrawalFee');
@@ -75,7 +75,7 @@ export async function send(swapType, transactions) {
     }));
 
     // Send BNB to the users
-    return bnb.multiSend(config.get('binance.wallet.mnemonic'), outputs, 'Loki Bridge');
+    return bnb.multiSend('mnemonic', outputs, 'Loki Bridge');
   } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
     // Deduct the loki withdrawal fees
     const outputs = transactions.map(({ address, amount }) => {

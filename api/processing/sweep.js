@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax, no-else-return, max-len */
-import { db, TYPE, transaction, SWAP_TYPE } from '../utils';
-import { bnb, postgres } from '../helpers';
+import { TYPE, SWAP_TYPE } from 'bridge-core';
+import { db, transactionHelper, postgres } from '../core';
 
 /**
  * Sweep any pending swaps
@@ -22,7 +22,7 @@ export async function sweepPendingLokiToBloki() {
   // Get all incoming transactions from the client accounts
   const promises = clientAccounts.map(async c => {
     const { address } = c.account;
-    const transactions = await transaction.getIncomingTransactions(c.account, TYPE.LOKI);
+    const transactions = await transactionHelper.getIncomingTransactions(c.account, TYPE.LOKI);
     return transactions.map(t => ({ ...t, address }));
   });
   const lokiTransactions = await Promise.all(promises).then(array => array.flat());
@@ -55,10 +55,10 @@ export async function sweepPendingLokiToBloki() {
  */
 export async function sweepPendingBlokiToLoki() {
   console.info(`Sweeping ${SWAP_TYPE.BLOKI_TO_LOKI}`);
-  const ourAddress = bnb.getOurAddress();
+  const ourAddress = transactionHelper.ourBNBAddress;
 
   // Get all our incoming transactions which contain a memo
-  const transactions = await transaction.getIncomingBNBTransactions(ourAddress);
+  const transactions = await transactionHelper.getIncomingBNBTransactions(ourAddress);
   const memoTransactions = transactions.filter(t => t.memo && t.memo.length > 0);
 
   // Get all the deposit hases from the db

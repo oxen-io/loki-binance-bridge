@@ -1,11 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
+import { TYPE, SWAP_TYPE } from 'bridge-core';
 import * as swapRoutes from '../../routes/swap';
-import { bnb, loki, postgres } from '../../helpers';
-import { db, TYPE, SWAP_TYPE, validation, transaction, crypto } from '../../utils';
+import { bnb, loki, postgres, db, transactionHelper } from '../../core';
+import { validation, crypto } from '../../utils';
 import { dbHelper, wrapRouterFunction } from '../helpers';
 
-const ourBnbAddress = 'ourAddress';
+const ourBnbAddress = transactionHelper.ourBNBAddress;
 
 const sandbox = sinon.createSandbox();
 
@@ -21,7 +22,6 @@ describe('Swap API', () => {
     // Pretend all our addresses we pass are valid for these tests
     sandbox.stub(loki, 'validateAddress').returns(true);
     sandbox.stub(bnb, 'validateAddress').returns(true);
-    sandbox.stub(bnb, 'getOurAddress').returns(ourBnbAddress);
   });
 
   afterEach(() => {
@@ -202,7 +202,7 @@ describe('Swap API', () => {
 
       it('should return 400 if no incoming transactions were found', async () => {
         sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
-        sandbox.stub(transaction, 'getIncomingTransactions').returns([]);
+        sandbox.stub(transactionHelper, 'getIncomingTransactions').returns([]);
         sandbox.stub(db, 'getSwapsForClientAccount').returns([{ deposit_transaction_hash: '1234' }]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
@@ -215,7 +215,7 @@ describe('Swap API', () => {
         const txHash = '1234';
 
         sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
-        sandbox.stub(transaction, 'getIncomingTransactions').returns([{ hash: txHash, amount: 100 }]);
+        sandbox.stub(transactionHelper, 'getIncomingTransactions').returns([{ hash: txHash, amount: 100 }]);
         sandbox.stub(db, 'getSwapsForClientAccount').returns([{ deposit_transaction_hash: txHash }]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
@@ -233,7 +233,7 @@ describe('Swap API', () => {
       });
 
       it('should return the newly inserted swaps', async () => {
-        sandbox.stub(transaction, 'getIncomingTransactions').returns(transactions);
+        sandbox.stub(transactionHelper, 'getIncomingTransactions').returns(transactions);
         sandbox.stub(db, 'getSwapsForClientAccount').returns([]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
@@ -244,7 +244,7 @@ describe('Swap API', () => {
 
       it('should filter out transactions which we have swaps for', async () => {
         const swaps = [1, 2].map(t => ({ deposit_transaction_hash: String(t) }));
-        sandbox.stub(transaction, 'getIncomingTransactions').returns(transactions);
+        sandbox.stub(transactionHelper, 'getIncomingTransactions').returns(transactions);
         sandbox.stub(db, 'getSwapsForClientAccount').returns(swaps);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
@@ -258,7 +258,7 @@ describe('Swap API', () => {
 
       it('should return the correct data', async () => {
         const txHash = '123';
-        sandbox.stub(transaction, 'getIncomingTransactions').returns([{ hash: txHash, amount: 100 }]);
+        sandbox.stub(transactionHelper, 'getIncomingTransactions').returns([{ hash: txHash, amount: 100 }]);
         sandbox.stub(db, 'getSwapsForClientAccount').returns([]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
@@ -274,7 +274,7 @@ describe('Swap API', () => {
       });
 
       it('should have inserted the swaps in the db', async () => {
-        sandbox.stub(transaction, 'getIncomingTransactions').returns(transactions);
+        sandbox.stub(transactionHelper, 'getIncomingTransactions').returns(transactions);
         sandbox.stub(db, 'getSwapsForClientAccount').returns([]);
 
         const { status, success } = await finalizeSwapToken({ uuid: 'fake' });

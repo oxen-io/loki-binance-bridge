@@ -5,9 +5,7 @@
     "api": "https://testnet-dex.binance.org",
     "network": "testnet",
     "symbol": "BLOKI",
-    "wallet": {
-      "mnemonic": ""
-    }
+    "depositAddress": ""
   },
   "database": {
     "host": "localhost",

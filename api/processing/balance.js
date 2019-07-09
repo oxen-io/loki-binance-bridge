@@ -1,6 +1,6 @@
 /* eslint-disable no-else-return */
-import { db, SWAP_TYPE, TYPE, transaction } from '../utils';
-import { bnb } from '../helpers';
+import { SWAP_TYPE, TYPE } from 'bridge-core';
+import { db, transactionHelper } from '../core';
 
 export async function checkAllBalances() {
   const lokiBalance = await getBalances(SWAP_TYPE.LOKI_TO_BLOKI);
@@ -63,7 +63,7 @@ export async function getBalanceFromIncomingTransactions(accountType, from, to) 
 
   if (accountType === TYPE.LOKI) {
     // Get all incoming transactions from the client accounts
-    const promises = clientAccounts.map(async c => transaction.getIncomingLokiTransactions(c.account.addressIndex));
+    const promises = clientAccounts.map(async c => transactionHelper.getIncomingLokiTransactions(c.account.addressIndex));
     const lokiTransactions = await Promise.all(promises).then(array => array.flat());
 
     // Filter out all transactions that don't fit our date ranges
@@ -77,8 +77,8 @@ export async function getBalanceFromIncomingTransactions(accountType, from, to) 
     return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
   } else if (accountType === TYPE.BNB) {
     // Get all our incoming transactions which contain a memo
-    const ourAddress = bnb.getOurAddress();
-    const transactions = await transaction.getIncomingBNBTransactions(ourAddress, from);
+    const ourAddress = transactionHelper.ourBNBAddress;
+    const transactions = await transactionHelper.getIncomingBNBTransactions(ourAddress, from);
     const bnbClientAccounts = await db.getClientAccounts(TYPE.BNB);
     const clientMemos = bnbClientAccounts.map(c => c.account.memo);
 
@@ -101,8 +101,8 @@ export async function getBalanceFromIncomingTransactions(accountType, from, to) 
 
 export async function printBNBTransactionsWithIncorrectMemo() {
   // Get all our incoming transactions which contain a memo
-  const ourAddress = bnb.getOurAddress();
-  const transactions = await transaction.getIncomingBNBTransactions(ourAddress);
+  const ourAddress = transactionHelper.ourBNBAddress;
+  const transactions = await transactionHelper.getIncomingBNBTransactions(ourAddress);
   const bnbClientAccounts = await db.getClientAccounts(TYPE.BNB);
   const clientMemos = bnbClientAccounts.filter(c => c.account.memo);
   const unkownMemoTransactions = transactions.filter(t => {

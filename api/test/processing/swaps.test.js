@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import config from 'config';
-import { bnb, loki, postgres } from '../../helpers';
+import { SWAP_TYPE, TYPE } from 'bridge-core';
+import { bnb, loki, postgres } from '../../core';
 import * as functions from '../../processing/swaps';
-import { SWAP_TYPE, TYPE } from '../../utils';
 import { dbHelper } from '../helpers';
 
 const sandbox = sinon.createSandbox();
