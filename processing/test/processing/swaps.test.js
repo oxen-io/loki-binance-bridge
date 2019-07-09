@@ -120,7 +120,7 @@ describe('Processing Swaps', () => {
 
       await postgres.tx(t => t.batch([
         dbHelper.insertClientAccount(clientAccountUuid, 'address', addressType, 'uuid', accountType),
-        dbHelper.insertSwap(swapUuid, swapType, 10, clientAccountUuid, 'pending'),
+        dbHelper.insertSwap(swapUuid, swapType, 10 * 1e9, clientAccountUuid, 'pending'),
       ]));
 
       await functions.processSwaps(swapType);

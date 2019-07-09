@@ -200,18 +200,18 @@ describe('Swap API', () => {
         assert.strictEqual(result, 'Unable to find swap details');
       });
 
-      it('should return 400 if no incoming transactions were found', async () => {
+      it('should return 200 with success set to false if no incoming transactions were found', async () => {
         sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
         sandbox.stub(transactionHelper, 'getIncomingTransactions').returns([]);
         sandbox.stub(db, 'getSwapsForClientAccount').returns([{ deposit_transaction_hash: '1234' }]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
-        assert.equal(status, 400);
+        assert.equal(status, 200);
         assert.isFalse(success);
         assert.strictEqual(result, 'Unable to find a deposit');
       });
 
-      it('should return 400 if no NEW incoming transactions were found', async () => {
+      it('should return 200 with success set to false if no NEW incoming transactions were found', async () => {
         const txHash = '1234';
 
         sandbox.stub(db, 'getClientAccountForUuid').returns(clientAccount);
@@ -219,7 +219,7 @@ describe('Swap API', () => {
         sandbox.stub(db, 'getSwapsForClientAccount').returns([{ deposit_transaction_hash: txHash }]);
 
         const { status, success, result } = await finalizeSwapToken({ uuid: 'fake' });
-        assert.equal(status, 400);
+        assert.equal(status, 200);
         assert.isFalse(success);
         assert.strictEqual(result, 'Unable to find any new deposits');
       });

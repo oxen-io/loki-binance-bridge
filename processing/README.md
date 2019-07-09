@@ -43,6 +43,24 @@ The flow for processing would be the following:
 - Swap
   - Send out all amounts to the users
 
+## Testing
+
+The tests will fail to run if you don't have `binance.mnemonic` set in the config.
+We want to avoid setting it in `config/default.json`.
+
+What you want to do is generate a binance wallet and note down it's mnemonic.
+After you have done that create a new config file `config/local-test.json` and paste the following:
+
+```json
+{
+  "binance": {
+    "mnemonic": "<paste your new wallet mnemonic>"
+  }
+}
+```
+
+This `local-test.json` will not be added to your git.
+
 ## Testnet Coins
 
 If you would like to issue some tokens on the binance testnet, please follow this guide: [How to create binance token](https://lightrains.com/blogs/how-create-binance-token)
