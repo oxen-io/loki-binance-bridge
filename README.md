@@ -1,4 +1,11 @@
-# Loki Bridge
+# Loki Binance Bridge
+
+### Features:
+- [x] Swap Loki to B-Loki.
+- [x] Swap B-Loki to Loki.
+- [x] See balance of Loki and B-Loki accounts.
+- [x] Process all Loki and B-Loki swaps.
+- [x] Print invalid transactions
 
 | Folder | Description |
 | --- | --- |
@@ -6,3 +13,5 @@
 | bridge-core | Shared code between the `api` and `processing` |
 | loki-bridge | The front end for the bridge |
 | processing | The processing logic for the bridge |
+
+#### Build instructions 
