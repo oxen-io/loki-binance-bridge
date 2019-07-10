@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode.react';
 import AnimateHeight from 'react-animate-height';
@@ -8,10 +8,9 @@ import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button, QRIcon } from '@components';
 import { SWAP_TYPE } from '@constants';
 import { store, Events } from '@store';
-import SwapList from '../../../components/swapList';
-import styles from '../styles';
+import styles from './styles';
 
-class SwapInfo extends Component {
+class SwapInfo extends PureComponent {
   state = {
     info: {},
     showQR: false,
@@ -76,7 +75,6 @@ class SwapInfo extends Component {
     const { showQR, qrSize } = this.state;
     const { classes, swapInfo } = this.props;
     const { depositAddress } = swapInfo;
-
     const height = showQR ? 'auto' : 0;
 
     return (
@@ -99,7 +97,7 @@ class SwapInfo extends Component {
 
     return (
       <div className={classes.memoFrame}>
-        <Typography className={classes.redText}>
+        <Typography className={classes.warningText}>
           PLEASE READ CAREFULLY
         </Typography>
         <Typography id='memo' className={classes.memo}>
@@ -110,11 +108,11 @@ class SwapInfo extends Component {
             <CopyIcon/>
           </IconButton>
         </Tooltip>
-        <Typography>
+        <Typography className={classes.instructionBold}>
           When creating the transaction, please paste the string above into the <b>Memo</b> field. <br/>
+          Ensure that this is the only thing that you put in the field.
         </Typography>
-        <Typography>Ensure that this is the only thing that you put in the field.</Typography>
-        <Typography className={classes.redText}>
+        <Typography className={classes.warningText}>
           If done incorrectly then you will not receive <b>LOKI</b> into your designated address.
         </Typography>
       </div>
@@ -133,53 +131,47 @@ class SwapInfo extends Component {
     if (typeof lokiConfirmations != 'number') { lokiConfirmations = '-'; }
 
     return (
-      <React.Fragment>
-        <Grid item xs={ 12 } className={ classes.frame }>
-          <Typography className={ classes.instructions }>
+      <div className={classes.instructionContainer}>
+        <Typography className={ classes.instructions }>
             Here's what you need to do next:
-          </Typography>
-          <Typography className={ classes.instructionBold }>
+        </Typography>
+        <Typography className={ classes.instructionBold }>
             Transfer your {depositCurrency}
-          </Typography>
-          <Typography className={ classes.instructions }>
+        </Typography>
+        <Typography className={ classes.instructions }>
             to
-          </Typography>
-          <Typography component={'div'} className={ classes.instructionBold }>
-            <div id='depositAddress'>{depositAddress}</div>
-            <div className={classes.actionButtons}>
-              <Tooltip title="Copy Address" placement="left">
-                <IconButton onClick={() => this.onCopy('depositAddress')} aria-label="Copy Address">
-                  <CopyIcon/>
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Toggle QR" placement="right">
-                <IconButton onClick={this.toggleQR} aria-label="Toggle QR">
-                  <QRIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
-          </Typography>
-          {this.renderQR() }
-          {this.renderMemo() }
+        </Typography>
+        <Typography component={'div'} className={ classes.instructionBold }>
+          <div id='depositAddress'>{depositAddress}</div>
+          <div className={classes.actionButtons}>
+            <Tooltip title="Copy Address" placement="left">
+              <IconButton onClick={() => this.onCopy('depositAddress')} aria-label="Copy Address">
+                <CopyIcon/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Toggle QR" placement="right">
+              <IconButton onClick={this.toggleQR} aria-label="Toggle QR">
+                <QRIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Typography>
+        {this.renderQR() }
+        {this.renderMemo() }
+        { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
           <Typography className={ classes.instructions }>
-            After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through.
+            <b>Note:</b> You will have to wait for there to be atleast {lokiConfirmations} confirmations before your added to our processing queue.
           </Typography>
-          { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
-            <Typography className={ classes.instructions }>
-              <b>Note:</b> You will have to wait for there to be atleast {lokiConfirmations} confirmations before your request is logged.
-            </Typography>
-          )}
-          { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (
-            <Typography className={ classes.instructionBold }>
+        )}
+        { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (
+          <Typography className={ classes.instructionBold }>
               There will be a processing fee of {lokiFee} LOKI which will be charged when processing all your pending swaps.
-            </Typography>
-          )}
-          <Typography className={ classes.instructions }>
-            You can leave this page and come back later to refresh your swap requests. <br/>
-            If you run into any trouble, or your swap request has not gone through, please contact us.
           </Typography>
-        </Grid>
-      </React.Fragment>
+        )}
+        <Typography className={ classes.instructions }>
+            If you run into any trouble, or your swap request has not gone through, please contact us.
+        </Typography>
+      </div>
     );
   }
 
@@ -202,23 +194,10 @@ class SwapInfo extends Component {
   }
 
   render() {
-    const { classes, swapType, loading, onRefresh, swapInfo, unconfirmedTxs, onBack } = this.props;
-
-    const unconfirmed = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? unconfirmedTxs : [];
-    const unconfirmedSwaps = (unconfirmed || []).map(({ hash, amount, created }) => ({
-      uuid: hash,
-      type: SWAP_TYPE.LOKI_TO_BLOKI,
-      amount,
-      txHash: hash,
-      transferTxHashes: [],
-      created,
-      unconfirmed: true,
-    }));
-
-    const swaps = [...unconfirmedSwaps, ...(swapInfo.swaps || [])];
+    const { classes, loading, onRefresh, onBack } = this.props;
 
     return (
-      <React.Fragment>
+      <div className={classes.root}>
         <Grid item xs={ 12 } align='left' className={ classes.back }>
           <Typography>
             <Link className={classes.link} onClick={onBack}>
@@ -227,17 +206,15 @@ class SwapInfo extends Component {
           </Typography>
         </Grid>
         {this.renderInstructions()}
-        <Grid item xs={ 12 } align='right' className={ classes.button }>
+        <Grid item xs={12} className={classes.button}>
           <Button
             fullWidth
             label="Refresh"
-            disabled={loading}
+            loading={loading}
             onClick={onRefresh}
           />
         </Grid>
-        {this.renderReceivingAmount()}
-        <SwapList swaps={swaps} />
-      </React.Fragment>
+      </div>
     );
   }
 }
@@ -246,7 +223,6 @@ SwapInfo.propTypes = {
   classes: PropTypes.object.isRequired,
   swapType: PropTypes.string.isRequired,
   swapInfo: PropTypes.object.isRequired,
-  unconfirmedTxs: PropTypes.array,
   onRefresh: PropTypes.func.isRequired,
   onBack: PropTypes.func.isRequired,
   loading: PropTypes.bool,

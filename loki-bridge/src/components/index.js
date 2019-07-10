@@ -6,6 +6,9 @@ import Label from './label';
 import PageLoader from './pageLoader';
 import Select from './select';
 import QRIcon from './qrIcon';
+import Swap from './swap';
+import SwapInfo from './swapInfo';
+import SwapSelection from './swapSelection';
 
 export {
   Button,
@@ -15,5 +18,8 @@ export {
   Label,
   PageLoader,
   Select,
-  QRIcon
+  QRIcon,
+  Swap,
+  SwapInfo,
+  SwapSelection
 };

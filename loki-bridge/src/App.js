@@ -1,34 +1,17 @@
 import React, { PureComponent } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { Grid } from '@material-ui/core';
-import { Swap } from 'pages';
-import { Snackbar } from '@components';
+import { Grid, Typography } from '@material-ui/core';
+import { Snackbar, Swap } from '@components';
 import theme from '@theme';
 
 export default class App extends PureComponent {
   state = {
-    padding: 0,
     snackbar: {
       message: null,
       variant: 'success',
       open: false,
     }
-  }
-
-  componentDidMount() {
-    this.onResize();
-    window.addEventListener('resize', this.onResize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.onResize);
-  }
-
-  onResize = () => {
-    const width = window.innerWidth;
-    const padding = (width <= 600) ? '0 8px' : '0 7.5em';
-    this.setState({ padding });
   }
 
   showMessage = (message, variant) => {
@@ -55,19 +38,18 @@ export default class App extends PureComponent {
   }
 
   render() {
-    const { padding } = this.state;
-
     return (
       <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
         <div id="content">
           <Grid
-            style={{ padding }}
+            id="grid"
             container
             justify="center"
             alignItems="center"
           >
-            <Grid item style={{ maxWidth: '100%' }}>
+            <Grid item direction="column" xs={12}>
+              <Typography variant="h4" className="title">Loki Bridge</Typography>
               <Swap showMessage={this.showMessage} />
               { this.renderSnackbar() }
             </Grid>

@@ -11,6 +11,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #008522; /* Old browsers */
+  background: -moz-linear-gradient(-45deg,  #78be20 0%, #008522 50%, #005f61 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg,  #78be20 0%,#008522 50%,#005f61 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg,  #78be20 0%,#008522 50%,#005f61 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
 code {
@@ -30,5 +34,22 @@ code {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 16px;
+  flex-direction: column;
+}
+
+#grid {
+  flex: 1;
+  padding: 16px 7.5em;
+  overflow: auto;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 40px !important;
+}
+
+@media (max-width: 680px) {
+  #grid {
+    padding: 8px;
+  }
 }
