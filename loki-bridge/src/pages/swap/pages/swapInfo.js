@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import QRCode from 'qrcode.react';
+import AnimateHeight from 'react-animate-height';
 import { Grid, Typography, IconButton, Link } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
-import { Button } from '@components';
+import { Button, QRIcon } from '@components';
 import { SWAP_TYPE } from '@constants';
 import { store, Events } from '@store';
 import SwapList from '../components/swapList';
 import styles from '../styles';
 
 class SwapInfo extends Component {
+  state = {
+    info: {},
+    showQR: false,
+    qrSize: 128,
+  };
+
   onCopy = (id) => {
     var elm = document.getElementById(id);
     let range;
@@ -39,15 +47,50 @@ class SwapInfo extends Component {
   componentDidMount() {
     // Run a timer every 10 seconds to refresh
     this.timer = setInterval(this.props.onRefresh, 30 * 1000);
+
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
   }
 
   componentWillUnmount() {
     store.removeListener(Events.FETCHED_INFO, this.onInfoUpdated);
+    window.removeEventListener('resize', this.onResize);
     clearInterval(this.timer);
   }
 
   onInfoUpdated = () => {
     this.setState({ info: store.getStore('info') || {} });
+  }
+
+  onResize = () => {
+    const width = window.innerWidth;
+    const qrSize = (width <= 600) ? 128 : 210;
+    this.setState({ qrSize });
+  }
+
+  toggleQR = () => {
+    this.setState({ showQR: !this.state.showQR });
+  }
+
+  renderQR = () => {
+    const { showQR, qrSize } = this.state;
+    const { classes, swapInfo } = this.props;
+    const { depositAddress } = swapInfo;
+
+    const height = showQR ? 'auto' : 0;
+
+    return (
+      <AnimateHeight
+        duration={250}
+        height={height}
+      >
+        <div className={classes.qrContainer}>
+          <div className={classes.qr}>
+            <QRCode value={depositAddress} renderAs='canvas' size={qrSize} />
+          </div>
+        </div>
+      </AnimateHeight>
+    );
   }
 
   renderMemo = () => {
@@ -103,12 +146,16 @@ class SwapInfo extends Component {
           </Typography>
           <Typography component={'div'} className={ classes.instructionBold }>
             <div id='depositAddress'>{depositAddress}</div>
-            <IconButton
-              onClick={() => this.onCopy('depositAddress')}
-            >
-              <CopyIcon/>
-            </IconButton>
+            <div className={classes.actionButtons}>
+              <IconButton onClick={() => this.onCopy('depositAddress')}>
+                <CopyIcon/>
+              </IconButton>
+              <IconButton onClick={this.toggleQR}>
+                <QRIcon />
+              </IconButton>
+            </div>
           </Typography>
+          {this.renderQR() }
           {this.renderMemo() }
           <Typography className={ classes.instructions }>
             After you've completed the transfer, click the <b>"REFRESH"</b> button to see if any swap requests have gone through.

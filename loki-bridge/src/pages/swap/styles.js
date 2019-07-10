@@ -92,6 +92,16 @@ const styles = theme => ({
   },
   link: {
     cursor: 'pointer'
+  },
+  qr: {
+    padding: theme.spacing(1),
+    backgroundColor: 'white',
+  },
+  qrContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
   }
 });
 
