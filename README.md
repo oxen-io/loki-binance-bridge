@@ -14,4 +14,6 @@
 | loki-bridge | The front end for the bridge |
 | processing | The processing logic for the bridge |
 
-#### Build instructions 
+#### Build instructions
+
+Each of the modules are designed so they can be run on different servers. As such all relevant building instructions are placed inside the folders.
