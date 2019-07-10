@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode.react';
 import AnimateHeight from 'react-animate-height';
-import { Grid, Typography, IconButton, Link } from '@material-ui/core';
+import { Grid, Typography, IconButton, Link, Tooltip } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button, QRIcon } from '@components';
@@ -105,11 +105,11 @@ class SwapInfo extends Component {
         <Typography id='memo' className={classes.memo}>
           {memo}
         </Typography>
-        <IconButton
-          onClick={() => this.onCopy('memo')}
-        >
-          <CopyIcon/>
-        </IconButton>
+        <Tooltip title="Copy Memo" placement="right">
+          <IconButton onClick={() => this.onCopy('memo')} aria-label="Copy Memo">
+            <CopyIcon/>
+          </IconButton>
+        </Tooltip>
         <Typography>
           When creating the transaction, please paste the string above into the <b>Memo</b> field. <br/>
         </Typography>
@@ -147,12 +147,16 @@ class SwapInfo extends Component {
           <Typography component={'div'} className={ classes.instructionBold }>
             <div id='depositAddress'>{depositAddress}</div>
             <div className={classes.actionButtons}>
-              <IconButton onClick={() => this.onCopy('depositAddress')}>
-                <CopyIcon/>
-              </IconButton>
-              <IconButton onClick={this.toggleQR}>
-                <QRIcon />
-              </IconButton>
+              <Tooltip title="Copy Address" placement="left">
+                <IconButton onClick={() => this.onCopy('depositAddress')} aria-label="Copy Address">
+                  <CopyIcon/>
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Toggle QR" placement="right">
+                <IconButton onClick={this.toggleQR} aria-label="Toggle QR">
+                  <QRIcon />
+                </IconButton>
+              </Tooltip>
             </div>
           </Typography>
           {this.renderQR() }
