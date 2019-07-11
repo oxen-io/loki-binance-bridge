@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TimeAgo from 'timeago-react';
 import dateformat from 'dateformat';
-import { Grid, Typography, Paper, Divider, Link } from '@material-ui/core';
+import { Grid, Typography, Box, Divider, Link } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import config from '@config';
 import { SWAP_TYPE, TYPE } from '@constants';
@@ -37,10 +37,10 @@ class SwapList extends Component {
 
     if(transferTxHashes.length === 0) {
       return (
-        <React.Fragment>
+        <Box>
           <Typography className={classes.hashTitle}>Deposit Transaction Hash</Typography>
           {hashItems[0]}
-        </React.Fragment>
+        </Box>
       );
     }
 
@@ -84,30 +84,34 @@ class SwapList extends Component {
     }
 
     return (
-      <Grid item xs={12} key={uuid} className={classes.item}>
-        <Paper className={classes.container}>
-          <div className={classes.info}>
+      <Grid item xs={12} key={uuid}>
+        <Box className={classes.item}>
+          <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
             <Typography className={classes.amount}>{displayAmount} {depositCurrency}</Typography>
-            <div className={classes.rowCenter}>
+            <Box display="flex" flexDirection="row" alignItems="center">
               <Typography className={isPending ? classes.pending : classes.completed}>
                 {status}
               </Typography>
               <Typography className={classes.timeSeperator}> • </Typography>
               { this.renderTime(created) }
-            </div>
-          </div>
+            </Box>
+          </Box>
           <Divider variant="middle" className={classes.divider} />
-          <div className={classes.infoHash}>
-            { this.renderHash(type, txHash, transferTxHashes) }
-          </div>
-        </Paper>
+          { this.renderHash(type, txHash, transferTxHashes) }
+        </Box>
       </Grid>
     );
   }
 
   renderSwaps = () => {
-    const { swaps } = this.props;
-    if (!swaps || swaps.length === 0) return null;
+    const { classes, swaps } = this.props;
+    if (!swaps || swaps.length === 0) {
+      return (
+        <Box className={classes.item}>
+          <Typography className={classes.emptyTitle}>No Transactions Found</Typography>
+        </Box>
+      );
+    }
 
     return swaps.map(this.renderSwapItem);
   }

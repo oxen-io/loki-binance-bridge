@@ -2,7 +2,9 @@ import { common } from '@theme';
 
 const styles = theme => ({
   root: {
-    maxWidth: '600px',
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '600px',
+    },
     ...common.section,
   },
   button: {

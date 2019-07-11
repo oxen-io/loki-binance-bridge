@@ -23,7 +23,7 @@ const styles = theme => ({
   },
   message: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   primaryText: {
     color: theme.palette.text.primary,

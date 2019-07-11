@@ -48,7 +48,7 @@ export default class App extends PureComponent {
             justify="center"
             alignItems="center"
           >
-            <Grid item direction="column" xs={12}>
+            <Grid item xs={12}>
               <Typography variant="h4" className="title">Loki Bridge</Typography>
               <Swap showMessage={this.showMessage} />
               { this.renderSnackbar() }

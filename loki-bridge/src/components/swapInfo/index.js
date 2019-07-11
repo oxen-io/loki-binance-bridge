@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode.react';
 import AnimateHeight from 'react-animate-height';
-import { Grid, Typography, IconButton, Link, Tooltip } from '@material-ui/core';
+import { Grid, Typography, IconButton, Link, Tooltip, Box } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button, QRIcon } from '@components';
@@ -12,7 +12,6 @@ import styles from './styles';
 
 class SwapInfo extends PureComponent {
   state = {
-    info: {},
     showQR: false,
     qrSize: 128,
   };
@@ -38,11 +37,6 @@ class SwapInfo extends PureComponent {
     }
   };
 
-  componentWillMount() {
-    this.onInfoUpdated();
-    store.on(Events.FETCHED_INFO, this.onInfoUpdated);
-  }
-
   componentDidMount() {
     // Run a timer every 10 seconds to refresh
     this.timer = setInterval(this.props.onRefresh, 30 * 1000);
@@ -52,13 +46,8 @@ class SwapInfo extends PureComponent {
   }
 
   componentWillUnmount() {
-    store.removeListener(Events.FETCHED_INFO, this.onInfoUpdated);
     window.removeEventListener('resize', this.onResize);
     clearInterval(this.timer);
-  }
-
-  onInfoUpdated = () => {
-    this.setState({ info: store.getStore('info') || {} });
   }
 
   onResize = () => {
@@ -82,11 +71,11 @@ class SwapInfo extends PureComponent {
         duration={250}
         height={height}
       >
-        <div className={classes.qrContainer}>
-          <div className={classes.qr}>
+        <Box className={classes.qrContainer}>
+          <Box className={classes.qr}>
             <QRCode value={depositAddress} renderAs='canvas' size={qrSize} />
-          </div>
-        </div>
+          </Box>
+        </Box>
       </AnimateHeight>
     );
   }
@@ -96,7 +85,7 @@ class SwapInfo extends PureComponent {
     if (!memo) return null;
 
     return (
-      <div className={classes.memoFrame}>
+      <Box className={classes.memoFrame}>
         <Typography className={classes.warningText}>
           PLEASE READ CAREFULLY
         </Typography>
@@ -115,26 +104,18 @@ class SwapInfo extends PureComponent {
         <Typography className={classes.warningText}>
           If done incorrectly then you will not receive <b>LOKI</b> into your designated address.
         </Typography>
-      </div>
+      </Box>
     );
   }
 
-  renderInstructions = () => {
-    const { info } = this.state;
+  renderDepositInstructions = () => {
     const { swapType, classes, swapInfo } = this.props;
 
     const { depositAddress } = swapInfo;
     const depositCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'B-LOKI';
 
-    const lokiFee = (info && info.fees && info.fees.loki / 1e9) || 0;
-    let lokiConfirmations = (info && info.minLokiConfirmations);
-    if (typeof lokiConfirmations != 'number') { lokiConfirmations = '-'; }
-
     return (
-      <div className={classes.instructionContainer}>
-        <Typography className={ classes.instructions }>
-            Here's what you need to do next:
-        </Typography>
+      <React.Fragment>
         <Typography className={ classes.instructionBold }>
             Transfer your {depositCurrency}
         </Typography>
@@ -142,8 +123,8 @@ class SwapInfo extends PureComponent {
             to
         </Typography>
         <Typography component={'div'} className={ classes.instructionBold }>
-          <div id='depositAddress'>{depositAddress}</div>
-          <div className={classes.actionButtons}>
+          <Box id='depositAddress'>{depositAddress}</Box>
+          <Box>
             <Tooltip title="Copy Address" placement="left">
               <IconButton onClick={() => this.onCopy('depositAddress')} aria-label="Copy Address">
                 <CopyIcon/>
@@ -154,10 +135,27 @@ class SwapInfo extends PureComponent {
                 <QRIcon />
               </IconButton>
             </Tooltip>
-          </div>
+          </Box>
         </Typography>
         {this.renderQR() }
         {this.renderMemo() }
+      </React.Fragment>
+    );
+  }
+
+  renderInstructions = () => {
+    const { swapType, classes, info } = this.props;
+
+    const lokiFee = (info && info.fees && info.fees.loki / 1e9) || 0;
+    let lokiConfirmations = (info && info.minLokiConfirmations);
+    if (typeof lokiConfirmations != 'number') { lokiConfirmations = '-'; }
+
+    return (
+      <Box className={classes.instructionContainer}>
+        <Typography className={ classes.instructions }>
+            Here's what you need to do next:
+        </Typography>
+        {this.renderDepositInstructions()}
         { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
           <Typography className={ classes.instructions }>
             <b>Note:</b> You will have to wait for there to be atleast {lokiConfirmations} confirmations before your added to our processing queue.
@@ -171,7 +169,7 @@ class SwapInfo extends PureComponent {
         <Typography className={ classes.instructions }>
             If you run into any trouble, or your swap request has not gone through, please contact us.
         </Typography>
-      </div>
+      </Box>
     );
   }
 
@@ -223,6 +221,7 @@ SwapInfo.propTypes = {
   classes: PropTypes.object.isRequired,
   swapType: PropTypes.string.isRequired,
   swapInfo: PropTypes.object.isRequired,
+  info: PropTypes.object.isRequired,
   onRefresh: PropTypes.func.isRequired,
   onBack: PropTypes.func.isRequired,
   loading: PropTypes.bool,

@@ -2,7 +2,9 @@ import { colors, common } from '@theme';
 
 const styles = theme => ({
   root: {
-    maxWidth: '600px',
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '600px',
+    },
     ...common.section,
   },
   instructionContainer: {
@@ -42,7 +44,8 @@ const styles = theme => ({
   },
   warningText: {
     color: theme.palette.text.secondary,
-    margin: theme.spacing(1, 0)
+    margin: theme.spacing(1, 0),
+    textAlign: 'center',
   },
   link: {
     cursor: 'pointer'

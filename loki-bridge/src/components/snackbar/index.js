@@ -25,6 +25,11 @@ const textClasses = {
   warning: 'blackText',
 };
 
+const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
 function StyledSnackbar(props) {
   const { classes, className, message, onClose, variant, open } = props;
   const Icon = variantIcon[variant];
@@ -47,7 +52,7 @@ function StyledSnackbar(props) {
       message={
         <span id="message-id" className={clsx(classes.message, classes[text])}>
           <Icon className={clsx(classes.icon, classes.iconVariant)} />
-          {message && message.toString()}
+          {message && capitalize(message.toString())}
         </span>
       }
       action={[

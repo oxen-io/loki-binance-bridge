@@ -1,22 +1,13 @@
 import { orange, green } from '@material-ui/core/colors';
+import { common } from '@theme';
 
 const styles = theme => ({
   root: {
     margin: theme.spacing(2, 0),
   },
-  container: {
+  item: {
+    ...common.section,
     padding: theme.spacing(1, 2)
-  },
-  info: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  rowCenter: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   pending: {
     color: orange[500]
@@ -45,6 +36,10 @@ const styles = theme => ({
   amount: {
     fontSize: '1.25em',
     fontWeight: '700'
+  },
+  emptyTitle: {
+    padding: theme.spacing(1, 0),
+    color: '#c8c8c8'
   }
 });
 

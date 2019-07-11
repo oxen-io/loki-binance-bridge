@@ -9,6 +9,7 @@ import QRIcon from './qrIcon';
 import Swap from './swap';
 import SwapInfo from './swapInfo';
 import SwapSelection from './swapSelection';
+import SwapList from './swapList';
 
 export {
   Button,
@@ -21,5 +22,6 @@ export {
   QRIcon,
   Swap,
   SwapInfo,
-  SwapSelection
+  SwapSelection,
+  SwapList
 };
