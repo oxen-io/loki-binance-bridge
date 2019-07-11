@@ -5,7 +5,7 @@
   "main": "process.js",
   "private": true,
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha -r esm --recursive",
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive --timeout 10000",
     "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
     "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
     "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",

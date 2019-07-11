@@ -10,7 +10,8 @@
     "port": 5432,
     "database": "lokibridge",
     "user": "postgres",
-    "password": ""
+    "password": "",
+    "ssl": false
   },
   "loki": {
     "walletRPC": {
