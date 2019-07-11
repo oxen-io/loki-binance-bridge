@@ -2,6 +2,8 @@
 import { TYPE, SWAP_TYPE } from 'bridge-core';
 import { db, transactionHelper, postgres } from '../core';
 
+// TODO: Move to a module for better testing
+
 /**
  * Sweep any pending swaps
  */

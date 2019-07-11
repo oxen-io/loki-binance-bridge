@@ -1,7 +1,9 @@
+/* eslint-disable no-restricted-syntax, no-await-in-loop, no-continue  */
 import { Command } from 'commander';
-import { processAllSwaps } from './functions/swaps';
-import { sweepAllPendingSwaps } from './functions/sweep';
-import { checkAllBalances, printBNBTransactionsWithIncorrectMemo } from './functions/balance';
+import { SWAP_TYPE } from 'bridge-core';
+import swaps from './functions/swaps';
+import * as sweep from './functions/sweep';
+import * as balance from './functions/balance';
 
 const program = new Command();
 
@@ -15,17 +17,80 @@ program
 
 async function run(options) {
   if (options.swap) {
-    await processAllSwaps();
+    await swaps.processAllSwaps();
   } else if (options.sweep) {
-    await sweepAllPendingSwaps();
+    await sweep.sweepAllPendingSwaps();
   } else if (options.check) {
-    await checkAllBalances();
+    await balance.checkAllBalances();
   } else if (options.printInvalid) {
-    await printBNBTransactionsWithIncorrectMemo();
+    await balance.printBNBTransactionsWithIncorrectMemo();
   } else {
     program.help();
   }
 }
 
+export async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// TODO: Move to a module for better testing
+export async function runAutoProcessing() {
+  // Sleep for 10 minutes
+  await sleep(10 * 60 * 1000);
+
+  try {
+    // Sweep
+    await sweep.sweepAllPendingSwaps();
+
+    // Keep track of wether we should keep processing
+    let keepProcessing = false;
+
+    // Go through each swap type
+    for (const swapType of Object.values(SWAP_TYPE)) {
+      // Get balances and check
+      const currentBalance = await balance.getBalances(swapType);
+      balance.printBalance(swapType, currentBalance, false);
+      if (currentBalance.transaction !== currentBalance.swap) {
+        console.error(`Balances do not match for ${swapType}. Aborting!\n`);
+        return Promise.resolve();
+      }
+
+      // TODO: Get these from a stored file
+      const dailyAmount = 0;
+      const maxDailyAmount = 100;
+
+      // Make sure we can keep processing
+      if (dailyAmount >= maxDailyAmount) {
+        console.info('Daily limit hit!');
+        continue;
+      }
+
+      // Keep processing since we haven't hit the daily amount
+      keepProcessing = true;
+
+      const info = await swaps.processAutoSwaps(dailyAmount, maxDailyAmount, swapType);
+      if (!info) {
+        console.info(`No swaps to process for ${swapType}\n`);
+      }
+
+      swaps.printInfo(info);
+      console.info(`Amount sent in swaps: $${info.totalUSD} USD`);
+
+      // TODO: Save daily amount here
+      console.info(`Amount sent in a day: $${info.dailyAmount} USD`);
+    }
+
+    // Keep infinitely processing if we haven't hit the daily limit
+    return keepProcessing ? runAutoProcessing() : Promise.resolve();
+  } catch (e) {
+    if (e instanceof swaps.Errors.PriceFetchFailed) {
+      console.error('Failed to fetch price of LOKI\nWill try again next time.\n');
+      return runAutoProcessing();
+    }
+    console.error(`Error: ${e.message}\n`);
+    return Promise.resolve();
+  }
+}
+
 // Exit after running commands
-run(program).then(() => process.exit());
+run(program).finally(() => process.exit());

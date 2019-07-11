@@ -2,6 +2,8 @@
 import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { db, transactionHelper } from '../core';
 
+// TODO: Move to a module for better testing
+
 export async function checkAllBalances() {
   const lokiBalance = await getBalances(SWAP_TYPE.LOKI_TO_BLOKI);
   printBalance(SWAP_TYPE.LOKI_TO_BLOKI, lokiBalance);
@@ -10,13 +12,13 @@ export async function checkAllBalances() {
   printBalance(SWAP_TYPE.BLOKI_TO_LOKI, bnbBalance);
 }
 
-function printBalance(swapType, balance) {
+export function printBalance(swapType, balance, showWarning = true) {
   const receiveCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'BLOKI';
   const swapCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
   console.log(`${receiveCurrency} to ${swapCurrency}:`);
   console.log(` Transaction balance: ${balance.transaction / 1e9} ${receiveCurrency}`);
   console.log(` Swap balance: ${balance.swap / 1e9} ${swapCurrency}`);
-  if (balance.transaction !== balance.swap) console.log(' \n WARNING: AMOUNTS DO NOT MATCH! PLEASE TRY SWEEPING');
+  if (showWarning && balance.transaction !== balance.swap) console.log(' \nWARNING: AMOUNTS DO NOT MATCH! PLEASE TRY SWEEPING');
   console.log('');
 }
 

@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import config from 'config';
 import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { bnb, loki, postgres } from '../../core';
-import * as functions from '../../functions/swaps';
+import functions from '../../functions/swaps';
 import { dbHelper } from '../helpers';
 
 const sandbox = sinon.createSandbox();
