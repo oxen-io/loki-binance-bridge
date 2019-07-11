@@ -1,4 +1,5 @@
 {
+  "dailyLimit": 1000,
   "binance": {
     "api": "https://dex.binance.org",
     "network": "mainnet"

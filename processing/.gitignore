@@ -94,3 +94,5 @@ typings/
 config/development.json
 config/production.json
 config/local*
+
+localdb*

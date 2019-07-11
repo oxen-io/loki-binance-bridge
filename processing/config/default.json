@@ -1,4 +1,6 @@
 {
+  "dailyLimit": 100,
+  "autoRunInterval": 10,
   "binance": {
     "api": "https://testnet-dex.binance.org",
     "network": "testnet",

@@ -2,7 +2,7 @@ import config from 'config';
 import { TransactionHelper } from 'bridge-core';
 import bnb from './binance';
 import loki from './loki';
-import { postgres, db } from './database';
+import { postgres, db, localDB } from './database';
 
 const { minConfirmations } = config.get('loki');
 
@@ -17,4 +17,4 @@ const transactionHelper = new TransactionHelper({
   },
 });
 
-export { bnb, loki, postgres, db, transactionHelper };
+export { bnb, loki, postgres, db, transactionHelper, localDB };
