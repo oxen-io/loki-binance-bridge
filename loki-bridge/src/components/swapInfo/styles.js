@@ -4,6 +4,8 @@ const styles = theme => ({
   root: {
     [theme.breakpoints.up('md')]: {
       maxWidth: '600px',
+      position: 'sticky',
+      top: 0,
     },
     ...common.section,
   },

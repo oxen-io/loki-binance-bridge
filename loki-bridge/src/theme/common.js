@@ -10,7 +10,5 @@ export const section = {
   borderRadius: '4px',
   boxShadow: '0px 5px 8px 4px rgba(0, 0, 0, 0.2)',
   backgroundColor: colors.lokiBlack80,
-  padding: '1rem',
-  display: 'flex',
-  flexDirection: 'column'
+  padding: '1rem'
 };

@@ -11,7 +11,7 @@ import styles from './styles';
 const currencySymbols = {
   [TYPE.LOKI]: 'LOKI',
   [TYPE.BNB]: 'B-LOKI'
-}
+};
 
 class Swap extends Component {
   state = {

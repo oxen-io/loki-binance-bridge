@@ -1,7 +1,8 @@
 const styles = theme => ({
   item: {
     display: 'flex',
-    justifyContent: 'center'
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   itemColumn: {
     display: 'flex',

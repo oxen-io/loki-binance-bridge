@@ -7,7 +7,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { FileCopyOutlined as CopyIcon } from '@material-ui/icons';
 import { Button, QRIcon } from '@components';
 import { SWAP_TYPE } from '@constants';
-import { store, Events } from '@store';
 import styles from './styles';
 
 class SwapInfo extends PureComponent {
