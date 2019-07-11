@@ -103,7 +103,7 @@ describe('Processing Swaps', () => {
     });
   });
 
-  describe('#processSwaps', () => {
+  describe('#processAllSwapsOfType', () => {
     beforeEach(async () => {
       // Clear out any data in the db
       await postgres.none('TRUNCATE client_accounts, accounts_loki, accounts_bnb, swaps CASCADE;');
@@ -112,7 +112,7 @@ describe('Processing Swaps', () => {
       sandbox.stub(loki, 'multiSend').returns(['lokiTxHash1', 'lokiTxHash2']);
     });
 
-    const processSwap = async swapType => {
+    const processAllSwapsOfType = async swapType => {
       const addressType = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
       const accountType = addressType === TYPE.BNB ? TYPE.LOKI : TYPE.BNB;
       const clientAccountUuid = 'cbfa4d0f-cecb-4c46-88b8-719bbca6395a';
@@ -123,14 +123,14 @@ describe('Processing Swaps', () => {
         dbHelper.insertSwap(swapUuid, swapType, 10 * 1e9, clientAccountUuid, 'pending'),
       ]));
 
-      await functions.processSwaps(swapType);
+      await functions.processAllSwapsOfType(swapType);
 
       return postgres.oneOrNone('select transfer_transaction_hash from swaps where uuid = $1', [swapUuid]);
     };
 
     context('LOKI_TO_BLOKI', () => {
       it('should update the transfer transactions hash on success', async () => {
-        const swap = await processSwap(SWAP_TYPE.LOKI_TO_BLOKI);
+        const swap = await processAllSwapsOfType(SWAP_TYPE.LOKI_TO_BLOKI);
         assert.isNotNull(swap);
         assert.strictEqual(swap.transfer_transaction_hash, 'bnbTxHash1,bnbTxHash2');
       });
@@ -138,7 +138,7 @@ describe('Processing Swaps', () => {
 
     context('BLOKI_TO_LOKI', () => {
       it('should update the transfer transactions hash on success', async () => {
-        const swap = await processSwap(SWAP_TYPE.BLOKI_TO_LOKI);
+        const swap = await processAllSwapsOfType(SWAP_TYPE.BLOKI_TO_LOKI);
         assert.isNotNull(swap);
         assert.strictEqual(swap.transfer_transaction_hash, 'lokiTxHash1,lokiTxHash2');
       });

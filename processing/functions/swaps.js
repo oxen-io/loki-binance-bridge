@@ -1,56 +1,90 @@
-/* eslint-disable no-else-return */
+/* eslint-disable no-else-return, no-restricted-syntax, no-await-in-loop */
 import config from 'config';
-import { SWAP_TYPE } from 'bridge-core';
+import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { db, bnb, loki } from '../core';
 
 // The fee charged for withdrawing loki
-const lokiWithdrawalFee = config.get('loki.withdrawalFee');
+const configFees = { [TYPE.LOKI]: config.get('loki.withdrawalFee') };
+
+// The fees in 1e9 format
+const fees = { [TYPE.LOKI]: (parseFloat(configFees[TYPE.LOKI]) * 1e9).toFixed(0) };
+
+const symbols = {
+  [TYPE.LOKI]: 'LOKI',
+  [TYPE.BNB]: 'BLOKI',
+};
 
 /**
  * Process all pending swaps and send out the coins.
  */
 export async function processAllSwaps() {
-  console.info(`Processing swaps for ${SWAP_TYPE.LOKI_TO_BLOKI}`);
-  await processSwaps(SWAP_TYPE.LOKI_TO_BLOKI);
-  console.info();
-
-  console.info(`Processing swaps for ${SWAP_TYPE.BLOKI_TO_LOKI}`);
-  await processSwaps(SWAP_TYPE.BLOKI_TO_LOKI);
-  console.info();
+  try {
+    for (const swapType of Object.values(SWAP_TYPE)) {
+      console.info(`Processing swaps for ${swapType}`);
+      const info = await processAllSwapsOfType(swapType);
+      printInfo(info);
+    }
+  } catch (e) {
+    console.log(`Error: ${e.message}\n`);
+  }
 }
 
 /**
- * Process any pending swaps and send out the coins.
- *
- * @param {string} swapType The type of swap.
- */
-export async function processSwaps(swapType) {
-  if (!swapType) {
-    console.error('Swap type must not be null or undefined.');
+ * Print out info to the console
+*/
+function printInfo(info, swapType) {
+  if (!info) {
+    console.info(`No swaps found for ${swapType}\n`);
     return;
   }
 
+  const { swaps, totalAmount } = info;
+  const sentCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
+
+  console.info(`Completed ${swaps} swaps`);
+  console.info(`Amount sent: ${totalAmount / 1e9} ${symbols[sentCurrency]}\n`);
+}
+
+/**
+ * Process all pending swaps and send out the coins.
+ *
+ * @param {string} swapType The type of swap.
+ * @returns {{ swaps, totalAmount, totalFee }} The completed swap info.
+ */
+export async function processAllSwapsOfType(swapType) {
   const swaps = await db.getPendingSwaps(swapType);
+  return processSwaps(swaps, swapType);
+}
+
+/**
+ * Process the given swaps and send out the coins
+ * @param {[*]} swaps The swaps.
+ * @param {string} swapType The swap type.
+ * * @returns {{ swaps, totalAmount, totalFee }} The completed swap info.
+ */
+export async function processSwaps(swaps, swapType) {
   const ids = swaps.map(s => s.uuid);
   const transactions = getTransactions(swaps);
 
   if (!transactions || transactions.length === 0) {
-    console.info(`No swaps found for ${swapType}`);
-    return;
+    return null;
   }
 
-  try {
-    const txHashes = await send(swapType, transactions);
-    await db.updateSwapsTransferTransactionHash(ids, txHashes.join(','));
+  const txHashes = await send(swapType, transactions);
+  await db.updateSwapsTransferTransactionHash(ids, txHashes.join(','));
 
-    const totalAmount = transactions.reduce((total, current) => total + current.amount, 0);
-    const sentCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
+  const sentCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
+  const transactionAmount = transactions.reduce((total, current) => total + current.amount, 0);
 
-    console.info(`Completed ${swaps.length} swaps`);
-    console.info(`Amount sent: ${totalAmount / 1e9} ${sentCurrency}`);
-  } catch (e) {
-    console.log(`Error: ${e.message}`);
-  }
+  // Fee is per transaction (1 transaction = 1 user)
+  const totalFee = (fees[sentCurrency] || 0) * transactions.length;
+  const totalAmount = transactionAmount - totalFee;
+
+  return {
+    swaps,
+    totalAmount,
+    totalFee,
+  };
 }
 
 /**
@@ -98,7 +132,7 @@ export async function send(swapType, transactions) {
   } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
     // Deduct the loki withdrawal fees
     const outputs = transactions.map(({ address, amount }) => {
-      const fee = (parseFloat(lokiWithdrawalFee) * 1e9).toFixed(0);
+      const fee = fees[TYPE.LOKI] || 0;
       return {
         address,
         amount: Math.max(0, amount - fee),
