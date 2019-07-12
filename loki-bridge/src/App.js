@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react';
+import LazyLoad from 'react-lazy-load';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { Grid, Typography, Box } from '@material-ui/core';
-import { Snackbar, Swap } from '@components';
+import { Grid, Box } from '@material-ui/core';
+import { Snackbar, Swap, ImageLoader } from '@components';
 import theme from '@theme';
 
 export default class App extends PureComponent {
@@ -37,10 +38,31 @@ export default class App extends PureComponent {
     return <Snackbar message={snackbar.message} open={snackbar.open} onClose={this.closeMessage} variant={snackbar.variant} />;
   }
 
+  renderBackgroundImage = () => {
+    return (
+      <div id="background">
+        <LazyLoad height={'100%'}>
+          <ImageLoader className="backgroundImage" loadedClassName="backgroundImageLoaded" src="/images/background.png" alt="Background" />
+        </LazyLoad>
+      </div>
+    );
+  }
+
+  renderTitleImage = () => {
+    return (
+      <Box display="flex" justifyContent="center" className="title">
+        <LazyLoad height={'120px'}>
+          <ImageLoader className="titleImage" loadedClassName="titleImageLoaded" src="/images/logo.png" alt="Logo" />
+        </LazyLoad>
+      </Box>
+    );
+  }
+
   render() {
     return (
       <MuiThemeProvider theme={ createMuiTheme(theme) }>
         <CssBaseline />
+        {this.renderBackgroundImage()}
         <div id="content">
           <Grid
             id="grid"
@@ -49,9 +71,7 @@ export default class App extends PureComponent {
             alignItems="center"
           >
             <Grid item xs={12}>
-              <Box display="flex" justifyContent="center" className="title">
-                <img className="titleImage" src="/images/logo.png" alt="Logo" />
-              </Box>
+              {this.renderTitleImage()}
               <Swap showMessage={this.showMessage} />
               { this.renderSnackbar() }
             </Grid>
