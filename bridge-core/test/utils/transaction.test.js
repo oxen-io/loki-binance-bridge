@@ -35,7 +35,7 @@ describe('Transaction', () => {
           timestamp: 100,
         }];
 
-        const stub = sandbox.stub(bnb, 'getIncomingTransactions').returns(mockAPIResult);
+        const stub = sandbox.stub(bnb, 'getIncomingTransactions').resolves(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions({ memo }, TYPE.BNB);
         assert(stub.calledOnce, 'bnb.getIncomingTransactions was not called');
@@ -55,7 +55,7 @@ describe('Transaction', () => {
           timestamp: 100,
         }));
 
-        sandbox.stub(bnb, 'getIncomingTransactions').returns(mockAPIResult);
+        sandbox.stub(bnb, 'getIncomingTransactions').resolves(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions({ memo: 'memo1' }, TYPE.BNB);
         assert.lengthOf(transactions, 1);
@@ -75,7 +75,7 @@ describe('Transaction', () => {
           timestamp: 100,
         }];
 
-        const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(mockAPIResult);
+        const stub = sandbox.stub(loki, 'getIncomingTransactions').resolves(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions({ addressIndex: 0 }, TYPE.LOKI);
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');
@@ -93,8 +93,8 @@ describe('Transaction', () => {
           confirmations,
         }));
 
-        sandbox.stub(db, 'getLokiAccount').returns({ address_index: 0 });
-        const stub = sandbox.stub(loki, 'getIncomingTransactions').returns(mockAPIResult);
+        sandbox.stub(db, 'getLokiAccount').resolves({ address_index: 0 });
+        const stub = sandbox.stub(loki, 'getIncomingTransactions').resolves(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions({ addressIndex: 0 }, TYPE.LOKI);
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');

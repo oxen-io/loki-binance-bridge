@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha -r esm --recursive"
+    "test": "cross-env NODE_ENV=test mocha -r esm --recursive --timeout 10000"
   },
   "author": "",
   "license": "ISC",
