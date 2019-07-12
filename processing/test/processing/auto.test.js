@@ -1,11 +1,9 @@
 /* eslint-disable no-restricted-syntax, no-await-in-loop */
 import { assert } from 'chai';
 import sinon from 'sinon';
-import config from 'config';
-import { SWAP_TYPE, TYPE } from 'bridge-core';
-import { bnb, loki, postgres, db } from '../../core';
+import { SWAP_TYPE } from 'bridge-core';
+import { db } from '../../core';
 import { sweep, swaps, balance, auto } from '../../functions';
-import { dbHelper } from '../helpers';
 
 const sandbox = sinon.createSandbox();
 
