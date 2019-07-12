@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography, Box } from '@material-ui/core';
 import { Snackbar, Swap } from '@components';
 import theme from '@theme';
 
@@ -49,7 +49,9 @@ export default class App extends PureComponent {
             alignItems="center"
           >
             <Grid item xs={12}>
-              <Typography variant="h4" className="title">Loki Bridge</Typography>
+              <Box display="flex" justifyContent="center" className="title">
+                <img className="titleImage" src="/images/logo.png" alt="Logo" />
+              </Box>
               <Swap showMessage={this.showMessage} />
               { this.renderSnackbar() }
             </Grid>
