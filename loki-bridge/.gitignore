@@ -9,7 +9,8 @@
 /coverage
 
 # production
-/build
+/build/**/*
+!/build/serve.json
 
 # misc
 .DS_Store

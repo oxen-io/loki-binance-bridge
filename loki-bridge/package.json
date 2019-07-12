@@ -24,7 +24,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "request-promise": "^4.2.4",
-    "serve": "^11.0.2",
+    "serve": "~11.1.0",
     "sha256": "^0.2.0",
     "timeago-react": "^2.0.1"
   },
