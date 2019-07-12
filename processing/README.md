@@ -30,6 +30,7 @@ Edit the config `config/production.json` to match the values of the api server. 
 
 | Command | Description |
 | --- | --- |
+| npm run autoSwap | Perform auto swapping |
 | npm run swap | Perform any pending swaps in the database |
 | npm run sweep | Go through transactions and add new swaps if needed |
 | npm run checkBalance | Check if the amount received matches the amount we have swapped |
@@ -42,6 +43,27 @@ The flow for processing would be the following:
   - If these don't match then something went wrong, sweeping might fix it.
 - Swap
   - Send out all amounts to the users
+
+## Auto Swap
+
+To get auto swap to work correctly, you will have to modify
+```
+  "dailyLimit": 100,
+  "autoRunInterval": 10,
+```
+in the config file.
+
+| Field | Description |
+| --- | --- |
+| dailyLimit | The maximum amount of USD worth of swaps that can be processed on a given day.<br>Once a given `SWAP_TYPE` hits this limit then no more swaps of those type will be processed. |
+| autoRunInterval | The interval in minutes to run the auto processing |
+
+Once you have done that then simply run:
+```
+npm run autoSwap
+```
+
+If any error occurs then the process will be terminated to ensure that funds stay safe.
 
 ## Testing
 

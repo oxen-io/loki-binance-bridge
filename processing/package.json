@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha -r esm --recursive --timeout 10000",
+    "autoSwap": "cross-env NODE_ENV=production node -r esm process.js --autoSwap",
     "swap": "cross-env NODE_ENV=production node -r esm process.js --swap",
     "sweep": "cross-env NODE_ENV=production node -r esm process.js --sweep",
     "checkBalance": "cross-env NODE_ENV=production node -r esm process.js --check",
