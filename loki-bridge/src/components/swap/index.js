@@ -213,38 +213,57 @@ class Swap extends Component {
     );
   }
 
-  render() {
+  renderSelection = () => {
     const { classes } = this.props;
 
-    const { page, loading, swapType, swapInfo, info } = this.state;
+    const { loading, swapType } = this.state;
+
+    return (
+      <Grid item xs={12} className={classes.item}>
+        <SwapSelection
+          swapType={swapType}
+          onSwapTypeChanged={(swapType) => this.setState({ swapType })}
+          onNext={(address) => {
+            this.setState({ address });
+            // Wait for state to refresh correctly
+            setImmediate(() => this.onNext());
+          }}
+          loading={loading}
+        />
+      </Grid>
+    );
+  }
+
+  renderInfo = () => {
+    const { classes } = this.props;
+
+    const { loading, swapType, swapInfo, info } = this.state;
+
+    return (
+      <React.Fragment>
+            <Grid item xs={12} md={6} className={classes.item}>
+              <SwapInfo
+                swapType={swapType}
+                swapInfo={swapInfo}
+                info={info}
+                onRefresh={this.onRefresh}
+                onBack={this.resetState}
+                loading={loading}
+              />
+            </Grid>
+            {this.renderTransactions()}
+          </React.Fragment>
+    )
+  }
+
+  render() {
+    const { classes } = this.props;
+    const { page} = this.state;
 
     return (
       <Grid container className={classes.root} spacing={2}>
-        <Grid item xs={12} md={6} className={classes.item}>
-          { page === 0 && (
-            <SwapSelection
-              swapType={swapType}
-              onSwapTypeChanged={(swapType) => this.setState({ swapType })}
-              onNext={(address) => {
-                this.setState({ address });
-                // Wait for state to refresh correctly
-                setImmediate(() => this.onNext());
-              }}
-              loading={loading}
-            />
-          )}
-          { page === 1 && (
-            <SwapInfo
-              swapType={swapType}
-              swapInfo={swapInfo}
-              info={info}
-              onRefresh={this.onRefresh}
-              onBack={this.resetState}
-              loading={loading}
-            />
-          )}
-        </Grid>
-        {page === 1 && this.renderTransactions()}
+        { page === 0 && this.renderSelection()}
+        { page === 1 && this.renderInfo()}
       </Grid>
     );
   };
