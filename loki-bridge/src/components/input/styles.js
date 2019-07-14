@@ -1,7 +1,7 @@
 const styles = theme => ({
   root: {
     verticalAlign: 'bottom',
-    minWidth: '200px',
+    minWidth: '100px',
     display: 'inline-block',
     marginTop: '12px',
     marginBottom: '12px'

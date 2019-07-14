@@ -1,6 +1,6 @@
 const styles = theme => ({
   root: {
-    minWidth: '200px',
+    minWidth: '100px',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

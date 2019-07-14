@@ -51,7 +51,7 @@ export default class App extends PureComponent {
   renderTitleImage = () => {
     return (
       <Box display="flex" justifyContent="center" className="title">
-        <LazyLoad height={'120px'}>
+        <LazyLoad height={'120px'} className="titleContainer">
           <ImageLoader className="titleImage" loadedClassName="titleImageLoaded" src="/images/logo.png" alt="Logo" />
         </LazyLoad>
       </Box>
