@@ -30,8 +30,8 @@ const module = {
     const twoDaysAgo = now - (2 * 24 * 60 * 60 * 1000);
 
     const accountType = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.LOKI : TYPE.BNB;
-    const transactionBalance = await getBalanceFromIncomingTransactions(accountType, twoDaysAgo, now);
-    const swapBalance = await getSwapBalance(swapType, twoDaysAgo, now);
+    const transactionBalance = await module.getBalanceFromIncomingTransactions(accountType, twoDaysAgo, now);
+    const swapBalance = await module.getSwapBalance(swapType, twoDaysAgo, now);
     return {
       transaction: transactionBalance,
       swap: swapBalance,
