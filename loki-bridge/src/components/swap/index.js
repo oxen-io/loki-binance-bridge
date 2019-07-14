@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import clsx from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography, Box } from '@material-ui/core';
 import { Warning } from '@utils/error';
@@ -198,14 +199,16 @@ class Swap extends Component {
     const merged = [...unconfirmedSwaps, ...swaps];
 
     return (
-      <Grid item xs={12} md={6} className={classes.itemColumn}>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
-          <Typography className={classes.transactionTitle}>Transactions</Typography>
-          {this.renderReceivingAmount()}
+      <Grid item xs={12} md={6}>
+        <Box display="flex" flexDirection="column" className={classes.section}>
+          <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
+            <Typography className={classes.transactionTitle}>Transactions</Typography>
+            {this.renderReceivingAmount()}
+          </Box>
+          <Grid item xs={12}>
+            <SwapList swaps={merged}/>
+          </Grid>
         </Box>
-        <Grid item xs={12}>
-          <SwapList swaps={merged}/>
-        </Grid>
       </Grid>
     );
   }

@@ -1,3 +1,5 @@
+import { common } from '@theme';
+
 const styles = theme => ({
   item: {
     display: 'flex',
@@ -24,6 +26,9 @@ const styles = theme => ({
   },
   transactionTitle: {
     fontSize: '1.3rem'
+  },
+  section: {
+    ...common.section,
   }
 });
 

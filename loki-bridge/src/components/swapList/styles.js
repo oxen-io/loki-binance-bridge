@@ -6,7 +6,7 @@ const styles = theme => ({
     margin: theme.spacing(2, 0),
   },
   item: {
-    ...common.section,
+    // ...common.section,
     padding: theme.spacing(1, 2)
   },
   pending: {
