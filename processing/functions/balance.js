@@ -16,7 +16,7 @@ const module = {
   printBalance(swapType, balance, showWarning = true) {
     const receiveCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'BLOKI';
     const swapCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
-    log.header(chalk.blue(`${receiveCurrency} to ${swapCurrency} balance:`));
+    log.header(chalk.blue(`Balance of ${swapType}`));
     log.info(chalk`{green Transaction balance:} {bold ${balance.transaction / 1e9}} {yellow ${receiveCurrency}}`);
     log.info(chalk`{green Swap balance:} {bold ${balance.swap / 1e9}} {yellow ${swapCurrency}}`);
     if (showWarning && balance.transaction !== balance.swap) {

@@ -44,7 +44,7 @@ const module = {
   */
   printInfo(info, swapType) {
     if (!info) {
-      log.info(chalk.yellow(`No swaps found for ${swapType}`));
+      log.info(chalk.yellow('No swaps found'));
       return;
     }
 

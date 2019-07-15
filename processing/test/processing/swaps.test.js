@@ -23,7 +23,6 @@ const processSwapFake = swaps => {
   };
 };
 
-
 const sandbox = sinon.createSandbox();
 
 describe('Processing Swaps', () => {

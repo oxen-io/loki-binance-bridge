@@ -14,8 +14,8 @@ const module = {
   },
 
   /**
- * Sweep any pending loki_to_bloki swaps
- */
+  * Sweep any pending loki_to_bloki swaps
+  */
   async sweepPendingLokiToBloki() {
     log.header(chalk.blue(`Sweeping ${SWAP_TYPE.LOKI_TO_BLOKI}`));
 
@@ -36,7 +36,7 @@ const module = {
     // Get all the new transactions
     const newTransactions = lokiTransactions.filter(t => !hashes.includes(t.hash));
     if (newTransactions.length === 0) {
-      log.info(chalk.yellow(`No new ${SWAP_TYPE.LOKI_TO_BLOKI} transactions`));
+      log.info(chalk.yellow('No new transactions'));
       return;
     }
 
@@ -54,8 +54,8 @@ const module = {
   },
 
   /**
- * Sweep any pending bloki_to_loki swaps
- */
+  * Sweep any pending bloki_to_loki swaps
+  */
   async sweepPendingBlokiToLoki() {
     log.header(chalk.blue(`Sweeping ${SWAP_TYPE.BLOKI_TO_LOKI}`));
     const ourAddress = transactionHelper.ourBNBAddress;
@@ -70,7 +70,7 @@ const module = {
     // Get all the new transactions
     const newTransactions = memoTransactions.filter(t => !hashes.includes(t.hash));
     if (newTransactions.length === 0) {
-      log.info(chalk.yellow(`No new ${SWAP_TYPE.BLOKI_TO_LOKI} transactions`));
+      log.info(chalk.yellow('No new transactions'));
       return;
     }
 

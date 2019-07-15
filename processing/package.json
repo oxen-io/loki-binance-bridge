@@ -24,7 +24,10 @@
     "cross-env": "^5.2.0",
     "decimal.js": "^10.2.0",
     "esm": "^3.2.25",
-    "lowdb": "^1.0.0"
+    "lowdb": "^1.0.0",
+    "strip-ansi": "^5.2.0",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^3.10.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",

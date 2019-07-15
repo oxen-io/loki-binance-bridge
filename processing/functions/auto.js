@@ -24,8 +24,12 @@ const module = {
       callCount: (options.callCount || 0) + 1,
     };
 
+    log.header(chalk.gray(`Sleeping for ${module.autoRunInterval} minutes.`));
+
     // Sleep for 10 minutes
     await module.sleep(module.autoRunInterval * 60 * 1000);
+
+    log.header(chalk.gray('Finished Sleeping, Starting auto processing.'));
 
     try {
       // Sweep
