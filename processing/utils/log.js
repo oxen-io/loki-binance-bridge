@@ -2,10 +2,10 @@ import winston, { format } from 'winston';
 import 'winston-daily-rotate-file';
 import stripAnsi from 'strip-ansi';
 
-const logger = winston.createLogger({
+const logger = filePrefix => winston.createLogger({
   transports: [
     new winston.transports.DailyRotateFile({
-      filename: 'logs/processing-%DATE%.log',
+      filename: `logs/${filePrefix}-%DATE%.log`,
       datePattern: 'YYYY-MM-DD',
       format: format.combine(
         format.timestamp(),
@@ -27,7 +27,10 @@ export const stubConsole = {
 };
 
 const module = {
-  console: logger,
+  console: logger('processing'),
+  setFilePrefix(prefix) {
+    module.console = logger(prefix);
+  },
   header(header) {
     module.console.info(`\n${header}`);
   },

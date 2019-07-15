@@ -33,6 +33,7 @@ async function run(options) {
     log.header(chalk.bold('=========== Print Invalid ==========='));
     await balance.printBNBTransactionsWithIncorrectMemo();
   } else if (options.autoSwap) {
+    log.setFilePrefix('auto-swap');
     log.header(chalk.bold('=========== Auto Swap ==========='));
     await auto.runAutoProcessing();
   } else {

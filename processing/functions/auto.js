@@ -70,7 +70,7 @@ const module = {
           const newDailyAmount = new Decimal(dailyAmount).add(info.totalUSD || 0).toNumber();
           module.saveDailyAmount(swapType, newDailyAmount);
 
-          swaps.printInfo(info);
+          swaps.printInfo(info, swapType);
           log.info(chalk`{green Amount sent in swaps:} {white.bold $${info.totalUSD}} {yellow USD}`);
           log.info(chalk`{green Amount sent in a day:} {white.bold $${newDailyAmount}} {yellow USD}`);
         } catch (e) {
