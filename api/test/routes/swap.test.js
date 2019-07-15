@@ -71,7 +71,7 @@ describe('Swap API', () => {
     });
 
     describe('success', () => {
-      context('LOKI To BLOKI', () => {
+      context('LOKI To B-LOKI', () => {
         it('should return the existing client account', async () => {
           const lokiAccountUuid = 'd27efda6-988b-11e9-a2a3-2a2ae2dbcce4';
           const bnbClientAccount = 'd27f031e-988b-11e9-a2a3-2a2ae2dbcce4';

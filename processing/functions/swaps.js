@@ -12,7 +12,7 @@ const configFees = { [TYPE.LOKI]: config.get('loki.withdrawalFee') };
 
 const symbols = {
   [TYPE.LOKI]: 'LOKI',
-  [TYPE.BNB]: 'BLOKI',
+  [TYPE.BNB]: 'B-LOKI',
 };
 
 class PriceFetchFailed extends Error {}
