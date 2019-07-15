@@ -6,7 +6,7 @@ module.exports = {
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     node_args: '-r esm',
     instances: 1,
-    autorestart: false,
+    autorestart: true,
     watch: false,
     max_memory_restart: '1G',
     env: { NODE_ENV: 'development' },
