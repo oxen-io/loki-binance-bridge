@@ -34,6 +34,7 @@ Edit the config `config/production.json` to match the values of the api server. 
 | npm run swap | Perform any pending swaps in the database |
 | npm run sweep | Go through transactions and add new swaps if needed |
 | npm run checkBalance | Check if the amount received matches the amount we have swapped |
+| npm run printInvalid | Print any transactions sent to the binance address which we don't have a client for. |
 
 The flow for processing would be the following:
 - Sweep transactions
@@ -46,12 +47,11 @@ The flow for processing would be the following:
 
 ## Auto Swap
 
-To get auto swap to work correctly, you will have to modify
+To get auto swap to work correctly, you will have to modify the following in the config file:
 ```
   "dailyLimit": 100,
   "autoRunInterval": 10,
 ```
-in the config file.
 
 | Field | Description |
 | --- | --- |
