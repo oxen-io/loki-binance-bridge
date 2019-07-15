@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-syntax, no-else-return, max-len */
+import chalk from 'chalk';
 import { TYPE, SWAP_TYPE } from 'bridge-core';
 import { db, transactionHelper, postgres } from '../core';
+import log from '../utils/log';
 
 const module = {
   /**
@@ -15,7 +17,7 @@ const module = {
  * Sweep any pending loki_to_bloki swaps
  */
   async sweepPendingLokiToBloki() {
-    console.info(`Sweeping ${SWAP_TYPE.LOKI_TO_BLOKI}`);
+    log.header(chalk.blue(`Sweeping ${SWAP_TYPE.LOKI_TO_BLOKI}`));
 
     // Get all the client accounts
     const clientAccounts = await db.getClientAccounts(TYPE.LOKI);
@@ -34,7 +36,7 @@ const module = {
     // Get all the new transactions
     const newTransactions = lokiTransactions.filter(t => !hashes.includes(t.hash));
     if (newTransactions.length === 0) {
-      console.info(`No new ${SWAP_TYPE.LOKI_TO_BLOKI} transactions`);
+      log.info(chalk.yellow(`No new ${SWAP_TYPE.LOKI_TO_BLOKI} transactions`));
       return;
     }
 
@@ -48,14 +50,14 @@ const module = {
     }
 
     const count = await postgres.tx(t => t.batch(promises));
-    console.info(`Inserted ${count.length} swaps for ${SWAP_TYPE.LOKI_TO_BLOKI}\n`);
+    log.info(chalk`{green Inserted {bold ${count.length}} swaps}`);
   },
 
   /**
  * Sweep any pending bloki_to_loki swaps
  */
   async sweepPendingBlokiToLoki() {
-    console.info(`Sweeping ${SWAP_TYPE.BLOKI_TO_LOKI}`);
+    log.header(chalk.blue(`Sweeping ${SWAP_TYPE.BLOKI_TO_LOKI}`));
     const ourAddress = transactionHelper.ourBNBAddress;
 
     // Get all our incoming transactions which contain a memo
@@ -68,7 +70,7 @@ const module = {
     // Get all the new transactions
     const newTransactions = memoTransactions.filter(t => !hashes.includes(t.hash));
     if (newTransactions.length === 0) {
-      console.info(`No new ${SWAP_TYPE.BLOKI_TO_LOKI} transactions`);
+      log.info(chalk.yellow(`No new ${SWAP_TYPE.BLOKI_TO_LOKI} transactions`));
       return;
     }
 
@@ -76,7 +78,7 @@ const module = {
     const memos = newTransactions.map(t => t.memo.trim());
     const clientAccounts = await db.getClientAccountsWithMemos(memos);
     if (clientAccounts.length === 0) {
-      console.error('Failed to insert new transactions. Could not find any client accounts');
+      log.error(chalk.red('Failed to insert new transactions. Could not find any client accounts'));
       return;
     }
 
@@ -90,7 +92,7 @@ const module = {
     }
 
     const count = await postgres.tx(t => t.batch(promises));
-    console.info(`Inserted ${count.length} swaps for ${SWAP_TYPE.BLOKI_TO_LOKI}`);
+    log.info(chalk`{green Inserted {bold ${count.length}} swaps}`);
   },
 };
 

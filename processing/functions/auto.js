@@ -1,8 +1,10 @@
 /* eslint-disable no-restricted-syntax, no-await-in-loop, no-continue  */
 import config from 'config';
+import chalk from 'chalk';
 import Decimal from 'decimal.js';
 import { SWAP_TYPE } from 'bridge-core';
 import { localDB } from '../core';
+import log from '../utils/log';
 import swaps from './swaps';
 import balance from './balance';
 import sweep from './sweep';
@@ -38,16 +40,18 @@ const module = {
         const currentBalance = await balance.getBalances(swapType);
         balance.printBalance(swapType, currentBalance, false);
         if (currentBalance.transaction !== currentBalance.swap) {
-          console.error(`Balances do not match for ${swapType}. Aborting!\n`);
+          log.error(chalk.red('Balances do not match. Aborting!'));
           return Promise.resolve();
         }
+
+        log.header(chalk.blue(`Processing swaps for ${swapType}`));
 
         const dailyAmount = module.getDailyAmount(swapType);
         const { dailyLimit } = module;
 
         // Make sure we can keep processing
         if (dailyAmount >= dailyLimit) {
-          console.info('Daily limit hit!');
+          log.info(chalk.yellow('Daily limit hit!'));
           continue;
         }
 
@@ -63,21 +67,21 @@ const module = {
           module.saveDailyAmount(swapType, newDailyAmount);
 
           swaps.printInfo(info);
-          console.info(`Amount sent in swaps: $${info.totalUSD} USD`);
-          console.info(`Amount sent in a day: $${newDailyAmount} USD\n`);
+          log.info(chalk`{green Amount sent in swaps:} {white.bold $${info.totalUSD}} {yellow USD}`);
+          log.info(chalk`{green Amount sent in a day:} {white.bold $${newDailyAmount}} {yellow USD}`);
         } catch (e) {
           if (e instanceof swaps.Errors.NoSwapsToProcess) {
-            console.info(`No swaps to process for ${swapType}\n`);
+            log.info(chalk.yellow('No swaps to process'));
             continue;
           }
 
           if (e instanceof swaps.Errors.DailyLimitHit) {
-            console.info('Daily limit hit!');
+            log.info(chalk.yellow('Daily limit hit!'));
             continue;
           }
 
           if (e instanceof swaps.Errors.PriceFetchFailed) {
-            console.error('Failed to fetch price of LOKI\nWill try again next time.\n');
+            log.error(chalk.yellow('Failed to fetch price of LOKI. Will try again next time.'));
             continue;
           }
 
@@ -88,7 +92,7 @@ const module = {
       // Keep infinitely processing if we haven't hit the daily limit
       return keepProcessing ? module.runAutoProcessing(newOptions) : Promise.resolve();
     } catch (e) {
-      console.error(`Error: ${e.message}\n`);
+      log.error(chalk.red(`Error: ${e.message}`));
       return Promise.resolve();
     }
   },

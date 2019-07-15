@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import { SWAP_TYPE } from 'bridge-core';
 import { db } from '../../core';
 import { sweep, swaps, balance, auto } from '../../functions';
+import log, { stubConsole } from '../../utils/log';
 
 const sandbox = sinon.createSandbox();
 
@@ -30,6 +31,11 @@ const stub = (options = {}) => {
 };
 
 describe('Auto Processing', () => {
+  beforeEach(() => {
+    // Disable any logs
+    sandbox.stub(log, 'console').value(stubConsole);
+  });
+
   afterEach(() => {
     sandbox.restore();
   });

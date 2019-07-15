@@ -6,6 +6,7 @@ import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { bnb, loki, postgres, db } from '../../core';
 import functions from '../../functions/swaps';
 import { dbHelper } from '../helpers';
+import log, { stubConsole } from '../../utils/log';
 
 const processSwapFake = swaps => {
   const transactions = functions.getTransactions(swaps);
@@ -22,9 +23,15 @@ const processSwapFake = swaps => {
   };
 };
 
+
 const sandbox = sinon.createSandbox();
 
 describe('Processing Swaps', () => {
+  beforeEach(() => {
+    // Disable any logs
+    sandbox.stub(log, 'console').value(stubConsole);
+  });
+
   afterEach(() => {
     sandbox.restore();
   });

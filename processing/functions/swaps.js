@@ -1,9 +1,11 @@
 /* eslint-disable no-else-return, no-restricted-syntax, no-await-in-loop */
 import axios from 'axios';
 import config from 'config';
+import chalk from 'chalk';
 import Decimal from 'decimal.js';
 import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { db, bnb, loki } from '../core';
+import log from '../utils/log';
 
 // The fees in decimal format
 const configFees = { [TYPE.LOKI]: config.get('loki.withdrawalFee') };
@@ -28,12 +30,12 @@ const module = {
   async processAllSwaps() {
     try {
       for (const swapType of Object.values(SWAP_TYPE)) {
-        console.info(`Processing swaps for ${swapType}`);
+        log.header(chalk.blue(`Processing swaps for ${swapType}`));
         const info = await module.processAllSwapsOfType(swapType);
-        module.printInfo(info);
+        module.printInfo(info, swapType);
       }
     } catch (e) {
-      console.error(`Error: ${e.message}\n`);
+      log.error(chalk.red(`Error: ${e.message}`));
     }
   },
 
@@ -42,15 +44,15 @@ const module = {
   */
   printInfo(info, swapType) {
     if (!info) {
-      console.info(`No swaps found for ${swapType}\n`);
+      log.info(chalk.yellow(`No swaps found for ${swapType}`));
       return;
     }
 
     const { swaps, totalAmount } = info;
     const sentCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? TYPE.BNB : TYPE.LOKI;
 
-    console.info(`Completed ${swaps.length} swaps`);
-    console.info(`Amount sent: ${totalAmount / 1e9} ${symbols[sentCurrency]}\n`);
+    log.info(chalk`{green Completed {white.bold ${swaps.length}} swaps}`);
+    log.info(chalk`{green Amount sent:} {bold ${totalAmount / 1e9}} {yellow ${symbols[sentCurrency]}}`);
   },
 
   /**
@@ -134,7 +136,7 @@ const module = {
       const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=loki-network&vs_currencies=usd');
       return response.data['loki-network'].usd;
     } catch (e) {
-      console.debug(e);
+      log.debug(e);
       throw new PriceFetchFailed();
     }
   },

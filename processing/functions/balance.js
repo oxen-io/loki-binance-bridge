@@ -1,6 +1,8 @@
 /* eslint-disable no-else-return */
+import chalk from 'chalk';
 import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { db, transactionHelper } from '../core';
+import log from '../utils/log';
 
 const module = {
   async checkAllBalances() {
@@ -14,11 +16,12 @@ const module = {
   printBalance(swapType, balance, showWarning = true) {
     const receiveCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'LOKI' : 'BLOKI';
     const swapCurrency = swapType === SWAP_TYPE.LOKI_TO_BLOKI ? 'BLOKI' : 'LOKI';
-    console.log(`${receiveCurrency} to ${swapCurrency}:`);
-    console.log(` Transaction balance: ${balance.transaction / 1e9} ${receiveCurrency}`);
-    console.log(` Swap balance: ${balance.swap / 1e9} ${swapCurrency}`);
-    if (showWarning && balance.transaction !== balance.swap) console.log(' \nWARNING: AMOUNTS DO NOT MATCH! PLEASE TRY SWEEPING');
-    console.log('');
+    log.header(chalk.blue(`${receiveCurrency} to ${swapCurrency} balance:`));
+    log.info(chalk`{green Transaction balance:} {bold ${balance.transaction / 1e9}} {yellow ${receiveCurrency}}`);
+    log.info(chalk`{green Swap balance:} {bold ${balance.swap / 1e9}} {yellow ${swapCurrency}}`);
+    if (showWarning && balance.transaction !== balance.swap) {
+      log.error(chalk.red('WARNING: AMOUNTS DO NOT MATCH! PLEASE TRY SWEEPING'));
+    }
   },
 
   /**
@@ -111,8 +114,18 @@ const module = {
       return memo && memo.length > 0 && !clientMemos.includes(memo);
     });
 
-    unkownMemoTransactions.forEach(t => {
-      console.info(`hash: ${t.hash}\namount: ${t.amount / 1e9} BLOKI\nmemo: ${t.memo}\ntimestamp: ${t.timeStamp}\n\n`);
+    const values = unkownMemoTransactions.map(({ hash, amount, memo, timeStamp }) => ({
+      hash,
+      amount: amount / 1e9,
+      memo,
+      timestamp: timeStamp,
+    }));
+
+    values.forEach(({ hash, amount, memo, timestamp }) => {
+      log.header(chalk.blue(hash));
+      log.info(chalk`{green amount:} ${amount} BLOKI`);
+      log.info(chalk`{green memo:} ${memo}`);
+      log.info(chalk`{green timestamp:} ${timestamp}`);
     });
   },
 };
