@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax, no-await-in-loop, no-continue  */
 import { Command } from 'commander';
+import { SWAP_TYPE } from 'bridge-core';
 import { swaps, sweep, balance, auto } from './functions';
 
 const program = new Command();
@@ -16,6 +17,9 @@ program
 async function run(options) {
   if (options.swap) {
     await swaps.processAllSwaps();
+
+    // Set daily balance to 0
+    Object.values(SWAP_TYPE).forEach(t => auto.saveDailyAmount(t, 0));
   } else if (options.sweep) {
     await sweep.sweepAllPendingSwaps();
   } else if (options.check) {

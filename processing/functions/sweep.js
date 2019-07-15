@@ -50,7 +50,7 @@ const module = {
     }
 
     const count = await postgres.tx(t => t.batch(promises));
-    log.info(chalk`{green Inserted {bold ${count.length}} swaps}`);
+    log.info(chalk`{green Inserted {white.bold ${count.length}} swaps}`);
   },
 
   /**
@@ -92,7 +92,7 @@ const module = {
     }
 
     const count = await postgres.tx(t => t.batch(promises));
-    log.info(chalk`{green Inserted {bold ${count.length}} swaps}`);
+    log.info(chalk`{green Inserted {white.bold ${count.length}} swaps}`);
   },
 };
 

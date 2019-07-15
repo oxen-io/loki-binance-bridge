@@ -98,7 +98,7 @@ const module = {
   },
   getDailyAmount(swapType) {
     const key = `${swapType}.dailyAmount`;
-    return localDB.has(key) ? localDB.get(key).value() : 0;
+    return localDB.has(key).value() ? localDB.get(key).value() : 0;
   },
   saveDailyAmount(swapType, value) {
     const float = parseFloat(value);
