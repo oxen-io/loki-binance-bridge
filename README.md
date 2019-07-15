@@ -17,3 +17,7 @@
 #### Build instructions
 
 Each of the modules are designed so they can be run on different servers. As such all relevant building instructions are placed inside the folders.
+
+##### Credits
+
+The Loki binance bridge uses parts of the Fantom Foundation bridge which can be found here https://github.com/Fantom-foundation/bnbridge.exchange
