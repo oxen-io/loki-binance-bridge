@@ -1,12 +1,10 @@
 import { orange, green } from '@material-ui/core/colors';
-import { common } from '@theme';
 
 const styles = theme => ({
   root: {
     margin: theme.spacing(2, 0),
   },
   item: {
-    // ...common.section,
     padding: theme.spacing(1, 2)
   },
   pending: {

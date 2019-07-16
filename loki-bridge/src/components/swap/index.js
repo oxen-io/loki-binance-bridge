@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import clsx from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
 import { Grid, Typography, Box } from '@material-ui/core';
 import { Warning } from '@utils/error';
