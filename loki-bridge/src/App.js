@@ -64,6 +64,7 @@ export default class App extends PureComponent {
         <CssBaseline />
         {this.renderBackgroundImage()}
         <div id="content">
+          {this.renderTitleImage()}
           <Grid
             id="grid"
             container
@@ -71,7 +72,6 @@ export default class App extends PureComponent {
             alignItems="center"
           >
             <Grid item xs={12}>
-              {this.renderTitleImage()}
               <Swap showMessage={this.showMessage} />
               { this.renderSnackbar() }
             </Grid>
