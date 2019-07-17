@@ -71,7 +71,7 @@ const styles = theme => ({
     borderColor: colors.lokiGreen,
     borderStyle: 'solid',
     padding: theme.spacing(1),
-    borderRadius: '2px'
+    borderRadius: '4px'
   }
 });
 
