@@ -94,7 +94,7 @@ code {
 
 @media (min-width: 600px) {
   .title {
-    margin-top: 40px;
+    margin-top: 60px;
   }
 
   #grid {
@@ -104,7 +104,7 @@ code {
 
 @media (min-width: 1280px) {
   .title {
-    margin-top: 60px;
+    margin-top: 80px;
     margin-bottom: 0px;
   }
   #grid {

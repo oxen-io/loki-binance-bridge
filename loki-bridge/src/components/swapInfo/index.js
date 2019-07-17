@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import clsx from  'clsx';
 import QRCode from 'qrcode.react';
 import AnimateHeight from 'react-animate-height';
 import { Grid, Typography, IconButton, Link, Tooltip, Box } from '@material-ui/core';
@@ -100,7 +101,7 @@ class SwapInfo extends PureComponent {
           When creating the transaction, please paste the string above into the <b>Memo</b> field. <br/>
           Ensure that this is the only thing that you put in the field.
         </Typography>
-        <Typography className={classes.warningText}>
+        <Typography className={clsx(classes.warningText, classes.red)}>
           If done incorrectly then you will not receive <b>LOKI</b> into your designated address.
         </Typography>
       </Box>
@@ -122,7 +123,7 @@ class SwapInfo extends PureComponent {
             to
         </Typography>
         <Typography component={'div'} className={ classes.instructionBold }>
-          <Box id='depositAddress'>{depositAddress}</Box>
+          <Box id='depositAddress' className={classes.greenBorder}>{depositAddress}</Box>
           <Box>
             <Tooltip title="Copy Address" placement="left">
               <IconButton onClick={() => this.onCopy('depositAddress')} aria-label="Copy Address">
@@ -151,9 +152,6 @@ class SwapInfo extends PureComponent {
 
     return (
       <Box className={classes.instructionContainer}>
-        <Typography className={ classes.instructions }>
-            Here's what you need to do next:
-        </Typography>
         {this.renderDepositInstructions()}
         { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
           <Typography className={ classes.instructions }>
