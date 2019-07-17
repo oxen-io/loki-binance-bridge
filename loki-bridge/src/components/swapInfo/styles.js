@@ -3,7 +3,7 @@ import { colors, common } from '@theme';
 const styles = theme => ({
   root: {
     [theme.breakpoints.up('md')]: {
-      maxWidth: '600px',
+      maxWidth: '800px',
       position: 'sticky',
       top: 0,
     },

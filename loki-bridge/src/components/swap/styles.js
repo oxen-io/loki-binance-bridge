@@ -29,6 +29,10 @@ const styles = theme => ({
   },
   section: {
     ...common.section,
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '800px',
+      margin: 'auto',
+    }
   }
 });
 

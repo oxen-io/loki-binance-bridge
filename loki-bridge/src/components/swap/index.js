@@ -240,19 +240,19 @@ class Swap extends Component {
 
     return (
       <React.Fragment>
-            <Grid item xs={12} md={6} className={classes.item}>
-              <SwapInfo
-                swapType={swapType}
-                swapInfo={swapInfo}
-                info={info}
-                onRefresh={this.onRefresh}
-                onBack={this.resetState}
-                loading={loading}
-              />
-            </Grid>
-            {this.renderTransactions()}
-          </React.Fragment>
-    )
+        <Grid item xs={12} md={6} className={classes.item}>
+          <SwapInfo
+            swapType={swapType}
+            swapInfo={swapInfo}
+            info={info}
+            onRefresh={this.onRefresh}
+            onBack={this.resetState}
+            loading={loading}
+          />
+        </Grid>
+        {this.renderTransactions()}
+      </React.Fragment>
+    );
   }
 
   render() {
