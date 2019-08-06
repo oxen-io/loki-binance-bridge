@@ -1,5 +1,6 @@
 /* eslint-disable no-else-return */
 import chalk from 'chalk';
+import config from 'config';
 import { SWAP_TYPE, TYPE } from 'bridge-core';
 import { db, transactionHelper } from '../core';
 import log from '../utils/log';
@@ -70,10 +71,60 @@ const module = {
       const promises = clientAccounts.map(async c => transactionHelper.getIncomingLokiTransactions(c.account.addressIndex));
       const lokiTransactions = await Promise.all(promises).then(array => array.flat());
 
+      // generate a list of all processed swaps
+      const swaps = await db.getAllSwaps(SWAP_TYPE.LOKI_TO_BLOKI);
+      // exclude any tx where we've received loki
+      // we want to include all those (and skip the confirmation check)
+      const completedSwaps = swaps.filter(swap => {
+        //console.log('swap, is complete?', swap.amount, swap.created);
+        //console.log('deposit', swap.deposit_transaction_hash, 'transfer', swap.transfer_transaction_hash, 'procssed', swap.processed);
+        // I don't think these matter:
+        // swap.transfer_transaction_hash !== null || swap.processed !== null ||
+        const completed = swap.deposit_transaction_hash !== null;
+        console.log(swap.amount, swap.created, 'deposit', swap.deposit_transaction_hash, 'completed', completed)
+        return completed; // only keep the completed ones
+      });
+
       // Filter out all transactions that don't fit our date ranges
       filtered = lokiTransactions.filter(tx => {
       // Loki timestamps are in seconds
         const timestamp = tx.timestamp * 1000;
+        //console.log('this tx', tx);
+
+        // loki.minConfirmations can change, we need to record it in the database
+        // or have a flag if it's confirmed or not
+        // actually the processed flag override should meet this criteria
+        console.log('need', config.get('loki.minConfirmations'), 'confirmations, have', tx.confirmations);
+
+        // we won't have a swap record...
+        if (tx.confirmations < config.get('loki.minConfirmations')) {
+
+          // confirm that this isn't a processed transaction
+          //console.log('tx info', tx.amount);
+          const results = completedSwaps.filter(swap => {
+            // found our tx/swap match
+            if (tx.txid == swap.deposit_transaction_hash) {
+              return true;
+            }
+            return false;
+          })
+          //console.log('results', results.length)
+
+          // if we a swap for this tx and only one match
+          if (results.length === 1) {
+            // this is a complete transaction, we need this added to the balance
+            return !(timestamp > to || timestamp < from);
+          }
+          // more than one match, we need to consider it like none where found...
+          if (results.length > 1) {
+            // should never have multiple tx matches
+            console.log('error too many results, treating like 0', results);
+          }
+
+          // we don't have enough confirmations and can't confirm the swap is complete
+          console.log('need to skip', tx.txid, tx.amount, new Date(tx.timestamp * 1000))
+          return false;
+        }
         return !(timestamp > to || timestamp < from);
       });
 
