@@ -464,7 +464,7 @@ describe('Database', () => {
 
       it('should insert the swap correctly', async () => {
         const clientUuid = '17b42f9e-97b1-11e9-bc42-526af7764f64';
-        const swap = await db.insertSwap({ hash: '123', amount: 10 }, { uuid: clientUuid, addressType: TYPE.LOKI });
+        const swap = await db.insertSwap({ hash: '123', amount: 10, timestamp: 3000 }, { uuid: clientUuid, addressType: TYPE.LOKI });
         assert.isNotNull(swap);
 
         const dbSwap = await postgres.oneOrNone('select * from swaps where uuid = $1', [swap.uuid]);
@@ -475,6 +475,7 @@ describe('Database', () => {
         assert.equal(dbSwap.amount, 10);
         assert.strictEqual(dbSwap.deposit_transaction_hash, '123');
         assert.strictEqual(dbSwap.client_account_uuid, clientUuid);
+        assert.equal(Date.parse(dbSwap.deposit_transaction_created), 3000);
       });
     });
 

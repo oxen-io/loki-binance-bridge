@@ -33,7 +33,7 @@ export default class TransactionHelper {
         const transactions = await this.getIncomingBNBTransactions(this.ourBNBAddress);
         return transactions
           .filter(tx => tx.memo.trim() === memo.trim())
-          .map(({ hash, amount }) => ({ hash, amount }));
+          .map(({ hash, amount, timestamp }) => ({ hash, amount, timestamp }));
       }
       case TYPE.LOKI: {
         const { addressIndex } = account;
@@ -42,7 +42,7 @@ export default class TransactionHelper {
         const transactions = await this.getIncomingLokiTransactions(addressIndex);
         return transactions
           .filter(tx => tx.confirmations >= this.minLokiConfirmations)
-          .map(({ hash, amount }) => ({ hash, amount }));
+          .map(({ hash, amount, timestamp }) => ({ hash, amount, timestamp }));
       }
       default:
         return [];
@@ -60,6 +60,8 @@ export default class TransactionHelper {
       ...tx,
       hash: tx.txHash,
       amount: tx.value,
+      // BNB timestamps are in string format
+      timestamp: Date.parse(tx.timeStamp),
     }));
   }
 
@@ -74,6 +76,8 @@ export default class TransactionHelper {
       ...tx,
       hash: tx.txid,
       amount: tx.amount,
+      // Loki timestamps are in seconds
+      timestamp: tx.timestamp * 1000,
     }));
   }
 }

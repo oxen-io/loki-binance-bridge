@@ -49,7 +49,10 @@ const module = {
  */
   async getSwapBalance(swapType, from, to) {
     const swaps = await db.getAllSwaps(swapType);
-    const filtered = swaps.filter(s => !(s.created > to || s.created < from));
+    const filtered = swaps.filter(s => {
+      console.log(s);
+      return !(s.deposit_transaction_created > to || s.deposit_transaction_created < from);
+    });
     // Sum up the amounts
     return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
   },
@@ -71,11 +74,7 @@ const module = {
       const lokiTransactions = await Promise.all(promises).then(array => array.flat());
 
       // Filter out all transactions that don't fit our date ranges
-      filtered = lokiTransactions.filter(tx => {
-      // Loki timestamps are in seconds
-        const timestamp = tx.timestamp * 1000;
-        return !(timestamp > to || timestamp < from);
-      });
+      filtered = lokiTransactions.filter(({ timestamp }) => !(timestamp > to || timestamp < from));
 
       // Sum up the amounts
       return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
@@ -93,10 +92,7 @@ const module = {
       });
 
       // Filter out all transactions that don't fit our date ranges
-      filtered = memoTransactions.filter(tx => {
-        const timestamp = Date.parse(tx.timeStamp);
-        return !(timestamp > to || timestamp < from);
-      });
+      filtered = memoTransactions.filter(({ timestamp }) => !(timestamp > to || timestamp < from));
     }
 
     // Sum up the amounts
@@ -114,11 +110,11 @@ const module = {
       return memo && memo.length > 0 && !clientMemos.includes(memo);
     });
 
-    const values = unkownMemoTransactions.map(({ hash, amount, memo, timeStamp }) => ({
+    const values = unkownMemoTransactions.map(({ hash, amount, memo, timestamp }) => ({
       hash,
       amount: amount / 1e9,
       memo,
-      timestamp: timeStamp,
+      timestamp,
     }));
 
     values.forEach(({ hash, amount, memo, timestamp }) => {

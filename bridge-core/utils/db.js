@@ -271,8 +271,9 @@ export default class Database {
     const type = addressType === TYPE.LOKI ? SWAP_TYPE.BLOKI_TO_LOKI : SWAP_TYPE.LOKI_TO_BLOKI;
 
     // eslint-disable-next-line max-len
-    const query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, now()) returning uuid, type, amount, deposit_transaction_hash;';
-    return this.postgres.oneOrNone(query, [type, transaction.amount, clientAccountUuid, transaction.hash]);
+    const query = 'insert into swaps(uuid, type, amount, client_account_uuid, deposit_transaction_hash, deposit_transaction_created, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, to_timestamp($5), now()) returning uuid, type, amount, deposit_transaction_hash;';
+    // Postgres stores timestamps in seconds where javascript uses milliseconds
+    return this.postgres.oneOrNone(query, [type, transaction.amount, clientAccountUuid, transaction.hash, transaction.timestamp / 1000]);
   }
 
   /**
