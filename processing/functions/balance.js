@@ -79,9 +79,6 @@ const module = {
 
       // Filter out all transactions that don't fit our date ranges
       filtered = lokiTransactions.filter(({ timestamp }) => !(timestamp * 1000 > to || timestamp * 1000 < from));
-
-      // Sum up the amounts
-      return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
     } else if (accountType === TYPE.BNB) {
     // Get all our incoming transactions which contain a memo
       const ourAddress = transactionHelper.ourBNBAddress;
