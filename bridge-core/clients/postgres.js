@@ -9,3 +9,6 @@ const pgp = pgPromise();
 export default function PostgresClient(config) {
   return pgp(config);
 }
+
+// Hack to make the returned timestamps always UTC
+pgp.pg.types.setTypeParser(1114, s => new Date(`${s}+0000`));

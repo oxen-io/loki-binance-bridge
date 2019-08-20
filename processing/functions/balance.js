@@ -50,8 +50,12 @@ const module = {
   async getSwapBalance(swapType, from, to) {
     const swaps = await db.getAllSwaps(swapType);
     const filtered = swaps.filter(s => {
-      console.log(s);
-      return !(s.deposit_transaction_created > to || s.deposit_transaction_created < from);
+      let created = Date.parse(s.deposit_transaction_created);
+
+      // Just incase deposit_transaction_created is not set
+      if (Number.isNaN(created)) created = Date.parse(s.created);
+
+      return !(created > to || created < from);
     });
     // Sum up the amounts
     return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);

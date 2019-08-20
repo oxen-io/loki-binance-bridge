@@ -60,8 +60,8 @@ export default class TransactionHelper {
       ...tx,
       hash: tx.txHash,
       amount: tx.value,
-      // BNB timestamps are in string format
-      timestamp: Date.parse(tx.timeStamp),
+      // BNB timestamps are in string format, we need to convert to seconds
+      timestamp: Math.floor(Date.parse(tx.timeStamp) / 1000),
     }));
   }
 
@@ -76,8 +76,6 @@ export default class TransactionHelper {
       ...tx,
       hash: tx.txid,
       amount: tx.amount,
-      // Loki timestamps are in seconds
-      timestamp: tx.timestamp * 1000,
     }));
   }
 }
