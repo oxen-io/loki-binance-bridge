@@ -78,7 +78,7 @@ const module = {
       const lokiTransactions = await Promise.all(promises).then(array => array.flat());
 
       // Filter out all transactions that don't fit our date ranges
-      filtered = lokiTransactions.filter(({ timestamp }) => !(timestamp > to || timestamp < from));
+      filtered = lokiTransactions.filter(({ timestamp }) => !(timestamp * 1000 > to || timestamp * 1000 < from));
 
       // Sum up the amounts
       return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
@@ -96,7 +96,7 @@ const module = {
       });
 
       // Filter out all transactions that don't fit our date ranges
-      filtered = memoTransactions.filter(({ timestamp }) => !(timestamp > to || timestamp < from));
+      filtered = memoTransactions.filter(({ timestamp }) => !(timestamp * 1000 > to || timestamp * 1000 < from));
     }
 
     // Sum up the amounts
