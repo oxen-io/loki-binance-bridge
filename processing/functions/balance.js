@@ -50,7 +50,14 @@ const module = {
  */
   async getSwapBalance(swapType, from, to) {
     const swaps = await db.getAllSwaps(swapType);
-    const filtered = swaps.filter(s => !(s.created > to || s.created < from));
+    const filtered = swaps.filter(s => {
+      let created = Date.parse(s.deposit_transaction_created);
+
+      // Just incase deposit_transaction_created is not set
+      if (Number.isNaN(created)) created = Date.parse(s.created);
+
+      return !(created > to || created < from);
+    });
     // Sum up the amounts
     return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
   },
@@ -86,10 +93,11 @@ const module = {
       });
 
       // Filter out all transactions that don't fit our date ranges
+
       filtered = lokiTransactions.filter(tx => {
-      // Loki timestamps are in seconds
+        // timestamps are in seconds so we need to convert to milliseconds
         const timestamp = tx.timestamp * 1000;
-        //console.log('this tx', tx);
+        // console.log('this tx', tx);
 
         // loki.minConfirmations can change, we need to record it in the database
         // or have a flag if it's confirmed or not
@@ -98,23 +106,23 @@ const module = {
 
         // we won't have a swap record...
         if (tx.confirmations < config.get('loki.minConfirmations')) {
-
           // confirm that this isn't a processed transaction
-          //console.log('tx info', tx.amount);
+          // console.log('tx info', tx.amount);
           const results = completedSwaps.filter(swap => {
             // found our tx/swap match
-            if (tx.txid == swap.deposit_transaction_hash) {
+            if (tx.txid === swap.deposit_transaction_hash) {
               return true;
             }
             return false;
-          })
-          //console.log('results', results.length)
+          });
+          // console.log('results', results.length)
 
           // if we a swap for this tx and only one match
           if (results.length === 1) {
             // this is a complete transaction, we need this added to the balance
             return !(timestamp > to || timestamp < from);
           }
+
           // more than one match, we need to consider it like none where found...
           if (results.length > 1) {
             // should never have multiple tx matches
@@ -122,14 +130,12 @@ const module = {
           }
 
           // we don't have enough confirmations and can't confirm the swap is complete
-          console.log('need to skip', tx.txid, tx.amount, new Date(tx.timestamp * 1000))
+          console.log('need to skip', tx.txid, tx.amount, new Date(tx.timestamp * 1000));
           return false;
         }
+
         return !(timestamp > to || timestamp < from);
       });
-
-      // Sum up the amounts
-      return filtered.reduce((total, current) => total + parseInt(current.amount, 10), 0);
     } else if (accountType === TYPE.BNB) {
     // Get all our incoming transactions which contain a memo
       const ourAddress = transactionHelper.ourBNBAddress;
@@ -144,10 +150,7 @@ const module = {
       });
 
       // Filter out all transactions that don't fit our date ranges
-      filtered = memoTransactions.filter(tx => {
-        const timestamp = Date.parse(tx.timeStamp);
-        return !(timestamp > to || timestamp < from);
-      });
+      filtered = memoTransactions.filter(({ timestamp }) => !(timestamp * 1000 > to || timestamp * 1000 < from));
     }
 
     // Sum up the amounts
@@ -165,11 +168,11 @@ const module = {
       return memo && memo.length > 0 && !clientMemos.includes(memo);
     });
 
-    const values = unkownMemoTransactions.map(({ hash, amount, memo, timeStamp }) => ({
+    const values = unkownMemoTransactions.map(({ hash, amount, memo, timestamp }) => ({
       hash,
       amount: amount / 1e9,
       memo,
-      timestamp: timeStamp,
+      timestamp,
     }));
 
     values.forEach(({ hash, amount, memo, timestamp }) => {

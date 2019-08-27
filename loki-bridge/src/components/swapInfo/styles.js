@@ -1,3 +1,4 @@
+import { red } from '@material-ui/core/colors';
 import { colors, common } from '@theme';
 
 const styles = theme => ({
@@ -61,6 +62,16 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     marginBottom: theme.spacing(2),
+  },
+  red: {
+    color: red[500]
+  },
+  greenBorder: {
+    borderWidth: 1,
+    borderColor: colors.lokiGreen,
+    borderStyle: 'solid',
+    padding: theme.spacing(1),
+    borderRadius: '4px'
   }
 });
 

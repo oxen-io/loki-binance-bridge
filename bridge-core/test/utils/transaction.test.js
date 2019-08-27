@@ -28,11 +28,12 @@ describe('Transaction', () => {
     context('BNB', () => {
       it('should correctly return the incoming transactions', async () => {
         const memo = 'meme-mos';
+        const timeStamp = '2019-07-12T04:04:49.529749Z';
         const mockAPIResult = [{
           txHash: 'hash',
           value: '100',
           memo,
-          timestamp: 100,
+          timeStamp,
         }];
 
         const stub = sandbox.stub(bnb, 'getIncomingTransactions').resolves(mockAPIResult);
@@ -44,15 +45,17 @@ describe('Transaction', () => {
         assert.deepEqual(transactions[0], {
           hash: 'hash',
           amount: '100',
+          timestamp: Math.floor(Date.parse(timeStamp) / 1000),
         });
       });
 
       it('should should only return the tx with the same account memo', async () => {
+        const timeStamp = '2019-07-12T04:04:49.529749Z';
         const mockAPIResult = ['memo1', 'memo2', 'memo3'].map((memo, i) => ({
           txHash: String(i),
           value: String(i),
           memo,
-          timestamp: 100,
+          timeStamp,
         }));
 
         sandbox.stub(bnb, 'getIncomingTransactions').resolves(mockAPIResult);
@@ -62,6 +65,7 @@ describe('Transaction', () => {
         assert.deepEqual(transactions[0], {
           hash: '0',
           amount: '0',
+          timestamp: Math.floor(Date.parse(timeStamp) / 1000),
         });
       });
     });
@@ -83,6 +87,7 @@ describe('Transaction', () => {
         assert.deepEqual(transactions[0], {
           hash: 'hash',
           amount: '100',
+          timestamp: 100,
         });
       });
 
