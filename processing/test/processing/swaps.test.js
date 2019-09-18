@@ -35,7 +35,7 @@ describe('Processing Swaps', () => {
     sandbox.restore();
   });
 
-  describe('#filterInvalidSwaps', () => {
+  describe('#getValidSwaps', () => {
     context('LOKI TO BLOKI', () => {
       it('should return the same array', () => {
         const swaps = [
@@ -44,7 +44,7 @@ describe('Processing Swaps', () => {
           { amount: 300, address: '1' },
         ];
 
-        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.LOKI_TO_BLOKI);
+        const filtered = functions.getValidSwaps(swaps, SWAP_TYPE.LOKI_TO_BLOKI);
         assert.deepEqual(filtered, swaps);
       });
     });
@@ -65,7 +65,7 @@ describe('Processing Swaps', () => {
           { amount: 300 + fee, address: '2' },
         ];
 
-        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        const filtered = functions.getValidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.deepEqual(filtered, swaps);
       });
 
@@ -78,7 +78,7 @@ describe('Processing Swaps', () => {
           { amount: 0, address: '4' },
         ];
 
-        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        const filtered = functions.getValidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.deepEqual(filtered, [valid]);
       });
 
@@ -88,7 +88,7 @@ describe('Processing Swaps', () => {
           { amount: fee, address: '1' },
         ];
 
-        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        const filtered = functions.getValidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
         assert.deepEqual(filtered, swaps);
       });
     });

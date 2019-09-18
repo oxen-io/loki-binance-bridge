@@ -148,7 +148,7 @@ const module = {
    * @returns {{ swaps, totalAmount, totalFee }} The completed swap info.
    */
   async processSwaps(swaps, swapType) {
-    const validSwaps = module.filterInvalidSwaps(swaps, swapType);
+    const validSwaps = module.getValidSwaps(swaps, swapType);
     const ids = validSwaps.map(s => s.uuid);
     const transactions = module.getTransactions(validSwaps);
 
@@ -174,16 +174,16 @@ const module = {
   },
 
   /**
-   * Filter out any swaps which are deemed as invalid.
+   * Get all the swaps which are not invalid.
    *
    * For BLOKI_TO_LOKI, a swap is invalid if:
    *  The total amount from an address is less than the fee
    *
    * @param {[{ uuid, amount, address }]} swaps The swaps
    * @param {string} swapType The swap type
-   * @returns the filtered out swaps
+   * @returns The valid swaps.
    */
-  filterInvalidSwaps(swaps, swapType) {
+  getValidSwaps(swaps, swapType) {
     if (swapType !== SWAP_TYPE.BLOKI_TO_LOKI) return swaps;
 
     // If it's BLOKI_TO_LOKI we need to sum up the swaps values and check that they're greater than the loki fee
