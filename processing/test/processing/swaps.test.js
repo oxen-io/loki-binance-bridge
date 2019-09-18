@@ -35,6 +35,65 @@ describe('Processing Swaps', () => {
     sandbox.restore();
   });
 
+  describe('#filterInvalidSwaps', () => {
+    context('LOKI TO BLOKI', () => {
+      it('should return the same array', () => {
+        const swaps = [
+          { amount: 100, address: '1' },
+          { amount: 200, address: '2' },
+          { amount: 300, address: '1' },
+        ];
+
+        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.LOKI_TO_BLOKI);
+        assert.deepEqual(filtered, swaps);
+      });
+    });
+
+    context('BLOKI TO LOKI', () => {
+      const fee = 100;
+      beforeEach(() => {
+        sandbox.stub(functions, 'fees').value({
+          [TYPE.LOKI]: fee,
+          [TYPE.BNB]: 0,
+        });
+      });
+
+      it('should return the same array if all amounts are greater than the fee', () => {
+        const swaps = [
+          { amount: 100 + fee, address: '1' },
+          { amount: 200 + fee, address: '2' },
+          { amount: 300 + fee, address: '2' },
+        ];
+
+        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        assert.deepEqual(filtered, swaps);
+      });
+
+      it('should filter out any swaps where the amount is less than or equal to the fee', () => {
+        const valid = { amount: 100 + fee, address: '2' };
+        const swaps = [
+          valid,
+          { amount: 0.1, address: '1' },
+          { amount: fee, address: '3' },
+          { amount: 0, address: '4' },
+        ];
+
+        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        assert.deepEqual(filtered, [valid]);
+      });
+
+      it('should not filter out swaps if the TOTAL amount is more than the fees', () => {
+        const swaps = [
+          { amount: 0.1, address: '1' },
+          { amount: fee, address: '1' },
+        ];
+
+        const filtered = functions.filterInvalidSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        assert.deepEqual(filtered, swaps);
+      });
+    });
+  });
+
   describe('#getTransactions', () => {
     it('should return an empty array if swaps is not an array', () => {
       const invalid = [0, null, {}, undefined, 'abc'];
@@ -182,6 +241,32 @@ describe('Processing Swaps', () => {
         swaps,
         totalAmount: total - expectedFees,
         totalFee: expectedFees,
+      });
+    });
+
+    context('BLOKI TO LOKI', () => {
+      it('should not return swaps which are invalid', async () => {
+        const fee = 20;
+        sandbox.stub(functions, 'fees').value({
+          [TYPE.LOKI]: fee,
+          [TYPE.BNB]: 0,
+        });
+
+        const values = {
+          a: [100, 200],
+          b: [150],
+          c: [0.1, 0.3],
+        };
+
+        const swaps = Object.keys(values).flatMap((address, i) => {
+          const amounts = values[address];
+          return amounts.map(amount => ({ uuid: i, amount, address }));
+        });
+
+        // Make sure we get the LOKI fees
+        const data = await functions.processSwaps(swaps, SWAP_TYPE.BLOKI_TO_LOKI);
+        assert.isNotNull(data);
+        assert.deepEqual(data.swaps, swaps.filter(v => v.address !== 'c'));
       });
     });
   });

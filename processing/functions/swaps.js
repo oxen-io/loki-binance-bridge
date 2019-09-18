@@ -148,8 +148,9 @@ const module = {
    * @returns {{ swaps, totalAmount, totalFee }} The completed swap info.
    */
   async processSwaps(swaps, swapType) {
-    const ids = swaps.map(s => s.uuid);
-    const transactions = module.getTransactions(swaps);
+    const validSwaps = module.filterInvalidSwaps(swaps, swapType);
+    const ids = validSwaps.map(s => s.uuid);
+    const transactions = module.getTransactions(validSwaps);
 
     if (!transactions || transactions.length === 0) throw new NoSwapsToProcess();
 
@@ -166,10 +167,37 @@ const module = {
     const totalAmount = transactionAmount - totalFee;
 
     return {
-      swaps,
+      swaps: validSwaps,
       totalAmount,
       totalFee,
     };
+  },
+
+  /**
+   * Filter out any swaps which are deemed as invalid.
+   *
+   * For BLOKI_TO_LOKI, a swap is invalid if:
+   *  The total amount from an address is less than the fee
+   *
+   * @param {[{ uuid, amount, address }]} swaps The swaps
+   * @param {string} swapType The swap type
+   * @returns the filtered out swaps
+   */
+  filterInvalidSwaps(swaps, swapType) {
+    if (swapType !== SWAP_TYPE.BLOKI_TO_LOKI) return swaps;
+
+    // If it's BLOKI_TO_LOKI we need to sum up the swaps values and check that they're greater than the loki fee
+    const transactions = module.getTransactions(swaps);
+
+    // A transaction is invalid if the amount - fee is negative
+    const invalidTransactions = transactions.filter(({ amount }) => {
+      const fee = module.fees[TYPE.LOKI] || 0;
+      return (amount - fee) <= 0;
+    });
+
+    // Get the swaps which don't have the invalid transaction addresses
+    const invalidAddresses = invalidTransactions.map(t => t.address);
+    return swaps.filter(s => !invalidAddresses.includes(s.address));
   },
 
   /**
@@ -217,23 +245,14 @@ const module = {
       // Send BNB to the users
       return bnb.multiSend(config.get('binance.mnemonic'), outputs, 'Loki Bridge');
     } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
-      /*
-        Deduct the loki withdrawal fees.
-
-        We need to filter out any transaction with 0 amounts.
-        This can be caused when a user has requested a swap of LOKI where the total amount is less than the fee.
-        Due to this the code below will classify the amount as 0, this inturn causes the wallet to give `Destination amount is zero`.
-
-        To get around this we filter out any 0 amounts,
-        but we still keep the swap in the db in case the user submits more swaps where the total value exceeds the fee.
-      */
+      // Deduct the loki withdrawal fees.
       const outputs = transactions.map(({ address, amount }) => {
         const fee = module.fees[TYPE.LOKI] || 0;
         return {
           address,
           amount: Math.max(0, amount - fee),
         };
-      }).filter(t => t.amount > 0);
+      });
 
       // Send Loki to the users
       return loki.multiSend(outputs);
