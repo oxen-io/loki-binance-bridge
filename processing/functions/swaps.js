@@ -217,14 +217,23 @@ const module = {
       // Send BNB to the users
       return bnb.multiSend(config.get('binance.mnemonic'), outputs, 'Loki Bridge');
     } else if (swapType === SWAP_TYPE.BLOKI_TO_LOKI) {
-    // Deduct the loki withdrawal fees
+      /*
+        Deduct the loki withdrawal fees.
+
+        We need to filter out any transaction with 0 amounts.
+        This can be caused when a user has requested a swap of LOKI where the total amount is less than the fee.
+        Due to this the code below will classify the amount as 0, this inturn causes the wallet to give `Destination amount is zero`.
+
+        To get around this we filter out any 0 amounts,
+        but we still keep the swap in the db in case the user submits more swaps where the total value exceeds the fee.
+      */
       const outputs = transactions.map(({ address, amount }) => {
         const fee = module.fees[TYPE.LOKI] || 0;
         return {
           address,
           amount: Math.max(0, amount - fee),
         };
-      });
+      }).filter(t => t.amount > 0);
 
       // Send Loki to the users
       return loki.multiSend(outputs);
