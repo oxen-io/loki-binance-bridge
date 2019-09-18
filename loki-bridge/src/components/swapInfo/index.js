@@ -166,7 +166,7 @@ class SwapInfo extends PureComponent {
           </Typography>
         )}
         <Typography className={ classes.instructions }>
-            If you run into any trouble, or your swap request has not gone through, please contact us.
+            If you run into any trouble, or your swap request has not gone through, please contact @jpthor on telegram.
         </Typography>
       </Box>
     );
@@ -211,6 +211,7 @@ class SwapInfo extends PureComponent {
             onClick={onRefresh}
           />
         </Grid>
+        <Link href="/tos/BLOKIBridgeTOS.html" target="_blank">Terms of Service</Link>
       </div>
     );
   }
