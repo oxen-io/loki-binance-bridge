@@ -82,7 +82,7 @@ class SwapSelection extends Component {
           />
           <Typography className={ classes.createAccount }>
             <Link href={url} target="_blank" rel="noreferrer">
-              Don't have an account? Create one
+              Don't have a wallet? create one
             </Link>
           </Typography>
         </Grid>
@@ -94,6 +94,7 @@ class SwapSelection extends Component {
             onClick={this.onNext}
           />
         </Grid>
+        <Link href="/tos/BLOKIBridgeTOS.html" target="_blank">Terms of Service</Link>
       </Grid>
     );
   }
