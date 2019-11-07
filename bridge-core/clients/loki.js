@@ -136,8 +136,8 @@ export default class LokiClient {
     }
 
     const incoming = (data.result.in || []);
-    // Set all the confirmations of the pool transactions to 0
-    const pool = (data.result.pool || []).map(t => ({ ...t, confirmations: 0 }));
+    // Set all transactions in the pool to not being checkpointed
+    const pool = (data.result.pool || []).map(t => ({ ...t, checkpointed: 0 }));
 
     return [incoming, pool].flat();
   }

@@ -15,7 +15,6 @@
       "username": "",
       "password": ""
     },
-    "minConfirmations": 12,
     "withdrawalFee": 5
   }
 }

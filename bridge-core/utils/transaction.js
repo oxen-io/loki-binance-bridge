@@ -7,7 +7,7 @@ import { TYPE } from './constants';
 export default class TransactionHelper {
   /**
    * Create a helper instance.
-   * @param {{ binance: { client, ourAddress }, loki: { client, minConfirmations }}} config The helper config.
+   * @param {{ binance: { client, ourAddress }, loki: { client }}} config The helper config.
    */
   constructor(config) {
     const { binance, loki } = config;
@@ -16,7 +16,6 @@ export default class TransactionHelper {
     this.ourBNBAddress = binance.ourAddress;
 
     this.loki = loki.client;
-    this.minLokiConfirmations = loki.minConfirmations;
   }
 
   /**
@@ -38,10 +37,10 @@ export default class TransactionHelper {
       case TYPE.LOKI: {
         const { addressIndex } = account;
 
-        // We only want transactions with a certain number of confirmations
+        // We only want transactions that have been confirmed
         const transactions = await this.getIncomingLokiTransactions(addressIndex);
         return transactions
-          .filter(tx => tx.confirmations >= this.minLokiConfirmations)
+          .filter(tx => tx.confirmed)
           .map(({ hash, amount, timestamp }) => ({ hash, amount, timestamp }));
       }
       default:
@@ -69,11 +68,13 @@ export default class TransactionHelper {
    * Get incoming transactions from the given LOKI address.
    * @param {number} addressIndex The LOKI address index.
    * @param {{ pool: boolean }} options Any additional options
+   * @returns {Promise<{ hash, amount, confirmed }>} An array of incoming transactions
    */
   async getIncomingLokiTransactions(addressIndex, options = {}) {
     const transactions = await this.loki.getIncomingTransactions(addressIndex, options);
     return transactions.map(tx => ({
       ...tx,
+      confirmed: !!tx.checkpointed,
       hash: tx.txid,
       amount: tx.amount,
     }));

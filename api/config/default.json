@@ -27,7 +27,6 @@
       "password": "",
       "accountIndex": 0
     },
-    "minConfirmations": 12,
     "withdrawalFee": 5
   }
 }

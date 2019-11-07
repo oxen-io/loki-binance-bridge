@@ -4,17 +4,12 @@ import { TYPE } from '../../utils/constants';
 import { TransactionHelper } from '../../utils';
 import { db, bnb, loki } from '../helpers';
 
-const minConfirmations = 6;
-
 const transaction = new TransactionHelper({
   binance: {
     client: bnb,
     ourAddress: 'ourAddress',
   },
-  loki: {
-    client: loki,
-    minConfirmations,
-  },
+  loki: { client: loki },
 });
 
 const sandbox = sinon.createSandbox();
@@ -75,7 +70,7 @@ describe('Transaction', () => {
         const mockAPIResult = [{
           txid: 'hash',
           amount: '100',
-          confirmations: transaction.minLokiConfirmations,
+          checkpointed: 1,
           timestamp: 100,
         }];
 
@@ -91,20 +86,21 @@ describe('Transaction', () => {
         });
       });
 
-      it('should only return incoming transactions with more than 5 confirmations', async () => {
-        const mockAPIResult = [minConfirmations - 1, minConfirmations, minConfirmations + 1].map(confirmations => ({
-          txid: confirmations,
-          amount: 100,
-          confirmations,
-        }));
+      it('should only return incoming transactions which have been confirmed', async () => {
+        const mockAPIResult = [
+          { txid: 1, amount: 100, checkpointed: 0 },
+          { txid: 2, amount: 100, checkpointed: 1 },
+          { txid: 3, amount: 100, checkpointed: 0 },
+          { txid: 4, amount: 100, checkpointed: 1 },
+        ];
 
         sandbox.stub(db, 'getLokiAccount').resolves({ address_index: 0 });
         const stub = sandbox.stub(loki, 'getIncomingTransactions').resolves(mockAPIResult);
 
         const transactions = await transaction.getIncomingTransactions({ addressIndex: 0 }, TYPE.LOKI);
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');
-        assert.lengthOf(transactions, 2);
-        assert.includeMembers(transactions.map(t => t.hash), [minConfirmations, minConfirmations + 1]);
+        assert.lengthOf(transactions, 1);
+        assert.includeMembers(transactions.map(t => t.hash), [2, 4]);
       });
     });
   });

@@ -5,10 +5,7 @@ export function getInfo(req, res, next) {
   const lokiFee = config.get('loki.withdrawalFee');
   const lokiAmount = (parseFloat(lokiFee) * 1e9).toFixed(0);
 
-  const info = {
-    fees: { loki: lokiAmount },
-    minLokiConfirmations: config.get('loki.minConfirmations'),
-  };
+  const info = { fees: { loki: lokiAmount } };
 
   res.status(205);
   res.body = {

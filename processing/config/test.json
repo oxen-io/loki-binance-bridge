@@ -6,7 +6,6 @@
     "symbol": "TEST"
   },
   "loki": {
-    "minConfirmations": 6,
     "withdrawalFee": 1
   }
 }
