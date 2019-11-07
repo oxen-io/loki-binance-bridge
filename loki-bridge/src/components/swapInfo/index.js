@@ -153,7 +153,7 @@ class SwapInfo extends PureComponent {
         {this.renderDepositInstructions()}
         { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
           <Typography className={ classes.instructions }>
-            <b>Note:</b> You will have to wait for the transaction to be checkpointed before you're added to our processing queue.
+            <b>Note:</b> You will have to wait for the transaction to be checkpointed before you're added to our processing queue, this usually takes 8 blocks.
           </Typography>
         )}
         { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (
