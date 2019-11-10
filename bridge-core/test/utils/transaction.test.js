@@ -99,7 +99,7 @@ describe('Transaction', () => {
 
         const transactions = await transaction.getIncomingTransactions({ addressIndex: 0 }, TYPE.LOKI);
         assert(stub.calledOnce, 'loki.getIncomingTransactions was not called');
-        assert.lengthOf(transactions, 1);
+        assert.lengthOf(transactions, 2);
         assert.includeMembers(transactions.map(t => t.hash), [2, 4]);
       });
     });
