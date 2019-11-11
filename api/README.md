@@ -114,7 +114,6 @@ Any values that you don't set in those files will be fetched from `config/defaul
 
 | Property | Description |
 | --- | --- |
-| minConfirmations | The minimum number of confirmations required before we add the incoming transaction to our swaps |
 | withdrawalFee | The amount of loki to deduct upon withdrawing |
 | walletRPC.host | The ip or address where the RPC can be accessed |
 | walletRPC.port | The RPC port |

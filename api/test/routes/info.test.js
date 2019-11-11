@@ -15,14 +15,5 @@ describe('Info API', () => {
       assert.isNotNull(result);
       assert.equal(result.fees.loki, lokiFee * 1e9);
     });
-
-    it('should return the correct minimum confirmations', async () => {
-      const minConfirmations = config.get('loki.minConfirmations');
-      const { status, success, result } = await getInfo();
-      assert.equal(status, 200);
-      assert.isTrue(success);
-      assert.isNotNull(result);
-      assert.equal(result.minLokiConfirmations, minConfirmations);
-    });
   });
 });

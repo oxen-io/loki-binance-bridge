@@ -147,15 +147,13 @@ class SwapInfo extends PureComponent {
     const { swapType, classes, info } = this.props;
 
     const lokiFee = (info && info.fees && info.fees.loki / 1e9) || 0;
-    let lokiConfirmations = (info && info.minLokiConfirmations);
-    if (typeof lokiConfirmations != 'number') { lokiConfirmations = '-'; }
 
     return (
       <Box className={classes.instructionContainer}>
         {this.renderDepositInstructions()}
         { swapType === SWAP_TYPE.LOKI_TO_BLOKI && (
           <Typography className={ classes.instructions }>
-            <b>Note:</b> You will have to wait for there to be atleast {lokiConfirmations} confirmations before your added to our processing queue.
+            <b>Note:</b> You will have to wait for the transaction to be checkpointed before you're added to our processing queue, this usually takes 8 blocks.
           </Typography>
         )}
         { swapType === SWAP_TYPE.BLOKI_TO_LOKI && (

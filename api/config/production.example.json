@@ -20,7 +20,6 @@
       "filename": "My production wallet",
       "password": ""
     },
-    "minConfirmations": 12,
     "withdrawalFee": 5
   }
 }
