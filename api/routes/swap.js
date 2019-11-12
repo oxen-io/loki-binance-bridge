@@ -3,6 +3,10 @@ import { TYPE, SWAP_TYPE } from 'bridge-core';
 import { loki, transactionHelper, db } from '../core';
 import { crypto, validation } from '../utils';
 
+// A cache to store the currently processing transactions
+// Maps client uuid to tx hash
+const txCache = {};
+
 // - Public
 
 /**
@@ -85,6 +89,7 @@ export function finalizeSwap(req, res, next) {
       return next(null, req, res, next);
     }
 
+    const currentHashes = [];
     const { uuid } = data;
     try {
       const clientAccount = await db.getClientAccountForUuid(uuid);
@@ -93,6 +98,9 @@ export function finalizeSwap(req, res, next) {
         res.body = { status: 400, success: false, result: 'Unable to find swap details' };
         return next(null, req, res, next);
       }
+
+      // Prepare the cache
+      if (!txCache[uuid]) { txCache[uuid] = []; }
 
       const { account, accountType } = clientAccount;
 
@@ -107,13 +115,22 @@ export function finalizeSwap(req, res, next) {
         return next(null, req, res, next);
       }
 
-      // Filter out any transactions we haven't added to our swaps db
-      const newTransactions = transactions.filter(tx => !swaps.find(s => s.deposit_transaction_hash === tx.hash));
+      const newTransactions = transactions.filter(tx => {
+        // Filter out any transactions we aren't processing and haven't added to our swaps db
+        const isProcessingTransaction = txCache[uuid].contains(tx.hash)
+        const processedTransaction = swaps.find(s => s.deposit_transaction_hash === tx.hash) != undefined
+        return !isProcessingTransaction && !processedTransaction;
+      });
+
       if (newTransactions.length === 0) {
         res.status(205);
         res.body = { status: 200, success: false, result: 'Unable to find any new deposits' };
         return next(null, req, res, next);
       }
+
+      // Add the new transactions to our processing cache
+      currentHashes = newTransactions.map(tx => tx.hash)
+      txCache[uuid] = [...txCache[uuid], ...currentHashes];
 
       // Give back the new swaps to the user
       const newSwaps = await db.insertSwaps(newTransactions, clientAccount);
@@ -125,6 +142,10 @@ export function finalizeSwap(req, res, next) {
       res.status(500);
       res.body = { status: 500, success: false, result: message || error };
     }
+
+    // Clear out the new transactions from the cache as we have done our work on them
+    // This will allow us to retry swap creation if we somehow failed
+    txCache[uuid] = txCache[uuid].filter(hash => !currentHashes.contains(hash));
 
     return next(null, req, res, next);
   });
