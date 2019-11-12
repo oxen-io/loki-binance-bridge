@@ -118,7 +118,7 @@ export function finalizeSwap(req, res, next) {
       const newTransactions = transactions.filter(tx => {
         // Filter out any transactions we aren't processing and haven't added to our swaps db
         const isProcessingTransaction = txCache[uuid].contains(tx.hash)
-        const processedTransaction = swaps.find(s => s.deposit_transaction_hash === tx.hash) != undefined
+        const processedTransaction = swaps.find(s => s.deposit_transaction_hash === tx.hash) !== undefined
         return !isProcessingTransaction && !processedTransaction;
       });
 
