@@ -89,7 +89,7 @@ export function finalizeSwap(req, res, next) {
       return next(null, req, res, next);
     }
 
-    const currentHashes = [];
+    let currentHashes = [];
     const { uuid } = data;
     try {
       const clientAccount = await db.getClientAccountForUuid(uuid);
@@ -117,8 +117,8 @@ export function finalizeSwap(req, res, next) {
 
       const newTransactions = transactions.filter(tx => {
         // Filter out any transactions we aren't processing and haven't added to our swaps db
-        const isProcessingTransaction = txCache[uuid].contains(tx.hash)
-        const processedTransaction = swaps.find(s => s.deposit_transaction_hash === tx.hash) !== undefined
+        const isProcessingTransaction = txCache[uuid].contains(tx.hash);
+        const processedTransaction = swaps.find(s => s.deposit_transaction_hash === tx.hash) !== undefined;
         return !isProcessingTransaction && !processedTransaction;
       });
 
@@ -129,8 +129,8 @@ export function finalizeSwap(req, res, next) {
       }
 
       // Add the new transactions to our processing cache
-      currentHashes = newTransactions.map(tx => tx.hash)
-      txCache[uuid] = [...txCache[uuid], ...currentHashes];
+      currentHashes = newTransactions.map(tx => tx.hash);
+      txCache[uuid].push(...currentHashes);
 
       // Give back the new swaps to the user
       const newSwaps = await db.insertSwaps(newTransactions, clientAccount);
