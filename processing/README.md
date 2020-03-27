@@ -22,7 +22,10 @@ Install all the dependencies:
 ```
 npm install
 ```
-If installation fails then remove `package-lock.json` and try again. Ref: https://npm.community/t/npm-install-for-package-with-local-dependency-fails/754/27
+If installation fails then run:
+```
+npm ci
+```
 
 Edit the config `config/production.json` to match the values of the api server. **THIS IS VERY IMPORTANT!**
 
