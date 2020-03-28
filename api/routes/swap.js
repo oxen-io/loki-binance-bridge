@@ -117,7 +117,7 @@ export function finalizeSwap(req, res, next) {
 
       const newTransactions = transactions.filter(tx => {
         // Filter out any transactions we aren't processing and haven't added to our swaps db
-        const isProcessingTransaction = txCache[uuid].contains(tx.hash);
+        const isProcessingTransaction = txCache[uuid].includes(tx.hash);
         const processedTransaction = swaps.find(s => s.deposit_transaction_hash === tx.hash) !== undefined;
         return !isProcessingTransaction && !processedTransaction;
       });
@@ -145,7 +145,7 @@ export function finalizeSwap(req, res, next) {
 
     // Clear out the new transactions from the cache as we have done our work on them
     // This will allow us to retry swap creation if we somehow failed
-    txCache[uuid] = txCache[uuid].filter(hash => !currentHashes.contains(hash));
+    txCache[uuid] = txCache[uuid].filter(hash => !currentHashes.includes(hash));
 
     return next(null, req, res, next);
   });
