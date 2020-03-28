@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@binance-chain/javascript-sdk": "^2.14.0",
+    "@binance-chain/javascript-sdk": "^2.16.4",
     "esm": "^3.2.25",
     "pg-promise": "^8.7.3",
     "request": "^2.88.0",
