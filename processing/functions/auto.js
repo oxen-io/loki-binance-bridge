@@ -26,9 +26,6 @@ const module = {
 
     log.header(chalk.gray(`Sleeping for ${module.autoRunInterval} minutes.`));
 
-    // Sleep for 10 minutes
-    await module.sleep(module.autoRunInterval * 60 * 1000);
-
     log.header(chalk.gray('Finished Sleeping, Starting auto processing.'));
 
     try {
@@ -92,6 +89,9 @@ const module = {
           throw e;
         }
       }
+
+      // wait before restarting
+      await module.sleep(module.autoRunInterval * 60 * 1000);
 
       // Keep infinitely processing if we haven't hit the daily limit
       return keepProcessing ? module.runAutoProcessing(newOptions) : Promise.resolve();
